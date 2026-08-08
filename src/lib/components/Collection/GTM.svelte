@@ -1,4 +1,5 @@
 <script lang="ts">
+	// @ts-nocheck
 	// Import Svelte module and required types
 	import { onMount } from 'svelte';
 

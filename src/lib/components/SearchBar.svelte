@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { fade } from 'svelte/transition';
+	import { getCDNImageUrl } from '$lib/utils/cdn';
 
 	let search: string = '';
 </script>
@@ -32,9 +33,8 @@
 								data-sveltekit-reload
 								class="btn btn-primary w-full justify-between"
 							>
-								<!-- img -->
 								<img
-									src={'/cdn/app/img/' + app.image}
+									src={getCDNImageUrl(app.image, 'app')}
 									alt={app.name}
 									class="w-30 h-10 rounded-lg object-cover"
 								/>
@@ -47,13 +47,12 @@
 					{#if game.name.toLowerCase().includes(search.toLowerCase())}
 						<div class="flex w-full flex-col">
 							<a
-								href="/games/{game.id}"
+								href="/g/{game.id}"
 								data-sveltekit-reload
 								class="btn btn-primary w-full justify-between"
 							>
-								<!-- img -->
 								<img
-									src={'/cdn/game/img/' + game.image}
+									src={getCDNImageUrl(game.image, 'game')}
 									alt={game.name}
 									class="w-30 h-10 rounded-lg object-cover"
 								/>

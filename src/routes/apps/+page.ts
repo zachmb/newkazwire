@@ -1,17 +1,14 @@
 import type { PageLoad } from './$types';
-import type { App } from '@prisma/client';
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { apps } from '$lib/data/apps';
 
-// TODO: ALLOW PRERENDERING
 export const prerender = false;
 
-export const load = (async ({ fetch, url }) => {
+export const load = (async ({ url }) => {
 	const searchParam = url.searchParams.get('search') || '';
 
-	const response = await fetch(
-		PUBLIC_API_BASE_URL + '/api/apps' + (searchParam ? '?search=' + searchParam : '')
+	const filteredApps = apps.filter(app =>
+		app.title.toLowerCase().includes(searchParam.toLowerCase())
 	);
-	const apps: App[] = await response.json();
 
-	return { apps, searchParam };
+	return { apps: filteredApps, searchParam };
 }) satisfies PageLoad;

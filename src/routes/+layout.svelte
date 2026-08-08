@@ -1,7 +1,5 @@
 <script lang="ts">
 	import Footer from '$lib/components/Footer/Footer.svelte';
-	import Nav from '$lib/components/Nav/Nav.svelte';
-	import Gtm from '$lib/components/Collection/GTM.svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { config } from '$lib/config';
@@ -9,9 +7,6 @@
 	import customMessage from '$lib/console';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-
-	import SearchBar from '$lib/components/SearchBar.svelte';
-	import { fade } from 'svelte/transition';
 	import { themeChange } from 'theme-change';
 
 	afterNavigate(() => {
@@ -24,45 +19,41 @@
 		}
 	});
 
-	let theme = '';
+	import { isSearchOpen } from '$lib/stores/search';
+	import SearchOverlay from '$lib/components/SearchOverlay.svelte';
+	import { userProfile } from '$lib/stores/userProfile';
+	import { telemetry } from '$lib/telemetry';
 
-	// if control  + k is pressed, focus the search bar and ensure the browser doesn't do anything
 	onMount(() => {
 		customMessage();
-
-		window.addEventListener('keydown', (e) => {
-			if (browser) {
-				let panicKey = localStorage.getItem('panicKey');
-				let panicLink = localStorage.getItem('panicLink');
-
-				if (e.key == panicKey) location.assign(panicLink as string);
-			}
-
-			if (e.ctrlKey && e.key === 'k') {
-				e.preventDefault();
-				if (window.searchBar === undefined) {
-					return;
-				}
-
-				if (window.searchBar.open) {
-					window.searchBar.close();
-				} else {
-					window.searchBar.showModal();
-				}
-			}
-		});
-
 		themeChange(false);
+		telemetry.init();
+
+		// Check for daily reward immediately
+		userProfile.claimDailyReward();
+
+		// Passive income: 1 coin every minute
+		const coinInterval = setInterval(() => {
+			userProfile.addCoins(1);
+		}, 60000);
+
+
+		return () => {
+			clearInterval(coinInterval);
+		};
 	});
 
-	// Reset the layout for certain pages containing the url path
-	const layoutResetPaths = ['/games/ruffle', '/games/emulator'];
-	let resetLayout = false;
-	for (const path of layoutResetPaths) {
-		if ($page.url.pathname.includes(path)) {
-			resetLayout = true;
-		}
-	}
+	// Hide footer on game and app pages
+	let isInIframe = false;
+	onMount(() => {
+		isInIframe = window.self !== window.top;
+	});
+
+	$: hideFooter =
+		isInIframe ||
+		($page.url.pathname.startsWith('/g/') && $page.url.pathname !== '/g') ||
+		($page.url.pathname.startsWith('/apps/') && $page.url.pathname !== '/apps') ||
+		$page.url.pathname.startsWith('/search');
 </script>
 
 <svelte:head>
@@ -73,30 +64,23 @@
 	/>
 </svelte:head>
 
-<Gtm gtmId={config.analytics.gtmID} />
-
-{#if !resetLayout}
-	<Nav />
-{/if}
-
-{#if !resetLayout}
-	<div class="min-h-[100vh] w-full bg-base-100 p-10 font-main">
-		{#if config.features.searchBar}
-			<dialog id="searchBar" class="modal">
-				<form method="dialog" class="modal-box h-fit" in:fade out:fade={{ duration: 50 }}>
-					<SearchBar />
-				</form>
-				<form method="dialog" class="modal-backdrop">
-					<button>close</button>
-				</form>
-			</dialog>
-		{/if}
+<div class="font-sans relative flex min-h-screen flex-col bg-base-100">
+	<!-- Main Content with Blur Effect -->
+	<main
+		class="w-full flex-grow transition-all duration-300 {$isSearchOpen
+			? 'pointer-events-none scale-[0.99] blur-sm brightness-50'
+			: ''}"
+	>
 		<slot />
-	</div>
-{:else}
-	<slot />
-{/if}
+	</main>
 
-{#if !resetLayout}
-	<Footer />
-{/if}
+	<!-- Footer: Hidden on individual game/app pages -->
+	{#if !hideFooter}
+		<div class={$isSearchOpen ? 'blur-sm brightness-50' : ''}>
+			<Footer />
+		</div>
+	{/if}
+
+	<!-- Global Search Overlay -->
+	<SearchOverlay />
+</div>

@@ -17,7 +17,7 @@ export function styledMessage(message: string, chip: string) {
 	].join(';');
 
 	const chipStyle = [
-		'background: #8d76d3',
+		'background: #3B82F6',
 		'color: #ffffff',
 		'font-size: 0.75rem',
 		'font-weight: bold',
@@ -31,25 +31,18 @@ export function styledMessage(message: string, chip: string) {
 }
 
 function customMessage() {
-	const message = `Welcome to ${config.branding.name}!`;
-	const style = [
-		'background: #000000',
-		'border: 1px solid #8d76d3',
-		'color: #ffffff',
-		'display: block',
-		'text-align: center',
-		'font-size: 2rem',
-		'font-weight: bold',
-		'padding: 1rem 1rem 1rem 1rem',
-		'border-radius: 0.5rem',
-		'margin: 1rem 0'
-	].join(';');
+	const asciiArt = `     /     \\
+     _(I)(I)_
+    ( _ .. _ )
+     \`.\`--'.'
+      )    (
+  ,-./      \\,-.
+ ( _( ||  || )_ )
+__\\ \\\\||--||'/ /__ hjw
+\`-._//||\\/||\\\\_.-'
+     \`--'\`--'\\"`;
 
-	console.log(`%c${message}`, style);
-	console.log(
-		`%c${config.branding.description} If you would like to learn more visit the about us page or read the FAQ.`,
-		'text-align: center; font-size: 1rem; margin: 1rem 0;'
-	);
+	console.log(asciiArt);
 
 	// Debugging info as a group
 	console.groupCollapsed('Debugging Info');

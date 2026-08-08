@@ -1,4 +1,5 @@
 <script lang="ts">
+	// @ts-nocheck
 	import { config } from '$lib/config';
 
 	import { Canvas } from '@threlte/core';

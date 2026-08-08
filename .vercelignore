@@ -1,0 +1,17 @@
+
+# Vercel
+.vercel
+.vercel_build_output
+.svelte-kit
+build/
+dist/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*

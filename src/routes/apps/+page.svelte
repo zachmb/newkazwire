@@ -4,12 +4,12 @@
 	export let data: PageData;
 
 	import { config } from '$lib/config';
+	import { getCDNImageUrl } from '$lib/utils/cdn';
 
 	import DefaultBox from '$lib/components/Box/DefaultBox.svelte';
 	import Icon from '@iconify/svelte';
 
 	let searchQuery = data.searchParam;
-	let tagQuery = data.tagParam || 'all';
 
 	function search() {
 		if (searchQuery === '') {
@@ -50,10 +50,10 @@
 	{/if}
 	{#each data.apps as app}
 		<DefaultBox
-			name={app.name}
-			developer={app.developer}
+			name={app.title}
+			developer={'Unknown'}
 			id={'appPage-' + app.id}
-			image="/cdn/app/img/{app.image}"
+			image={getCDNImageUrl(app.image, 'app')}
 			link={'/apps/' + app.id}
 		/>
 	{/each}

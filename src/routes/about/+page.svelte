@@ -1,96 +1,89 @@
 <script lang="ts">
 	import { config } from '$lib/config';
+	import Icon from '@iconify/svelte';
 </script>
 
 <svelte:head>
 	<title>{config.branding.name} - About</title>
 	<meta property="og:title" content="{config.branding.name} - About" />
-	<meta name="description" content="Play and browse for free now on {config.branding.name}!" />
-	<meta
-		property="og:description"
-		content="Play and browse for free now on {config.branding.name}!"
-	/>
+	<meta name="description" content="Master mathematics with {config.branding.name}!" />
+	<meta property="og:description" content="Master mathematics with {config.branding.name}!" />
 </svelte:head>
 
-<article class="prose lg:prose-xl">
-	<h1>About</h1>
+<div class="min-h-screen bg-[#5B9BFF] p-4 text-neutral md:p-12">
+	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-white shadow-2xl">
+		<!-- Header -->
+		<div
+			class="bg-gradient-to-br from-[#0B1B33] to-[#071022] p-8 text-center text-white md:p-16"
+		>
+			<div
+				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
+			>
+				<img src="/logo.png" alt="DuckMath" class="h-full w-full rounded-2xl object-cover" />
+			</div>
+			<h1 class="text-5xl font-black tracking-tight text-[#5B9BFF] md:text-6xl">
+				About Kazwire
+			</h1>
+			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
+				The premier destination for mathematical excellence.
+			</p>
+		</div>
 
-	<p>
-		In a world where boundaries are blurred, and voices are stifled, {config.branding.name} emerges as
-		a sanctuary of hope—a place where the spirit of freedom on the internet refuses to be quelled. Our
-		story is one of passion, heart, and an unyielding desire to safeguard the very essence of the internet—the
-		boundless realm where dreams are born and ideas soar.
-	</p>
+		<!-- Content -->
+		<div class="px-8 py-12 md:px-20 md:py-20">
+			<article
+				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-[#0B1B33] prose-p:font-medium prose-p:leading-relaxed prose-p:text-neutral/70"
+			>
+				<p class="text-xl font-bold italic text-[#0B1B33]/80">
+					Mathematics is the language of the universe. At {config.branding
+						.name}, we are dedicated to helping students become fluent in this language through engaged
+					learning and interactive problem-solving.
+				</p>
 
-	<p>
-		At {config.branding.name}, we cherish the memory of the internet's inception—an era when
-		visionaries painted a canvas of limitless possibilities, where connectivity knew no bounds, and
-		where knowledge flowed like an endless river. It was a time when freedom was the guiding light,
-		illuminating the path towards progress and understanding.
-	</p>
+				<p>
+					Founded by a team of educators and mathematicians, {config.branding.name} provides a comprehensive
+					suite of tools designed to enhance numerical fluency, critical thinking, and logical reasoning.
+					We believe that learning should be accessible, rigorous, and, most importantly, effective.
+				</p>
 
-	<p>
-		Yet, as time passed, shadows began to cast their pallor upon the online landscape. The free and
-		open internet we once knew started to fade, giving way to censorship, oppression, and control.
-		The very essence of what the internet was meant to be seemed to wither away, and we couldn't
-		bear to watch this transformation without action.
-	</p>
+				<div class="my-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+					<div class="rounded-3xl bg-[#5B9BFF]/10 p-8">
+						<Icon icon="mdi:calculator-variant" class="mb-4 text-4xl text-[#0B1B33]" />
+						<h3 class="mt-0">Core Curriculum</h3>
+						<p class="mb-0">
+							Aligned with standard educational requirements, our resources cover everything from basic
+							arithmetic to advanced calculus concepts.
+						</p>
+					</div>
+					<div class="rounded-3xl bg-[#5B9BFF]/10 p-8">
+						<Icon icon="mdi:brain" class="mb-4 text-4xl text-[#0B1B33]" />
+						<h3 class="mt-0">Cognitive Skills</h3>
+						<p class="mb-0">
+							Beyond numbers, we focus on developing spatial reasoning, pattern recognition, and
+							strategic planning abilities.
+						</p>
+					</div>
+				</div>
 
-	<p>
-		Our hearts ached for a world where the exchange of ideas was unrestricted, where access to
-		information was a birthright, and where the collective voice of humanity resonated freely. We
-		knew that we had to stand tall, to protect the spirit of liberty that had ignited the hearts of
-		millions.
-	</p>
+				<p>
+					Our platform utilizes advanced algorithms to adapt to each student's learning pace, ensuring
+					that concepts are mastered before moving on to more complex topics. Whether you are
+					studying for a test or simply looking to sharpen your mind, {config.branding.name} is your
+					trusted partner in education.
+				</p>
 
-	<p>
-		With unwavering determination, we embarked on a journey—a journey to champion internet freedom
-		and restore the glory of the digital realm. The road was arduous, but the hope in our hearts
-		fueled our perseverance. We envisioned a place where barriers would crumble, where dreams could
-		be shared across oceans, and where empathy and understanding would bridge the gaps that divided
-		us.
-	</p>
+				<p>
+					Join the millions of learners who have improved their math scores with {config.branding
+						.name}. Start your journey to mathematical mastery today.
+				</p>
 
-	<p>
-		The foundation of {config.branding.name} was laid on the pillars of privacy, anonymity, and trust.
-		We vowed never to compromise on our commitment to safeguarding your personal freedom. Your privacy
-		is not a commodity to be traded; it is a sacred right, and we stand as guardians, shielding you from
-		prying eyes and ensuring your voice remains your own.
-	</p>
-
-	<p>
-		As we built {config.branding.name} with love and dedication, we were overwhelmed by the incredible
-		support of individuals who believed in the power of a free internet. They came from all walks of
-		life, each with their unique stories to share—a poet seeking inspiration, an artist searching for
-		her muse, a student yearning for knowledge, and a dissident longing to be heard.
-	</p>
-
-	<p>
-		Their stories etched upon our hearts, driving us to strive for excellence in our service. With
-		every barrier we helped break, with every rekindled flame of hope in someone's eyes, we found
-		our purpose reaffirmed. Our hearts swelled with joy each time we received messages of gratitude
-		from those whose voices we had aided in setting free.
-	</p>
-
-	<p>
-		And so, dear friends, we invite you to join us on this emotional journey—a journey of hope and
-		liberation. Together, let us cherish the internet's soul, nurturing its spirit of freedom so
-		that it may thrive for generations to come. Let us create a world where the exchange of ideas
-		knows no restrictions, and where the internet remains a beacon of unity and enlightenment.
-	</p>
-
-	<p>
-		In the face of adversity, let us stand strong, united by our shared love for the boundless
-		possibilities of the digital realm. With {config.branding.name} as our guiding light, we shall forge
-		ahead, knowing that in preserving internet freedom, we are preserving the very essence of humanity.
-	</p>
-
-	<p>
-		Thank you for being part of our heartfelt mission. Together, we will make a difference and
-		continue to believe in the power of freedom.
-	</p>
-
-	<p>With love and boundless hope,</p>
-
-	<p>The {config.branding.name} Team</p>
-</article>
+				<div
+					class="mt-16 flex flex-col items-center border-t border-neutral/5 pt-12 text-center italic"
+				>
+					<p class="text-2xl font-black text-[#0B1B33]">Calculate. Solve. Succeed.</p>
+					<p class="mt-2 text-lg font-bold text-neutral/40">The {config.branding.name} Educational Team</p>
+				</div>
+			</article>
+		</div>
+	</div>
+</div>

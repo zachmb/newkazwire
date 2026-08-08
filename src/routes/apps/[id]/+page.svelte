@@ -6,12 +6,35 @@
 	import type { PageData } from './$types';
 	export let data: PageData;
 
-	import { PUBLIC_API_BASE_URL } from '$env/static/public';
 	import { config } from '$lib/config';
+	import { getCDNImageUrl } from '$lib/utils/cdn';
 
-	import { onMount } from 'svelte';
-
+	import { onMount, setContext } from 'svelte';
 	import { enhance } from '$app/forms';
+	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
+	import GameRail from '$lib/components/GameRail.svelte';
+	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
+
+	// Mock data for recommendations and rail
+	const mockGames = [
+		{
+			title: '10 Minutes Till Dawn',
+			image: '10-minutes-till-dawn.png',
+			href: '/g/10-minutes-till-dawn'
+		},
+		{ title: '1v1.lol', image: '1v1-lol.png', href: '/g/1v1-lol' },
+		{ title: '2048', image: '2048.png', href: '/g/2048' },
+		{ title: 'Slope', image: 'slope.png', href: '/g/slope' },
+		{ title: 'Subway Surfers', image: 'subway-surfers.png', href: '/g/subway-surfers' },
+		{ title: 'Retro Bowl', image: 'retro-bowl.png', href: '/g/retro-bowl' },
+		{ title: 'Temple Run 2', image: 'temple-run-2.png', href: '/g/temple-run-2' },
+		{ title: 'Super Mario 64', image: 'super-mario-64.png', href: '/g/super-mario-64' }
+	];
+
+	$: localizedMockGames = mockGames.map((g) => ({
+		...g,
+		image: getCDNImageUrl(g.image, 'game')
+	}));
 
 	// Turns a search into a valid URL
 	function search(input: string) {
@@ -45,6 +68,12 @@
 		if (!browser) {
 			return url;
 		}
+		// Check if __uv$config is defined before using it
+		if (typeof __uv$config === 'undefined') {
+			console.warn('Ultraviolet config not loaded yet, returning raw URL');
+			return url;
+		}
+
 		// check if the service worker is installed
 		navigator.serviceWorker.getRegistrations().then((registrations) => {
 			if (registrations.length === 0) {
@@ -58,10 +87,11 @@
 
 	function registerServiceWorker() {
 		// Register the service worker
-		if (__uv$config.prefix === undefined) {
-			console.error('Service worker prefix is undefined');
-			// wait 5 seconds and try again
-			setTimeout(registerServiceWorker, 5000);
+		if (typeof __uv$config === 'undefined' || __uv$config.prefix === undefined) {
+			console.warn('Service worker config not ready yet');
+			// wait 1 second and try again
+			setTimeout(registerServiceWorker, 1000);
+			return;
 		}
 		navigator.serviceWorker.register('/uv.js', { scope: __uv$config.prefix }).then((reg) => {
 			if (reg.installing) {
@@ -153,9 +183,6 @@
 	import Icon from '@iconify/svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
-	import Vert from '$lib/components/Google/Vert.svelte';
-	import Vert2 from '$lib/components/Google/Vert2.svelte';
-	import Leaderboard from '$lib/components/Google/Leaderboard.svelte';
 
 	let innerWidth: number = 0;
 
@@ -164,6 +191,10 @@
 	async function loadFrame() {
 		loadedFrame = true;
 		loadingApp = true;
+
+		// Track this as recently played (apps can count too)
+		recentlyPlayed.addGame(data.app.id);
+
 		// Just in case wait 5 seconds before removing the loading screen
 		setTimeout(() => {
 			loadedApp();
@@ -171,10 +202,7 @@
 	}
 
 	function addView() {
-		// Add to the views
-		fetch(PUBLIC_API_BASE_URL + '/api/apps/' + data.app.id + '/views', {
-			method: 'POST'
-		});
+		// Views are now handled by analytics or omitted in static mode
 	}
 
 	function loadedApp() {
@@ -191,172 +219,133 @@
 
 <svelte:window bind:innerWidth={innerWidth} />
 <svelte:head>
-	<title>{config.branding.name} - {data.app.name}</title>
-	<meta property="og:title" content="{config.branding.name} - {data.app.name}" />
-	<meta name="description" content="Play {data.app.name} for free now on {config.branding.name}!" />
+	<title>{config.branding.name} - {data.app.title}</title>
+	<meta property="og:title" content="{config.branding.name} - {data.app.title}" />
+	<meta
+		name="description"
+		content="Play {data.app.title} for free now on {config.branding.name}!"
+	/>
 	<meta
 		property="og:description"
-		content="Play {data.app.name} for free now on {config.branding.name}!"
+		content="Play {data.app.title} for free now on {config.branding.name}!"
 	/>
 
+	<script src="/uv/uv.config.js"></script>
 	<script src="/uv/uv.bundle.js" defer></script>
-	<script src="/uv/uv.config.js" defer></script>
 	<script src="/uv.js" defer></script>
 </svelte:head>
 
-{#if expanded}
-	<!-- Button to shrink the iframe -->
-	<button
-		class="absolute left-0 top-0 z-[5000] m-4 rounded-full bg-secondary p-2 opacity-40"
-		on:click={() => shrinkiFrame()}
-	>
-		<Icon class="h-6 w-6 text-secondary-content" icon="ic:round-compress" />
-	</button>
-{/if}
+<div class="font-sans min-h-screen bg-[#5B9BFF] p-4 text-neutral">
+	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
+		<!-- Left Rail: Navigation -->
+		<aside class="hidden h-full lg:block">
+			<GameRail games={localizedMockGames} />
+		</aside>
 
-<div class="relative flex flex-row justify-center">
-	<div
-		class="float-left flex h-[calc(80vh-132px)] pb-5 sm:w-full md:w-[820px] lg:w-[1000px] xl:w-full"
-	>
-		{#if innerWidth > 1424}
-			<Vert2 />
-		{/if}
-		<div class="align-center mb-14 flex-grow">
-			<div id="frame" class="h-full w-full rounded-t-lg bg-white">
-				{#if !loadedFrame}
-					<div class="relative flex h-full items-center justify-center overflow-hidden">
-						<img
-							class="absolute z-20 h-full w-full object-cover opacity-60 blur-lg"
-							src="/cdn/app/img/{data.app.image}"
-							alt="App"
-						/>
-						<div class="absolute z-10 h-full w-full rounded-t-lg bg-black" />
-
-						<!-- Content on top of the image -->
-						<div class="absolute z-30 flex flex-col items-center justify-center">
-							<h1
-								class="text-center text-3xl font-bold text-white sm:text-5xl md:text-5xl lg:text-8xl"
-							>
-								{data.app.name}
-							</h1>
-
-							<!-- Play now button -->
-							<button
-								class="btn btn-primary btn-xs mt-8 sm:btn-sm md:btn-md lg:btn-lg"
-								on:click={() => addView()}
-								on:click={() => loadFrame()}
-							>
-								Browse Now
-								<Icon icon="carbon:play-filled" class="my-auto ml-1 inline-block" />
-							</button>
-						</div>
-					</div>
-				{:else}
+		<!-- Main Content: App Player -->
+		<main class="flex flex-col gap-6">
+			<HeroGameCard
+				game={{
+					name: data.app.title,
+					developer: 'Unknown',
+					image: getCDNImageUrl(data.app.image, 'app'),
+					views: data.app.views,
+					likes: data.app.loves || 0
+				}}
+				on:play={() => {
+					addView();
+					loadFrame();
+				}}
+			>
+				<!-- Slot Content: The actual app player logic -->
+				<div id="frame" class="relative h-full w-full overflow-hidden rounded-lg bg-black">
 					{#if loadingApp}
 						<!-- Loading animation -->
 						<div
-							class="relative flex h-full items-center justify-center rounded-t-lg bg-black transition-all"
+							class="absolute inset-0 z-50 flex h-full w-full items-center justify-center bg-black transition-all"
 						>
-							<div class="absolute z-30 flex flex-col items-center justify-center gap-8">
+							<div class="flex flex-col items-center justify-center gap-8">
 								<div class="flex flex-col items-center gap-8 sm:flex-row">
-									<img src="/logo.png" alt="Loading" class="h-16 w-16" />
-									<h1
-										class="text-center text-3xl font-bold text-white sm:text-5xl md:text-5xl lg:text-8xl"
-									>
+									<img src="/logo.png" alt="Loading" class="h-16 w-16 animate-bounce" />
+									<h1 class="text-center text-3xl font-bold text-white sm:text-5xl">
 										{config.branding.name}
 									</h1>
 								</div>
-								<Icon icon="line-md:loading-alt-loop" class="animate-spin text-6xl text-white" />
+								<Icon icon="line-md:loading-alt-loop" class="text-6xl text-white" />
 							</div>
 						</div>
 					{/if}
+
 					<!-- Proxied app -->
 					{#if data.app.embedURL != null}
 						<iframe
-							class="h-full w-full rounded-t-lg bg-white opacity-0"
+							class="h-full w-full bg-white opacity-0"
 							id="iframe"
-							title={data.app.name}
+							title={data.app.title}
 							src={encodeURL(data.app.embedURL)}
 							on:load={() => loadedApp()}
+							allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; clipboard-read; fullscreen"
 						/>
 					{/if}
+				</div>
+			</HeroGameCard>
+
+			<!-- Description / Extra Info -->
+			<div class="rounded-3xl bg-white p-6 shadow-sm">
+				<h2 class="mb-2 text-xl font-black">About {data.app.title}</h2>
+				<p class="leading-relaxed text-neutral/80">{data.app.description}</p>
+				{#if canShare}
+					<button
+						class="btn btn-primary mt-4"
+						on:click={() => navigator.share({ url: window.location.href })}
+					>
+						Share App
+						<Icon icon="mdi:share-variant" class="text-xl" />
+					</button>
 				{/if}
 			</div>
+		</main>
 
-			<div class="relative mt-2 w-full items-center rounded-b-lg bg-base-300 text-base-content">
-				<div class="float-right mr-5">
-					<button class="mt-4 fill-white" on:click={() => fullScreen()}>
-						<!-- Full screen -->
-						<Icon class="h-6 w-6" icon="ic:baseline-fullscreen" />
-					</button>
+		<!-- Right Column: Ads & Recs -->
+		<aside class="flex flex-col gap-6">
+			<a
+				href="https://joinkaz.com"
+				target="_blank"
+				class="group flex h-64 w-full flex-col items-center justify-center gap-4 rounded-3xl bg-primary text-center transition-all hover:scale-[1.02] hover:shadow-xl"
+			>
+				<Icon
+					icon="ic:baseline-discord"
+					class="text-7xl text-white transition-transform group-hover:scale-110"
+				/>
+				<div class="flex flex-col gap-1 px-4">
+					<span class="text-lg font-bold text-white/90">Join our discord at</span>
+					<span class="text-3xl font-black text-white">joinkaz.com</span>
 				</div>
-				<div class="float-right mr-5">
-					<button class="mt-4" on:click={() => expandiFrame()}>
-						<!-- Fill screen -->
-						<Icon class="h-6 w-6" icon="ic:round-expand" />
-					</button>
-				</div>
-				<div class="float-right mr-5">
-					<form method="POST" use:enhance>
-						<button id="heart" class="mt-4" formaction="?/love">
-							<!-- Heart -->
-							<!-- if the loved_apps array includes the app id show the heart -->
-							{#if data.loved_apps !== undefined && data.loved_apps.includes(data.app.id)}
-								<Icon class="h-6 w-6 text-red-500" icon="mdi:heart" />
-							{:else}
-								<Icon class="h-6 w-6" icon="mdi:heart-outline" />
-							{/if}
-						</button>
-					</form>
-				</div>
-				<div class="flex">
-					<!-- Logo -->
-					<img src="/logo.png" alt="Logo" class="my-auto ml-4 h-6 w-6" />
-					<!-- Name -->
-					<div class="ml-2 truncate text-2xl font-bold leading-[3.5rem]">
-						{data.app.name}
-					</div>
+			</a>
+
+			<!-- Recommended Apps/Games -->
+			<div class="flex flex-col gap-4">
+				<h3 class="px-2 text-lg font-black text-white drop-shadow-sm">Recommended</h3>
+				<div class="grid grid-cols-2 gap-3">
+					{#each localizedMockGames.slice(0, 6) as game}
+						<a
+							href={game.href}
+							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-white shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+						>
+							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
+							<!-- Minimal overlay -->
+							<div
+								class="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+							>
+								<span class="block truncate text-[10px] font-bold text-white">
+									{game.title}
+								</span>
+							</div>
+						</a>
+					{/each}
 				</div>
 			</div>
-		</div>
-		{#if innerWidth > 1224}
-			<Vert />
-		{/if}
+		</aside>
 	</div>
 </div>
-
-{#if innerWidth >= 728}
-	<Leaderboard />
-{/if}
-
-<!-- Bottom area for displaying more information about the app -->
-<!-- Center the div -->
-<div class="flex justify-center">
-	<div
-		class="rounded-lg bg-base-300 p-5 align-middle text-base-content sm:w-full md:w-[820px] lg:w-[1000px] xl:w-full"
-	>
-		<h1 class="text-3xl font-bold">{data.app.name}</h1>
-		<p>
-			{data.app.developer}
-		</p>
-		<p class="mt-1">
-			{data.app.description}
-		</p>
-		<!-- Line -->
-		<div class="my-2 h-[2px] w-10 rounded-lg bg-primary" />
-		<div class="flex">
-			<p>
-				{data.app.views} View{#if data.app.views != 1}s{/if}
-			</p>
-		</div>
-		{#if canShare}
-			<button
-				class="btn btn-primary mt-4"
-				on:click={() => navigator.share({ url: window.location.href })}
-			>
-				Share
-				<Icon icon="mdi:share-variant" class="text-xl" />
-			</button>
-		{/if}
-	</div>
-</div>
+```

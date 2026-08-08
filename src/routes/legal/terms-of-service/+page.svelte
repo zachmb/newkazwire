@@ -12,80 +12,67 @@
 	/>
 </svelte:head>
 
-<article class="prose lg:prose-lg">
-	<h1>Website Terms and Conditions of Use</h1>
-	<h2>1. Terms</h2>
-	<p>
-		By accessing this Website, accessible from {config.branding.mainDomain}, you are agreeing to be
-		bound by these Website Terms and Conditions of Use and agree that you are responsible for the
-		agreement with any applicable local laws. If you disagree with any of these terms, you are
-		prohibited from accessing this site. The materials contained in this Website are protected by
-		copyright and trade mark law.
-	</p>
-	<h2>2. Use License</h2>
-	<p>
-		Permission is granted to temporarily download one copy of the materials on {config.branding
-			.name}'s Website for personal, non-commercial transitory viewing only. This is the grant of a
-		license, not a transfer of title, and under this license you may not:
-	</p>
-	<ul>
-		<li>modify or copy the materials;</li>
-		<li>use the materials for any commercial purpose or for any public display;</li>
-		<li>attempt to reverse engineer any software contained on {config.branding.name}'s Website;</li>
-		<li>remove any copyright or other proprietary notations from the materials; or</li>
-		<li>
-			transferring the materials to another person or "mirror" the materials on any other server.
-		</li>
-	</ul>
-	<p>
-		This will let {config.branding.name} to terminate upon violations of any of these restrictions. Upon
-		termination, your viewing right will also be terminated and you should destroy any downloaded materials
-		in your possession whether it is printed or electronic format.
-	</p>
-	<h2>3. Disclaimer</h2>
-	<p>
-		All the materials on {config.branding.name}’s Website are provided "as is". {config.branding
-			.name} makes no warranties, may it be expressed or implied, therefore negates all other warranties.
-		Furthermore,
-		{config.branding.name} does not make any representations concerning the accuracy or reliability of
-		the use of the materials on its Website or otherwise relating to such materials or any sites linked
-		to this Website.
-	</p>
-	<h2>4. Limitations</h2>
-	<p>
-		{config.branding.name} or its suppliers will not be hold accountable for any damages that will arise
-		with the use or inability to use the materials on {config.branding.name}’s Website, even if {config
-			.branding.name} or an authorize representative of this Website has been notified, orally or written,
-		of the possibility of such damage. Some jurisdiction does not allow limitations on implied warranties
-		or limitations of liability for incidental damages, these limitations may not apply to you.
-	</p>
-	<h2>5. Revisions and Errata</h2>
-	<p>
-		The materials appearing on {config.branding.name}’s Website may include technical,
-		typographical, or photographic errors. {config.branding.name} will not promise that any of the materials
-		in this Website are accurate, complete, or current. {config.branding.name} may change the materials
-		contained on its Website at any time without notice. {config.branding.name} does not make any commitment
-		to update the materials.
-	</p>
-	<h2>6. Links</h2>
-	<p>
-		{config.branding.name} has not reviewed all of the sites linked to its Website and is not responsible
-		for the contents of any such linked site. The presence of any link does not imply endorsement by
-		{config.branding.name} of the site. The use of any linked website is at the user’s own risk.
-	</p>
-	<h2>7. Site Terms of Use Modifications</h2>
-	<p>
-		{config.branding.name} may revise these Terms of Use for its Website at any time without prior notice.
-		By using this Website, you are agreeing to be bound by the current version of these Terms and Conditions
-		of Use.
-	</p>
-	<h2>8. Your Privacy</h2>
-	<p>Please read our Privacy Policy.</p>
-	<h2>9. Governing Law</h2>
-	<p>
-		Any claim related to {config.branding.name}'s Website shall be governed by the laws of us
-		without regards to its conflict of law provisions. We are based in the United States, however,
-		if the circumstances require foreign laws to be applicable, please let us know when you contact
-		us.
-	</p>
-</article>
+<div class="min-h-screen bg-[#5B9BFF] p-4 text-neutral md:p-12">
+	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-white shadow-2xl">
+		<!-- Header -->
+		<div class="bg-gradient-to-br from-[#0B1B33] to-[#071022] p-8 text-center text-white md:p-16">
+			<div
+				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
+			>
+				<img src="/logo.png" alt="Kazwire" class="h-full w-full rounded-2xl object-cover" />
+			</div>
+			<h1 class="text-5xl font-black tracking-tight text-[#5B9BFF] md:text-6xl">
+				Terms of Service
+			</h1>
+			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
+				The rules of the lily pad.
+			</p>
+		</div>
+
+		<!-- Content -->
+		<div class="px-8 py-12 md:px-20 md:py-20">
+			<article
+				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-[#0B1B33] prose-p:font-medium prose-p:leading-relaxed prose-p:text-neutral/70 prose-li:font-medium prose-li:text-neutral/70"
+			>
+				<p>
+					By accessing {config.branding.name}, you are agreeing to be bound by these website Terms
+					and Conditions of Use, all applicable laws and regulations, and agree that you are
+					responsible for compliance with any applicable local laws.
+				</p>
+
+				<h2>Use License</h2>
+				<p>
+					Permission is granted to temporarily download one copy of the materials (information or
+					software) on {config.branding.name}'s website for personal, non-commercial transitory
+					viewing only. This is the grant of a license, not a transfer of title.
+				</p>
+
+				<h2>Disclaimer</h2>
+				<p>
+					The materials on {config.branding.name}'s website are provided "as is". {config.branding
+						.name} makes no warranties, expressed or implied, and hereby disclaims and negates all other
+					warranties.
+				</p>
+
+				<h2>Limitations</h2>
+				<p>
+					In no event shall {config.branding.name} or its suppliers be liable for any damages arising
+					out of the use or inability to use the materials on {config.branding.name}'s website.
+				</p>
+
+				<h2>Revisions and Errata</h2>
+				<p>
+					The materials appearing on {config.branding.name}'s website could include technical,
+					typographical, or photographic errors. {config.branding.name} does not warrant that any of
+					the materials on its website are accurate, complete, or current.
+				</p>
+
+				<h2>Governing Law</h2>
+				<p>
+					Any claim relating to {config.branding.name}'s website shall be governed by the laws of
+					the site owner's jurisdiction without regard to its conflict of law provisions.
+				</p>
+			</article>
+		</div>
+	</div>
+</div>

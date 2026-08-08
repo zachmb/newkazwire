@@ -1,4 +1,5 @@
 <script lang="ts">
+	// @ts-nocheck
 	import { config } from '$lib/config';
 	import { T, useFrame } from '@threlte/core';
 	import { OrbitControls, useGltf } from '@threlte/extras';

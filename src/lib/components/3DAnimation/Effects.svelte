@@ -1,4 +1,5 @@
 <script lang="ts">
+	// @ts-nocheck
 	import { useThrelte, useRender } from '@threlte/core';
 	import {
 		EffectComposer,

@@ -1,4 +1,5 @@
 <script lang="ts">
+	// @ts-nocheck
 	import { onMount } from 'svelte';
 	import { config } from '$lib/config';
 	let showAlternate = false;

@@ -37,7 +37,7 @@
 							<DefaultBox
 								name={app.name}
 								id={'loved-' + app.id}
-								image={'/cdn/app/img/' + app.image}
+								image={app.image}
 								developer={app.developer}
 								link={'/apps/' + app.id}
 							/>
@@ -66,7 +66,7 @@
 					<DefaultBox
 						name={app.name}
 						id={'app-' + app.id}
-						image={'/cdn/app/img/' + app.image}
+						image={app.image}
 						developer={app.developer}
 						link={'/apps/' + app.id}
 					/>
@@ -100,7 +100,7 @@
 							<DefaultBox
 								name={game.name}
 								id={'loved-' + game.id}
-								image={'/cdn/game/img/' + game.image}
+								image={game.image}
 								developer={game.developer}
 								link={'/games/' + game.id}
 							/>
@@ -118,7 +118,7 @@
 			<div class="max-w-[calc(100vw-6rem)]">
 				<h1 class="mb-1 flex text-2xl font-bold capitalize">
 					Suggested Games
-					<Icon icon="material-symbols:recommend" class="my-auto ml-2 text-xl text-green-500" />
+					<Icon icon="material-symbols:recommend" class="my-auto ml-2 text-xl text-blue-500" />
 					<!-- center the text vertically -->
 					<a
 						href="/profile"
@@ -133,7 +133,7 @@
 						<DefaultBox
 							name={game.name}
 							id={'suggested-' + game.id}
-							image={'/cdn/game/img/' + game.image}
+							image={game.image}
 							developer={game.developer}
 							link={'/games/' + game.id}
 						/>
@@ -148,7 +148,7 @@
 			<div class="max-w-[calc(100vw-6rem)]">
 				<h1 class="mb-1 flex text-2xl font-bold capitalize">
 					Suggested Games
-					<Icon icon="material-symbols:recommend" class="my-auto ml-2 text-xl text-green-500" />
+					<Icon icon="material-symbols:recommend" class="my-auto ml-2 text-xl text-blue-500" />
 					<!-- center the text vertically -->
 					<a
 						href="/signup"
@@ -179,7 +179,7 @@
 								<DefaultBox
 									name={game.name}
 									id={'suggested-' + game.id}
-									image={'/cdn/game/img/' + game.image}
+									image={game.image}
 									developer={game.developer}
 									link={'/games/' + game.id}
 								/>
@@ -216,7 +216,7 @@
 							<DefaultBox
 								name={game.name}
 								id={tag + '-' + game.id}
-								image={'/cdn/game/img/' + game.image}
+								image={game.image}
 								developer={game.developer}
 								link={'/games/' + game.id}
 							/>

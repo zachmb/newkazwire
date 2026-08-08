@@ -1,26 +1,29 @@
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
-import type { App } from '@prisma/client';
 import type { PageLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+import { apps } from '$lib/data/apps';
 
 export const prerender = false;
 
-export const load = (async ({ params, fetch, data }) => {
-	// Get the slug of the URL
-	const slug: string = params.id;
+export const load: PageLoad = async ({ params, data }) => {
+	const slug = params.id;
 
-	// Get the apps from the api
-	const response: Response = await fetch(PUBLIC_API_BASE_URL + '/api/apps/' + slug);
-	if (response.status === 404) {
-		// Redirect to app page
-		throw redirect(307, '/apps/');
+	// Try to find static apps data
+	const app = apps.find((a: any) => a.href === `/apps/${slug}` || a.id === slug);
+
+	if (!app) {
+		throw error(404, 'App not found');
 	}
 
-	const app: App = await response.json();
-
 	return {
-		...data,
-		// Return the app
-		app: app
+		app: {
+			id: app.id || slug,
+			title: app.title,
+			description: app.description || 'No description available',
+			developer: 'Kazwire',
+			image: app.image, // Map thumbnail_url to image for compatibility
+			embedURL: app.href,    // Map embed_url to embedURL for compatibility
+			views: 1000,
+			loves: 5          // Map likes to loves for compatibility with local state if needed
+		}
 	};
-}) satisfies PageLoad;
+};
