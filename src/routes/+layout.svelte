@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Footer from '$lib/components/Footer/Footer.svelte';
+	import Nav from '$lib/components/Nav/Nav.svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { config } from '$lib/config';
@@ -65,6 +66,13 @@
 </svelte:head>
 
 <div class="font-sans relative flex min-h-screen flex-col bg-base-100">
+	<!-- Global top navigation (hidden inside game/app iframes) -->
+	{#if !isInIframe}
+		<div class={$isSearchOpen ? 'pointer-events-none blur-sm brightness-50' : ''}>
+			<Nav />
+		</div>
+	{/if}
+
 	<!-- Main Content with Blur Effect -->
 	<main
 		class="w-full flex-grow transition-all duration-300 {$isSearchOpen

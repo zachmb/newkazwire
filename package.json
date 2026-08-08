@@ -42,18 +42,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@google/generative-ai": "^0.24.1",
 		"@sveltejs/adapter-node": "^5.2.9",
-		"@threlte/core": "^6.1.1",
-		"@threlte/extras": "^7.5.1",
 		"@tomphttp/bare-server-node": "^2.0.6",
-		"@types/adm-zip": "^0.5.7",
-		"@types/three": "^0.158.3",
-		"adm-zip": "^0.5.16",
 		"dotenv": "^17.3.1",
-		"playwright": "^1.58.2",
-		"postprocessing": "^6.33.3",
-		"theme-change": "^2.5.0",
-		"three": "^0.158.0"
+		"theme-change": "^2.5.0"
 	}
 }

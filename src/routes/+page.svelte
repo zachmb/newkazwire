@@ -2,239 +2,199 @@
 	import { config } from '$lib/config';
 	import { getCDNImageUrl } from '$lib/utils/cdn';
 	import { userProfile } from '$lib/stores/userProfile';
-	import GameGrid from '$lib/components/GameGrid.svelte';
+	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
 	import GameCard from '$lib/components/GameCard.svelte';
+	import GameRow from '$lib/components/GameRow.svelte';
 	import Icon from '@iconify/svelte';
-
-	let aiGames: any[] = [];
-	let aiGamesLoading = true;
-
-	const featuredGame = (config as any).featuredGame;
+	import { onMount } from 'svelte';
 
 	export let data: any;
-	$: games = data.games.map((g: any) => ({
+
+	type G = { title: string; image: string; href: string; tags?: string[] };
+
+	$: games = (data.games as any[]).map((g) => ({
 		...g,
 		title: g.title || 'Untitled',
 		image: getCDNImageUrl(g.image, 'game'),
-		href: g.href
+		href: g.href,
+		tags: g.tags || []
+	})) as G[];
+
+	const pinnedIds: string[] = (config as any).pinnedGames || [];
+	const idOf = (g: G) => g.href.split('/').pop() || '';
+
+	// Featured (hero) = first pinned game available
+	$: featured =
+		games.find((g) => pinnedIds.includes(idOf(g))) || games[0];
+
+	// Popular = pinned games, in configured order
+	$: popular = pinnedIds
+		.map((id) => games.find((g) => idOf(g) === id))
+		.filter(Boolean) as G[];
+
+	// Recently played (client store) -> resolved games
+	$: recent = ($recentlyPlayed || [])
+		.map((r: any) => games.find((g) => idOf(g) === r.id))
+		.filter(Boolean) as G[];
+
+	// Favorites
+	$: favorites = games.filter((g) => $userProfile.favoriteGames.includes(idOf(g)));
+
+	// Build category rails from tags (top tags by count)
+	$: tagCounts = (() => {
+		const m: Record<string, number> = {};
+		for (const g of games) for (const t of g.tags || []) m[t] = (m[t] || 0) + 1;
+		return m;
+	})();
+	$: topTags = Object.entries(tagCounts)
+		.filter(([, n]) => n >= 4)
+		.sort((a, b) => b[1] - a[1])
+		.slice(0, 10)
+		.map(([t]) => t);
+	const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+	$: rails = topTags.map((tag) => ({
+		tag,
+		id: 'cat-' + slug(tag),
+		games: games.filter((g) => (g.tags || []).includes(tag)).slice(0, 18)
 	}));
 
-	let showPopupAd = false;
-	let showStickyAd = true;
-
-	import { onMount } from 'svelte';
-
+	// AI community games
+	let aiGames: any[] = [];
 	onMount(async () => {
 		try {
 			const res = await fetch('/api/ai/gallery');
-			const data = await res.json();
-			if (res.ok) aiGames = (data.games || []).slice(0, 8);
+			const j = await res.json();
+			if (res.ok) aiGames = (j.games || []).slice(0, 12);
 		} catch {
-			// silently fail — AI section is non-critical
-		} finally {
-			aiGamesLoading = false;
+			/* non-critical */
 		}
 	});
-
-	// Reactive check to hide ads immediately if toggled off
-	$: if (!$userProfile.showAds) {
-		showPopupAd = false;
-		showStickyAd = false;
-	} else {
-		// If toggled on, show sticky ad (popup handles itself via timeout/close)
-		showStickyAd = true;
-	}
 </script>
 
 <svelte:head>
-	<title>{config.branding.name}</title>
+	<title>{config.branding.name} — Play unblocked games</title>
 	<meta property="og:title" content={config.branding.name} />
 	<meta name="description" content={config.branding.description} />
 	<meta property="og:description" content={config.branding.description} />
 </svelte:head>
 
-<div
-	class="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#5B9BFF] via-[#3B82F6] to-[#2563EB] p-4 text-neutral"
->
-	<!-- Animated Background Pattern & Coral Highlights -->
-	<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-		<!-- Moving pattern overlay -->
-		<div class="animated-pattern absolute inset-0 opacity-[0.07] mix-blend-overlay" />
-
-		<!-- Coral accents / Dart frog vibes -->
-		<div
-			class="absolute -left-20 top-20 h-96 w-96 rounded-full bg-[#FF6A1A] opacity-20 blur-[100px]"
-		/>
-		<div
-			class="absolute -right-20 bottom-40 h-80 w-80 rounded-full bg-[#FF9F1C] opacity-20 blur-[100px]"
-		/>
-		<div
-			class="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FF3D2E] opacity-10 blur-[120px]"
-		/>
-	</div>
-
-	<div class="relative z-10 mx-auto flex max-w-[1800px] flex-col gap-12">
-		<GameGrid games={games} />
-
-		<!-- AI Community Games Section -->
-		{#if aiGamesLoading}
-			<section class="flex flex-col gap-4">
-				<div class="flex items-center gap-3">
-					<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/20">
-						<Icon icon="mdi:robot" class="text-2xl text-accent" />
+<div class="min-h-screen bg-base-100">
+	<div class="mx-auto flex max-w-[1800px] flex-col gap-8 px-3 py-5 sm:px-5">
+		<!-- HERO -->
+		{#if featured}
+			<section class="relative overflow-hidden rounded-3xl">
+				<img src={featured.image} alt="" class="absolute inset-0 h-full w-full scale-110 object-cover blur-xl" aria-hidden="true" />
+				<div class="absolute inset-0 bg-gradient-to-r from-[#0B1220]/95 via-[#0B1220]/80 to-[#2563EB]/50"></div>
+				<div class="relative flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-10">
+					<img src={featured.image} alt={featured.title} class="h-40 w-40 flex-none rounded-2xl object-cover shadow-2xl ring-1 ring-white/20 sm:h-48 sm:w-48" />
+					<div class="flex flex-col gap-3">
+						<span class="flex items-center gap-1.5 text-sm font-black uppercase tracking-wider text-[#FF9F1C]">
+							<Icon icon="mdi:star" /> Featured
+						</span>
+						<h1 class="text-3xl font-black leading-tight text-white drop-shadow sm:text-5xl">{featured.title}</h1>
+						<p class="max-w-xl text-sm font-medium text-white/80 sm:text-base">
+							{config.branding.slogan} No downloads, no blocks — just click and play.
+						</p>
+						<div class="mt-1 flex flex-wrap items-center gap-3">
+							<a href={featured.href} class="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-black text-white shadow-lg transition hover:brightness-110">
+								<Icon icon="mdi:play" class="text-2xl" /> Play now
+							</a>
+							<a href="/proxy" class="flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 text-base font-bold text-white backdrop-blur-sm transition hover:bg-white/25">
+								<Icon icon="mdi:shield-lock" /> Open Proxy
+							</a>
+						</div>
 					</div>
-					<h2 class="text-2xl font-black text-white drop-shadow-sm">AI Community Games</h2>
-					<div class="loading loading-dots loading-sm text-white opacity-60" />
 				</div>
 			</section>
-		{:else if aiGames.length > 0}
-			<section class="flex flex-col gap-4">
-				<div class="flex items-center justify-between">
-					<div class="flex items-center gap-3">
-						<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/30">
-							<Icon icon="mdi:robot" class="text-2xl text-white" />
-						</div>
-						<h2 class="text-2xl font-black text-white drop-shadow-sm">AI Community Games</h2>
-					</div>
-					<a
-						href="/ai/gallery"
-						class="btn btn-sm rounded-full bg-white/20 font-bold text-white backdrop-blur-sm hover:bg-white/30"
-					>
-						See All <Icon icon="mdi:arrow-right" />
-					</a>
+		{/if}
+
+		<!-- CATEGORY CHIPS -->
+		{#if rails.length}
+			<div class="row-scroll -mt-2 flex gap-2 overflow-x-auto pb-1">
+				<a href="#top" class="flex-none rounded-full bg-primary px-4 py-1.5 text-sm font-bold text-white">All</a>
+				{#each rails as r}
+					<a href={'#' + r.id} class="flex-none rounded-full bg-base-200 px-4 py-1.5 text-sm font-bold text-base-content/80 transition hover:bg-base-300 hover:text-base-content">{r.tag}</a>
+				{/each}
+			</div>
+		{/if}
+
+		<span id="top"></span>
+
+		<!-- CONTINUE / FAVORITES -->
+		{#if recent.length}
+			<GameRow title="Continue playing" icon="mdi:history" games={recent} />
+		{/if}
+		{#if favorites.length}
+			<GameRow title="Your favorites" icon="mdi:heart" games={favorites} />
+		{/if}
+
+		<!-- POPULAR -->
+		{#if popular.length}
+			<GameRow title="Popular now" icon="mdi:fire" games={popular} />
+		{/if}
+
+		<!-- AI COMMUNITY -->
+		<section class="flex flex-col gap-3">
+			<div class="flex items-end justify-between px-1">
+				<h2 class="flex items-center gap-2 text-xl font-black tracking-tight text-base-content sm:text-2xl">
+					<Icon icon="mdi:sparkles" class="text-2xl text-primary" /> Community creations
+				</h2>
+				<div class="flex items-center gap-3">
+					<a href="/ai" class="text-sm font-bold text-primary hover:underline">Create yours</a>
+					<a href="/ai/gallery" class="text-sm font-bold text-primary hover:underline">View all</a>
 				</div>
-				<div
-					class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
-				>
-					{#each aiGames as game (game.id)}
-						<a
-							href="/ai/user-g/{game.id}"
-							class="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 to-accent/30 shadow-lg backdrop-blur-sm transition-all hover:scale-[1.04] hover:shadow-xl"
-						>
-							<div
-								class="absolute inset-0 flex flex-col items-center justify-center gap-1 p-2 text-center"
-							>
-								<Icon
-									icon="mdi:robot"
-									class="text-4xl text-white/60 transition-transform group-hover:scale-110"
-								/>
-								<span class="line-clamp-2 text-xs font-black text-white drop-shadow"
-									>{game.title}</span
-								>
-							</div>
-							<div
-								class="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-full bg-black/40 px-2 py-0.5 text-xs font-bold text-yellow-300"
-							>
-								<Icon icon="mdi:star" class="text-xs" />{game.avgRating || 'New'}
-							</div>
-							{#if game.sourceGameId}
-								<div class="badge badge-accent absolute left-2 top-2 text-xs font-bold">REMIX</div>
+			</div>
+			{#if aiGames.length}
+				<div class="row-scroll flex snap-x gap-3 overflow-x-auto pb-2">
+					{#each aiGames as g (g.id)}
+						<a href={'/ai/user-g/' + g.id} class="group relative flex aspect-square w-36 flex-none snap-start flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/25 to-secondary/25 p-3 text-center ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-xl sm:w-40 md:w-44">
+							<Icon icon="mdi:robot-happy" class="text-4xl text-base-content/70 transition group-hover:scale-110" />
+							<span class="line-clamp-2 text-sm font-bold text-base-content">{g.title}</span>
+							{#if g.avgRating}
+								<span class="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-full bg-black/50 px-2 py-0.5 text-xs font-bold text-[#FF9F1C]"><Icon icon="mdi:star" class="text-xs" />{g.avgRating}</span>
 							{/if}
 						</a>
 					{/each}
 				</div>
-			</section>
-		{/if}
+			{:else}
+				<a href="/ai" class="flex items-center gap-4 rounded-2xl border border-dashed border-base-300 bg-base-200 p-5 transition hover:border-primary">
+					<div class="grid h-12 w-12 place-items-center rounded-xl bg-primary/15 text-primary"><Icon icon="mdi:sparkles" class="text-2xl" /></div>
+					<div>
+						<p class="font-black text-base-content">Make your own game with AI</p>
+						<p class="text-sm text-base-content/70">Describe a game and publish it to the community — no code required.</p>
+					</div>
+				</a>
+			{/if}
+		</section>
 
-		<!-- Favorites Section (Conditional) -->
-		{#if $userProfile.favoriteGames.length > 0}
-			<section class="flex flex-col gap-6">
-				<div class="flex items-center gap-2">
-					<Icon icon="mdi:heart" class="text-3xl text-red-500" />
-					<h2 class="px-2 text-3xl font-black text-white drop-shadow-sm">Your Favorites</h2>
-				</div>
-				<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-					{#each games.filter((g: any) => {
-						const id = g.href.split('/').pop() || '';
-						return $userProfile.favoriteGames.includes(id) && id !== featuredGame;
-					}) as game}
-						<div class="aspect-[3/4]">
-							<GameCard
-								title={game.title || 'Untitled'}
-								image={game.image || ''}
-								href={game.href}
-							/>
-						</div>
-					{/each}
-				</div>
-			</section>
-		{/if}
+		<!-- CATEGORY RAILS -->
+		{#each rails as r}
+			<div id={r.id} class="scroll-mt-24">
+				<GameRow title={r.tag} games={r.games} />
+			</div>
+		{/each}
+
+		<!-- ALL GAMES GRID -->
+		<section class="flex flex-col gap-3">
+			<h2 class="flex items-center gap-2 px-1 text-xl font-black tracking-tight text-base-content sm:text-2xl">
+				<Icon icon="mdi:grid" class="text-2xl text-primary" /> All games
+			</h2>
+			<div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+				{#each games as game (game.href)}
+					<div class="aspect-square">
+						<GameCard title={game.title} image={game.image} href={game.href} />
+					</div>
+				{/each}
+			</div>
+		</section>
 	</div>
 </div>
 
-<!-- Popup Ad Modal (Placeholder) -->
-{#if showPopupAd}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-		<div
-			class="animate-bounce-in relative w-full max-w-lg overflow-hidden rounded-3xl bg-white p-6 shadow-2xl"
-		>
-			<button
-				class="btn btn-circle btn-ghost btn-sm absolute right-4 top-4"
-				on:click={() => (showPopupAd = false)}
-			>
-				<Icon icon="mdi:close" class="text-2xl" />
-			</button>
-
-			<div class="flex flex-col items-center gap-4 text-center">
-				<h3 class="text-2xl font-black text-neutral">Check this out!</h3>
-				<div
-					class="flex h-64 w-full items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-100"
-				>
-					<span class="font-bold text-gray-400">Ad Space Placeholder</span>
-				</div>
-				<button
-					class="btn btn-primary btn-wide rounded-full font-black text-white shadow-lg shadow-primary/30"
-				>
-					Learn More
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<!-- Sticky Bottom Ad (Placeholder) -->
-{#if showStickyAd}
-	<div class="fixed bottom-4 left-1/2 z-40 w-full max-w-3xl -translate-x-1/2 px-4">
-		<div
-			class="relative flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-xl"
-		>
-			<div class="flex items-center gap-4">
-				<div
-					class="flex h-16 w-16 items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-400"
-				>
-					Ad
-				</div>
-				<div class="flex flex-col">
-					<span class="font-bold text-neutral">Special Offer</span>
-					<span class="text-sm text-neutral/60">Get 50% off Kazwire Coins today!</span>
-				</div>
-			</div>
-			<div class="flex items-center gap-2">
-				<button class="btn btn-primary btn-sm rounded-full text-white">View</button>
-				<button
-					class="btn btn-circle btn-ghost btn-sm text-neutral/50"
-					on:click={() => (showStickyAd = false)}
-				>
-					<Icon icon="mdi:close" />
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
-
 <style>
-	@keyframes move-pattern {
-		0% {
-			background-position: 0 0;
-		}
-		100% {
-			background-position: 100px 100px;
-		}
+	.row-scroll {
+		scrollbar-width: none;
 	}
-
-	.animated-pattern {
-		background-image: url('/bg-pattern.png');
-		background-size: 300px;
-		animation: move-pattern 30s linear infinite;
+	.row-scroll::-webkit-scrollbar {
+		display: none;
 	}
 </style>
