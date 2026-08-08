@@ -24,8 +24,19 @@
 		try {
 			const cfg = (window as any).__uv$config;
 			if (!cfg) throw new Error('proxy config not loaded');
-			await navigator.serviceWorker.register('/uv.js', { scope: cfg.prefix });
-			await navigator.serviceWorker.ready;
+			if (!('serviceWorker' in navigator)) throw new Error('service workers are not supported in this browser');
+			const reg = await navigator.serviceWorker.register('/uv.js', { scope: cfg.prefix });
+			// Wait for the worker to ACTIVATE. We can't use navigator.serviceWorker.ready
+			// because this page (/proxy) is outside the SW scope (/service/), so ready never resolves.
+			if (!reg.active) {
+				await new Promise<void>((resolve) => {
+					const sw = reg.installing || reg.waiting;
+					if (!sw) return resolve();
+					const done = () => sw.state === 'activated' && resolve();
+					sw.addEventListener('statechange', done);
+					done();
+				});
+			}
 			swReady = true;
 			return true;
 		} catch (e: any) {
