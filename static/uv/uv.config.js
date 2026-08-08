@@ -20,7 +20,7 @@ const xorDecode = (str) => {
 
 self.__uv$config = {
 	prefix: '/service/',
-	bare: 'https://tomp.app/bare/',
+	bare: '/bare/',
 	encodeUrl: xorEncode,
 	decodeUrl: xorDecode,
 	handler: '/uv/uv.handler.js',

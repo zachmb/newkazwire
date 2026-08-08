@@ -1,0 +1,18 @@
+[Unit]
+Description=Kazwire Ultraviolet bare-server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/kazwire
+Environment=NODE_ENV=production
+Environment=BARE_HOST=127.0.0.1
+Environment=BARE_PORT=8080
+ExecStart=/usr/bin/node server/bare-server.cjs
+Restart=always
+RestartSec=3
+User=kazwire
+Group=kazwire
+
+[Install]
+WantedBy=multi-user.target

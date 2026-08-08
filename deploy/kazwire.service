@@ -1,0 +1,20 @@
+[Unit]
+Description=Kazwire SvelteKit app (adapter-node)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/kazwire
+# SvelteKit adapter-node reads HOST/PORT/ORIGIN from env
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+Environment=ORIGIN=https://kazwire.com
+ExecStart=/usr/bin/node build/index.js
+Restart=always
+RestartSec=3
+User=kazwire
+Group=kazwire
+
+[Install]
+WantedBy=multi-user.target
