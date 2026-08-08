@@ -12,12 +12,12 @@
 	/>
 </svelte:head>
 
-<div class="min-h-screen bg-[#5B9BFF] p-4 text-neutral md:p-12">
-	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-white shadow-2xl">
+<div class="min-h-screen bg-base-200 p-4 text-base-content md:p-12">
+	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-base-100 shadow-2xl">
 		<!-- Header -->
 		<div class="bg-gradient-to-br from-[#0B1B33] to-[#071022] p-8 text-center text-white md:p-16">
 			<div
-				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
+				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-base-100 p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
 			>
 				<img src="/logo.png" alt="Kazwire" class="h-full w-full rounded-2xl object-cover" />
 			</div>
@@ -32,7 +32,7 @@
 		<!-- Content -->
 		<div class="px-8 py-12 md:px-20 md:py-20">
 			<article
-				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-[#0B1B33] prose-p:font-medium prose-p:leading-relaxed prose-p:text-neutral/70 prose-li:font-medium prose-li:text-neutral/70"
+				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-base-content prose-p:font-medium prose-p:leading-relaxed prose-p:text-base-content/70 prose-li:font-medium prose-li:text-base-content/70"
 			>
 				<p>
 					By accessing {config.branding.name}, you are agreeing to be bound by these website Terms

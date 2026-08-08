@@ -92,7 +92,7 @@
 	<title>{config.branding.name} - Account</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-br from-[#5B9BFF] via-[#3B82F6] to-[#2563EB] p-4">
+<div class="min-h-screen bg-base-200 p-4">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 
 		<!-- Left Rail -->
@@ -119,7 +119,7 @@
 							<div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-accent/50 bg-white/20 shadow-xl ring-4 ring-white/10 backdrop-blur-sm">
 								<Icon icon="mdi:account-circle" class="h-full w-full text-white/60" />
 							</div>
-							<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-3 py-0.5 text-xs font-black text-neutral shadow-lg">
+							<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-3 py-0.5 text-xs font-black text-base-content shadow-lg">
 								LVL {$userProfile.level}
 							</span>
 						</div>
@@ -130,7 +130,7 @@
 								<div class="flex flex-wrap items-center gap-2">
 									<input
 										type="text"
-										class="input input-bordered w-full max-w-xs bg-white font-black text-neutral"
+										class="input input-bordered w-full max-w-xs bg-base-100 font-black text-base-content"
 										bind:value={newUsername}
 										on:keydown={(e) => e.key === 'Enter' && saveUsername()}
 									/>
@@ -200,7 +200,7 @@
 					<button
 						class="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition-all duration-150
 							{activeTab === tab.id
-								? 'bg-white text-primary shadow-md'
+								? 'bg-base-100 text-primary shadow-md'
 								: 'text-white/70 hover:bg-white/10 hover:text-white'}"
 						on:click={() => { activeTab = tab.id; }}
 					>
@@ -218,8 +218,8 @@
 
 					<!-- Recently Played -->
 					{#if recentGamesList.length > 0}
-						<div class="col-span-full rounded-3xl bg-white p-6 shadow-lg">
-							<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-neutral">
+						<div class="col-span-full rounded-3xl bg-base-100 p-6 shadow-lg">
+							<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Icon icon="mdi:history" class="text-primary" /></span>
 								Recently Played
 							</h2>
@@ -241,8 +241,8 @@
 					{/if}
 
 					<!-- Settings -->
-					<div class="rounded-3xl bg-white p-6 shadow-lg">
-						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-neutral">
+					<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/15"><Icon icon="mdi:cog" class="text-amber-600" /></span>
 							Settings
 						</h2>
@@ -253,8 +253,8 @@
 										<Icon icon="mdi:advertisements" class="text-primary" />
 									</div>
 									<div>
-										<div class="font-bold text-neutral">Support Ads</div>
-										<div class="text-xs text-neutral/40">Help support the developer</div>
+										<div class="font-bold text-base-content">Support Ads</div>
+										<div class="text-xs text-base-content/40">Help support the developer</div>
 									</div>
 								</div>
 								<input type="checkbox" class="toggle toggle-success" checked={$userProfile.showAds}
@@ -266,8 +266,8 @@
 										<Icon icon="mdi:theme-light-dark" class="text-amber-500" />
 									</div>
 									<div>
-										<div class="font-bold text-neutral">Dark Mode</div>
-										<div class="text-xs text-neutral/40">Toggle dark theme</div>
+										<div class="font-bold text-base-content">Dark Mode</div>
+										<div class="text-xs text-base-content/40">Toggle dark theme</div>
 									</div>
 								</div>
 								<input type="checkbox" class="toggle toggle-success" checked />
@@ -278,8 +278,8 @@
 										<Icon icon="mdi:volume-high" class="text-secondary" />
 									</div>
 									<div>
-										<div class="font-bold text-neutral">Sound Effects</div>
-										<div class="text-xs text-neutral/40">Enable or disable UI sounds</div>
+										<div class="font-bold text-base-content">Sound Effects</div>
+										<div class="text-xs text-base-content/40">Enable or disable UI sounds</div>
 									</div>
 								</div>
 								<input type="checkbox" class="toggle toggle-success" checked />
@@ -288,15 +288,15 @@
 					</div>
 
 					<!-- Favorites -->
-					<div class="rounded-3xl bg-white p-6 shadow-lg">
-						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-neutral">
+					<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50"><Icon icon="mdi:heart" class="text-red-400" /></span>
 							Favorite Games
 						</h2>
 						{#if $userProfile.favoriteGames.length === 0}
 							<div class="flex h-32 flex-col items-center justify-center gap-2 rounded-2xl bg-base-100 text-center">
-								<Icon icon="mdi:heart-outline" class="text-3xl text-neutral/20" />
-								<p class="text-sm font-bold text-neutral/30">No favorites yet — heart a game to save it.</p>
+								<Icon icon="mdi:heart-outline" class="text-3xl text-base-content/20" />
+								<p class="text-sm font-bold text-base-content/30">No favorites yet — heart a game to save it.</p>
 							</div>
 						{:else}
 							<div class="grid grid-cols-4 gap-2">
@@ -321,16 +321,16 @@
 								<h2 class="text-2xl font-black">Kazwire AI Lab</h2>
 								<p class="mt-1 opacity-80">Turn your ideas into playable games instantly.</p>
 							</div>
-							<a href="/ai" class="btn shrink-0 rounded-2xl bg-white font-black text-primary shadow-md hover:bg-white/90">
+							<a href="/ai" class="btn shrink-0 rounded-2xl bg-base-100 font-black text-primary shadow-md hover:bg-white/90">
 								<Icon icon="mdi:auto-fix" />Generate a Game
 							</a>
 						</div>
 					</div>
 
 					<!-- Games grid -->
-					<div class="rounded-3xl bg-white p-6 shadow-lg">
+					<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
 						<div class="mb-5 flex items-center justify-between">
-							<h3 class="flex items-center gap-2 text-lg font-black text-neutral">
+							<h3 class="flex items-center gap-2 text-lg font-black text-base-content">
 								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10"><Icon icon="mdi:robot" class="text-secondary" /></span>
 								My AI Games
 							</h3>
@@ -339,8 +339,8 @@
 
 						{#if $localAiGames.length === 0}
 							<div class="flex h-48 flex-col items-center justify-center gap-3 rounded-2xl bg-base-100 text-center">
-								<Icon icon="mdi:robot-outline" class="text-5xl text-neutral/15" />
-								<p class="text-sm font-bold text-neutral/30">No AI games yet.</p>
+								<Icon icon="mdi:robot-outline" class="text-5xl text-base-content/15" />
+								<p class="text-sm font-bold text-base-content/30">No AI games yet.</p>
 								<a href="/ai" class="btn btn-primary btn-sm rounded-full font-black text-white">Generate one now</a>
 							</div>
 						{:else}
@@ -349,8 +349,8 @@
 									<div class="group flex flex-col gap-2 rounded-2xl border-l-4 border-primary/40 bg-base-100 p-4 transition-all hover:shadow-md">
 										<div class="flex items-start justify-between gap-2">
 											<div class="min-w-0 flex-1">
-												<div class="truncate font-black text-neutral">{game.title}</div>
-												<div class="mt-0.5 text-xs text-neutral/40">{new Date(game.createdAt).toLocaleDateString()}</div>
+												<div class="truncate font-black text-base-content">{game.title}</div>
+												<div class="mt-0.5 text-xs text-base-content/40">{new Date(game.createdAt).toLocaleDateString()}</div>
 											</div>
 											<div class="flex shrink-0 gap-1.5">
 												{#if successfullyPublishedIds.has(game.id)}
@@ -376,7 +376,7 @@
 											</div>
 										</div>
 										{#if game.description}
-											<p class="line-clamp-2 text-sm text-neutral/50">{game.description}</p>
+											<p class="line-clamp-2 text-sm text-base-content/50">{game.description}</p>
 										{/if}
 										{#if publishError && publishingIds.has(game.id)}
 											<p class="text-xs font-bold text-error">{publishError}</p>
@@ -391,8 +391,8 @@
 			<!-- SHOP -->
 			{:else if activeTab === 'shop'}
 				<div class="flex flex-col gap-4">
-					<div class="flex items-center justify-between rounded-3xl bg-white px-6 py-4 shadow-lg">
-						<h2 class="flex items-center gap-2 text-xl font-black text-neutral">
+					<div class="flex items-center justify-between rounded-3xl bg-base-100 px-6 py-4 shadow-lg">
+						<h2 class="flex items-center gap-2 text-xl font-black text-base-content">
 							<span class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent/15"><Icon icon="mdi:store" class="text-amber-600" /></span>
 							Item Shop
 						</h2>
@@ -403,13 +403,13 @@
 					</div>
 					<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
 						{#each SHOP_ITEMS as item}
-							<div class="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl">
+							<div class="group flex flex-col overflow-hidden rounded-3xl bg-base-100 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl">
 								<div class="relative flex h-32 items-center justify-center bg-gradient-to-br {item.color}">
 									<Icon icon={item.icon} class="text-5xl text-white drop-shadow-lg" />
 									<span class="absolute right-3 top-3 rounded-full bg-black/20 px-2.5 py-1 text-xs font-black text-white backdrop-blur-sm">{item.type}</span>
 								</div>
 								<div class="flex flex-1 flex-col p-4">
-									<div class="mb-3 font-black text-neutral">{item.name}</div>
+									<div class="mb-3 font-black text-base-content">{item.name}</div>
 									<div class="mt-auto">
 										{#if $userProfile.inventory.includes(item.id)}
 											<div class="flex items-center gap-1.5 text-sm font-bold text-success">
@@ -447,10 +447,10 @@
 					</div>
 
 					<!-- Table -->
-					<div class="overflow-hidden rounded-3xl bg-white shadow-lg">
+					<div class="overflow-hidden rounded-3xl bg-base-100 shadow-lg">
 						<table class="table w-full">
 							<thead>
-								<tr class="bg-neutral/5 text-xs font-black uppercase tracking-wider text-neutral/40">
+								<tr class="bg-neutral/5 text-xs font-black uppercase tracking-wider text-base-content/40">
 									<th class="w-14 py-4">Rank</th>
 									<th class="py-4">Player</th>
 									<th class="py-4 text-right">Level</th>
@@ -470,19 +470,19 @@
 											{#if player.rank === 1}<Icon icon="mdi:medal" class="text-2xl text-yellow-400" />
 											{:else if player.rank === 2}<Icon icon="mdi:medal" class="text-2xl text-slate-400" />
 											{:else if player.rank === 3}<Icon icon="mdi:medal" class="text-2xl text-orange-400" />
-											{:else}<span class="text-neutral/30">#{player.rank}</span>{/if}
+											{:else}<span class="text-base-content/30">#{player.rank}</span>{/if}
 										</td>
 										<td class="py-4">
 											<div class="flex items-center gap-3">
 												<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black
-													{player.isUser ? 'bg-primary text-white' : 'bg-neutral/10 text-neutral/50'}">
+													{player.isUser ? 'bg-primary text-white' : 'bg-neutral/10 text-base-content/50'}">
 													{player.name.substring(0, 2).toUpperCase()}
 												</div>
-												<span class="font-bold {player.isUser ? 'text-primary' : 'text-neutral'}">{player.name}</span>
+												<span class="font-bold {player.isUser ? 'text-primary' : 'text-base-content'}">{player.name}</span>
 												{#if player.isUser}<span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">You</span>{/if}
 											</div>
 										</td>
-										<td class="py-4 text-right font-mono font-bold text-neutral/60">{player.level}</td>
+										<td class="py-4 text-right font-mono font-bold text-base-content/60">{player.level}</td>
 										<td class="py-4 text-right font-mono font-bold text-yellow-600">{player.coins.toLocaleString()}</td>
 									</tr>
 								{/each}
@@ -509,7 +509,7 @@
 				<h3 class="mb-3 text-xs font-black uppercase tracking-widest text-white/60">Recommended</h3>
 				<div class="grid grid-cols-2 gap-3">
 					{#each mappedGames.slice(0, 6) as game}
-						<a href={game.href} class="group relative aspect-square overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:scale-105 hover:shadow-md">
+						<a href={game.href} class="group relative aspect-square overflow-hidden rounded-2xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-md">
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
 							<div class="absolute inset-x-0 bottom-0 translate-y-full p-1.5 transition-transform group-hover:translate-y-0">

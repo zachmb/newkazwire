@@ -4,9 +4,8 @@
 
 @layer base {
 	body {
-		@apply bg-[#C5DDF8];
+		@apply bg-base-100 text-base-content;
 		font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-		/* Remove gradient */
 		background-image: none;
 	}
 }
@@ -15,12 +14,12 @@
 
 	/* Flat, square buttons for Antigravity style */
 	.btn-flat {
-		@apply bg-white px-6 py-3 font-bold text-neutral shadow-sm hover:shadow-md active:shadow-inner transition-shadow rounded-none;
+		@apply bg-base-100 px-6 py-3 font-bold text-base-content shadow-sm hover:shadow-md active:shadow-inner transition-shadow rounded-none;
 	}
 
 	/* Flat, square cards */
 	.card-antigravity {
-		@apply relative overflow-hidden bg-white shadow-none hover:shadow-lg transition-shadow duration-200 rounded-none;
+		@apply relative overflow-hidden bg-base-100 shadow-none hover:shadow-lg transition-shadow duration-200 rounded-none;
 	}
 
 	/* Hide scrollbar for Chrome, Safari and Opera */

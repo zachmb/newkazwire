@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { themeChange } from 'theme-change';
 	import { browser } from '$app/environment';
+
+	function setTheme(t: string) {
+		theme = t;
+		document.documentElement.setAttribute('data-theme', t);
+		try {
+			localStorage.setItem('kz-theme', t);
+		} catch (e) {
+			/* ignore */
+		}
+	}
 
 	let searchQuery: string = '';
 	let contentTitle: string = 'Nothing yet...';
@@ -11,17 +20,7 @@
 	// NOTE: the element that is using one of the theme attributes must be in the DOM on mount
 	let theme = '';
 	onMount(() => {
-		themeChange(false);
-		// 👆 false parameter is required for svelte
-
-		// check if theme is set in system preferences
-		if (localStorage.getItem('theme') != null) {
-			theme = localStorage.getItem('theme') || 'light';
-		} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-			theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-		} else {
-			theme = 'light';
-		}
+		theme = document.documentElement.getAttribute('data-theme') || 'light';
 
 		if (browser) {
 			let panicKey = localStorage.getItem('panicKey');
@@ -176,9 +175,9 @@
 			<h2 class="card-title justify-center">Theme</h2>
 
 			<div class="card-actions mt-3 justify-center">
-				<select class="select min-w-[6rem] max-w-xs" data-choose-theme>
-					<option value="light" class="bg-base-100" selected={theme == 'light'}>Light</option>
-					<option value="dark" class="bg-base-100" selected={theme == 'dark'}>Dark</option>
+				<select class="select min-w-[6rem] max-w-xs" bind:value={theme} on:change={(e) => setTheme((e.target as HTMLSelectElement).value)}>
+					<option value="light" class="bg-base-100">Light</option>
+					<option value="dark" class="bg-base-100">Dark</option>
 				</select>
 			</div>
 		</div>

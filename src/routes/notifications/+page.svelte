@@ -73,7 +73,7 @@
 	<title>{config.branding.name} - Updates</title>
 </svelte:head>
 
-<div class="font-sans min-h-screen bg-[#5B9BFF] p-4 text-neutral">
+<div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 		<!-- Left Rail -->
 		<aside class="hidden h-full lg:block">
@@ -82,11 +82,11 @@
 
 		<!-- Main Content -->
 		<main class="flex flex-col gap-6">
-			<div class="rounded-3xl bg-white p-8 shadow-sm">
+			<div class="rounded-3xl bg-base-100 p-8 shadow-sm">
 				<div class="mb-8 flex items-center justify-between">
 					<div>
-						<h1 class="text-4xl font-black text-[#0B1B33]">Changelog</h1>
-						<p class="mt-2 text-lg text-neutral/60">Latest updates, features, and improvements.</p>
+						<h1 class="text-4xl font-black text-base-content">Changelog</h1>
+						<p class="mt-2 text-lg text-base-content/60">Latest updates, features, and improvements.</p>
 					</div>
 					<div class="hidden md:block">
 						<Icon icon="lucide:sparkles" class="h-12 w-12 text-[#5B9BFF]" />
@@ -100,16 +100,16 @@
 						<div class="relative">
 							<!-- Dot -->
 							<div
-								class="absolute -left-[29px] top-1.5 h-6 w-6 rounded-full border-4 border-white bg-[#5B9BFF] shadow-sm"
+								class="absolute -left-[29px] top-1.5 h-6 w-6 rounded-full border-4 border-white bg-base-200 shadow-sm"
 							/>
 
 							<div
 								class="flex flex-col gap-2 rounded-2xl border border-neutral/5 bg-neutral/[0.02] p-6 transition-colors hover:bg-neutral/[0.04]"
 							>
 								<div class="flex flex-wrap items-center gap-3">
-									<span class="font-mono text-sm font-bold text-neutral/50">{update.date}</span>
+									<span class="font-mono text-sm font-bold text-base-content/50">{update.date}</span>
 									<span
-										class="rounded-full bg-neutral/10 px-2 py-0.5 text-xs font-bold text-neutral/60"
+										class="rounded-full bg-neutral/10 px-2 py-0.5 text-xs font-bold text-base-content/60"
 										>{update.version}</span
 									>
 									{#each update.tags as tag}
@@ -120,8 +120,8 @@
 									{/each}
 								</div>
 
-								<h3 class="text-2xl font-bold text-[#0B1B33]">{update.title}</h3>
-								<p class="text-lg leading-relaxed text-neutral/80">
+								<h3 class="text-2xl font-bold text-base-content">{update.title}</h3>
+								<p class="text-lg leading-relaxed text-base-content/80">
 									{update.description}
 								</p>
 							</div>
@@ -139,7 +139,7 @@
 					{#each mappedGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative aspect-square w-full overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative aspect-square w-full overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<div

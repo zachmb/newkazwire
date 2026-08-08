@@ -41,7 +41,7 @@
 	}
 </script>
 
-<div class="flex w-full flex-col overflow-hidden rounded-3xl bg-white shadow-xl">
+<div class="flex w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-xl">
 	<!-- Game Preview / Hero Area -->
 	<div class="group relative aspect-video w-full bg-black">
 		{#if playing}
@@ -50,7 +50,7 @@
 			</div>
 		{:else}
 			<!-- Thumbnail Image Area -->
-			<div class="h-full w-full bg-white">
+			<div class="h-full w-full bg-base-100">
 				<img
 					src={game.image ? game.image : '/logo.png'}
 					alt={game.name}
@@ -76,10 +76,10 @@
 	</div>
 
 	<!-- Metadata Bar -->
-	<div class="flex items-center justify-between bg-white p-6">
+	<div class="flex items-center justify-between bg-base-100 p-6">
 		<div class="flex flex-col">
-			<h1 class="text-3xl font-black tracking-tight text-neutral">{game.name}</h1>
-			<p class="text-sm font-bold uppercase tracking-wider text-neutral/50">
+			<h1 class="text-3xl font-black tracking-tight text-base-content">{game.name}</h1>
+			<p class="text-sm font-bold uppercase tracking-wider text-base-content/50">
 				{game.developer || 'Kazwire'}
 			</p>
 		</div>

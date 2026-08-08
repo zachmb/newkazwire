@@ -128,7 +128,7 @@
 	<title>{game?.title || 'Loading...'} - {config.branding.name}</title>
 </svelte:head>
 
-<div class="font-sans min-h-screen bg-[#5B9BFF] p-4 text-neutral">
+<div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 		<!-- Left Rail -->
 		<aside class="hidden h-full lg:block">
@@ -139,7 +139,7 @@
 		<main class="flex flex-col gap-6">
 			{#if isLoading}
 				<div
-					class="flex h-96 flex-col items-center justify-center gap-4 rounded-3xl bg-white opacity-50 shadow-xl"
+					class="flex h-96 flex-col items-center justify-center gap-4 rounded-3xl bg-base-100 opacity-50 shadow-xl"
 				>
 					<Icon icon="line-md:loading-alt-loop" class="text-6xl" />
 					<p class="font-bold">Loading game...</p>
@@ -213,14 +213,14 @@
 							tabindex="0"
 						>
 							<div
-								class="w-full max-w-6xl rounded-3xl bg-white p-8 text-center shadow-2xl"
+								class="w-full max-w-6xl rounded-3xl bg-base-100 p-8 text-center shadow-2xl"
 								on:click|stopPropagation
 								on:keydown|stopPropagation
 								role="dialog"
 								aria-modal="true"
 								tabindex="-1"
 							>
-								<h3 class="mb-6 text-2xl font-black text-neutral">Share this game!</h3>
+								<h3 class="mb-6 text-2xl font-black text-base-content">Share this game!</h3>
 								<div class="mb-8 rounded-xl bg-base-100 p-8 md:p-12">
 									<a
 										href="https://kazwire.com/ai/user-g/{game.id}"
@@ -243,7 +243,7 @@
 					<!-- Game Info & Review -->
 					<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<!-- Info -->
-						<div class="flex flex-col gap-4 rounded-3xl bg-white p-8 shadow-xl">
+						<div class="flex flex-col gap-4 rounded-3xl bg-base-100 p-8 shadow-xl">
 							<div class="flex items-center justify-between">
 								<h1 class="text-3xl font-black">{game.title}</h1>
 								<div class="flex items-center gap-1 text-xl font-bold text-primary">
@@ -251,7 +251,7 @@
 									<span>{game.avgRating || 0}</span>
 								</div>
 							</div>
-							<p class="leading-relaxed text-neutral/70">{game.description}</p>
+							<p class="leading-relaxed text-base-content/70">{game.description}</p>
 							<div class="mt-4 flex flex-col gap-2">
 								<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created on</div>
 								<div class="font-bold">{new Date(game.createdAt).toLocaleDateString()}</div>
@@ -269,7 +269,7 @@
 						</div>
 
 						<!-- Leave a Review -->
-						<div class="flex flex-col gap-4 rounded-3xl bg-white p-8 shadow-xl">
+						<div class="flex flex-col gap-4 rounded-3xl bg-base-100 p-8 shadow-xl">
 							<h3 class="text-2xl font-black">Rate this Game</h3>
 							<p class="text-sm opacity-60">Tap a star and submit your rating.</p>
 
@@ -278,7 +278,7 @@
 									<button
 										class="transition-transform hover:scale-125 {rating >= star
 											? 'text-primary'
-											: 'text-neutral/10'}"
+											: 'text-base-content/10'}"
 										on:click={() => (rating = star)}
 										aria-label="Rate {star} stars"
 									>
@@ -306,7 +306,7 @@
 
 		<!-- Right Column -->
 		<aside class="flex flex-col gap-6">
-			<div class="rounded-3xl bg-white p-6 shadow-xl">
+			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
 				<h3 class="mb-4 text-xl font-black">Pro Tip</h3>
 				<p class="text-sm leading-relaxed opacity-70">
 					AI games are experimental. If it doesn't work, try remixing it with a better description!

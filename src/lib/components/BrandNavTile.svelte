@@ -7,13 +7,13 @@
 </script>
 
 <div
-	class="group relative flex h-full w-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm"
+	class="group relative flex h-full w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-sm"
 >
 	<!-- Top Section: Brand (Compact) -->
 	<a
 		href="/"
 		data-sveltekit-reload
-		class="flex h-[60%] flex-col items-center justify-center gap-1 bg-white p-2 no-underline transition-colors hover:bg-neutral/5"
+		class="flex h-[60%] flex-col items-center justify-center gap-1 bg-base-100 p-2 no-underline transition-colors hover:bg-neutral/5"
 	>
 		<img src="/logo.png" alt="Kazwire" class="h-8 w-8 object-contain" />
 		<h1 class="text-lg font-black lowercase leading-none tracking-tighter text-black sm:text-xl">

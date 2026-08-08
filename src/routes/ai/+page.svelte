@@ -189,7 +189,7 @@
 	<title>{config.branding.name} - Kazwire AI Lab</title>
 </svelte:head>
 
-<div class="font-sans min-h-screen bg-gradient-to-br from-[#5B9BFF] to-[#2563EB] p-4 text-neutral">
+<div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 		<!-- Left Rail -->
 		<aside class="hidden h-full lg:block">
@@ -199,7 +199,7 @@
 		<!-- Main Content -->
 		<main class="flex flex-col gap-6">
 			<!-- Header Card -->
-			<div class="relative overflow-hidden rounded-3xl bg-white p-8 shadow-2xl">
+			<div class="relative overflow-hidden rounded-3xl bg-base-100 p-8 shadow-2xl">
 				<div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl"></div>
 				<div class="relative z-10 flex flex-col items-center gap-4 text-center">
 					<div
@@ -216,7 +216,7 @@
 
 			<div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
 				<!-- Generation Form -->
-				<section class="flex flex-col gap-6 rounded-3xl bg-white p-8 shadow-xl">
+				<section class="flex flex-col gap-6 rounded-3xl bg-base-100 p-8 shadow-xl">
 					<h2 class="flex items-center gap-2 text-2xl font-black">
 						<Icon icon="mdi:creation" class="text-primary" />
 						Create a New Game
@@ -227,7 +227,7 @@
 							class="flex items-center gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-4"
 						>
 							<div class="badge badge-primary font-bold">Remixing</div>
-							<div class="font-bold text-neutral/70">{sourceGame.title}</div>
+							<div class="font-bold text-base-content/70">{sourceGame.title}</div>
 							<button
 								type="button"
 								class="btn btn-ghost btn-xs"
@@ -247,7 +247,7 @@
 							id="game-title"
 							type="text"
 							placeholder="e.g. Neon Breakout, Zombie Survival..."
-							class="input input-bordered input-lg w-full rounded-2xl border-none bg-neutral/5 focus:bg-white"
+							class="input input-bordered input-lg w-full rounded-2xl border-none bg-neutral/5 focus:bg-base-100"
 							bind:value={title}
 						/>
 
@@ -287,7 +287,7 @@
 				</section>
 
 				<!-- Preview/Result Container -->
-				<section class="flex flex-col gap-6 rounded-3xl bg-white p-8 shadow-xl">
+				<section class="flex flex-col gap-6 rounded-3xl bg-base-100 p-8 shadow-xl">
 					{#if isGenerating}
 						<!-- Generating: show spinner at top + playable community games below -->
 						<div class="flex flex-col gap-6">
@@ -435,7 +435,7 @@
 
 		<!-- Right Column -->
 		<aside class="flex flex-col gap-6">
-			<div class="rounded-3xl bg-white p-6 shadow-xl">
+			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
 				<div class="mb-4 flex items-center justify-between gap-2">
 					<h3 class="text-xl font-black">Community Library</h3>
 					<a href="/ai/gallery" class="text-sm font-bold text-primary hover:underline">See all</a>
@@ -464,7 +464,7 @@
 				{/if}
 			</div>
 
-			<div class="alert alert-info rounded-3xl bg-white p-6 shadow-xl">
+			<div class="alert alert-info rounded-3xl bg-base-100 p-6 shadow-xl">
 				<Icon icon="mdi:information" class="text-2xl text-info" />
 				<div>
 					<h3 class="font-black">Private Generation</h3>
@@ -474,7 +474,7 @@
 				</div>
 			</div>
 
-			<div class="rounded-3xl bg-white p-6 shadow-xl">
+			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
 				<h3 class="mb-4 text-xl font-black">How it works</h3>
 				<ul class="space-y-4">
 					<li class="flex items-start gap-3">

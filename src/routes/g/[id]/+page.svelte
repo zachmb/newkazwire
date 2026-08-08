@@ -229,7 +229,7 @@
 </svelte:head>
 
 <div
-	class="font-sans relative min-h-screen overflow-hidden bg-gradient-to-br from-[#5B9BFF] via-[#3B82F6] to-[#2563EB] p-4 text-neutral"
+	class="font-sans relative min-h-screen overflow-hidden bg-base-200 p-4 text-base-content"
 >
 	<!-- Animated Background Pattern -->
 	<div
@@ -287,7 +287,7 @@
 					{#if data.game.embedURL == null && data.game.emulatorType == null}
 						<iframe
 							src={CDN_BASE_URL + '/game/static/' + data.game.id + '/index.html'}
-							class="h-full w-full bg-white opacity-0"
+							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.game.title}
 							on:load={() => loadedGame()}
@@ -297,7 +297,7 @@
 					{:else if data.game.emulatorType == 'ruffle'}
 						<iframe
 							src={'/games/ruffle/' + data.game.id}
-							class="h-full w-full bg-white opacity-0"
+							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.game.title}
 							on:load={() => loadedGame()}
@@ -307,7 +307,7 @@
 					{:else if data.game.emulatorType == 'emulatorjs'}
 						<iframe
 							src={'/games/emulator/' + data.game.id}
-							class="h-full w-full bg-white opacity-0"
+							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.game.title}
 							allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; clipboard-read; fullscreen"
@@ -315,7 +315,7 @@
 						<!-- Proxied game -->
 					{:else if data.game.embedURL != null}
 						<iframe
-							class="h-full w-full bg-white opacity-0"
+							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.game.title}
 							src={encodeURL(data.game.embedURL)}
@@ -358,7 +358,7 @@
 					tabindex="0"
 				>
 					<div
-						class="w-full max-w-6xl rounded-3xl bg-white p-8 text-center shadow-2xl"
+						class="w-full max-w-6xl rounded-3xl bg-base-100 p-8 text-center shadow-2xl"
 						on:click|stopPropagation
 						on:keydown|stopPropagation
 						role="dialog"
@@ -366,7 +366,7 @@
 						aria-labelledby="share-title"
 						tabindex="-1"
 					>
-						<h3 id="share-title" class="mb-6 text-2xl font-black text-neutral">Share this game!</h3>
+						<h3 id="share-title" class="mb-6 text-2xl font-black text-base-content">Share this game!</h3>
 
 						<div class="mb-8 rounded-xl bg-base-100 p-8 md:p-12">
 							<a
@@ -389,12 +389,12 @@
 			{/if}
 
 			<!-- Description / Extra Info -->
-			<div class="rounded-3xl bg-white p-6 shadow-sm">
+			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-black">About {data.game.title}</h2>
-				<p class="whitespace-pre-line leading-relaxed text-neutral/80">{data.game.description}</p>
+				<p class="whitespace-pre-line leading-relaxed text-base-content/80">{data.game.description}</p>
 				<div class="mt-4 flex flex-wrap gap-2">
 					{#each data.game.tags as tag}
-						<span class="badge badge-outline badge-lg font-bold text-neutral/60">{tag}</span>
+						<span class="badge badge-outline badge-lg font-bold text-base-content/60">{tag}</span>
 					{/each}
 				</div>
 			</div>
@@ -424,7 +424,7 @@
 					{#each localizedGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-white shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<!-- Minimal overlay -->

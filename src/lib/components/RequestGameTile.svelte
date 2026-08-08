@@ -6,7 +6,7 @@
 	href="https://docs.google.com/forms/d/e/1FAIpQLScvGNBsBX518mWLra1_iGa9IyCKU1ncV9ykUYngJ4S3xZOjqw/viewform"
 	target="_blank"
 	rel="noopener noreferrer"
-	class="group relative flex h-full w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-3xl bg-accent text-neutral transition-colors hover:bg-yellow-400"
+	class="group relative flex h-full w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-3xl bg-accent text-base-content transition-colors hover:bg-yellow-400"
 	aria-label="Request a Game"
 >
 	<Icon

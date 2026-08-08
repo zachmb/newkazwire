@@ -38,13 +38,13 @@
 			<div class="relative">
 				<Icon
 					icon="mdi:magnify"
-					class="absolute left-6 top-1/2 h-8 w-8 -translate-y-1/2 text-neutral/50"
+					class="absolute left-6 top-1/2 h-8 w-8 -translate-y-1/2 text-base-content/50"
 				/>
 				<input
 					type="text"
 					bind:value={$searchQuery}
 					placeholder="Search for games..."
-					class="w-full rounded-full bg-white py-6 pl-20 pr-8 text-2xl font-bold text-neutral shadow-2xl placeholder:text-neutral/30 focus:outline-none focus:ring-4 focus:ring-primary/50"
+					class="w-full rounded-full bg-base-100 py-6 pl-20 pr-8 text-2xl font-bold text-base-content shadow-2xl placeholder:text-base-content/30 focus:outline-none focus:ring-4 focus:ring-primary/50"
 					autofocus
 				/>
 			</div>
@@ -59,7 +59,7 @@
 					{#each mappedGames as game}
 						<a
 							href={game.href}
-							class="group relative aspect-square w-full overflow-hidden rounded-3xl bg-white shadow-lg transition-transform hover:scale-105"
+							class="group relative aspect-square w-full overflow-hidden rounded-3xl bg-base-100 shadow-lg transition-transform hover:scale-105"
 							on:click={() => ($isSearchOpen = false)}
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />

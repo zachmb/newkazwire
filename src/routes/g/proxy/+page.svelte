@@ -74,7 +74,7 @@
 	<script src="/uv.js" defer></script>
 </svelte:head>
 
-<div class="font-sans min-h-screen bg-[#5B9BFF] p-4 text-neutral">
+<div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 		<!-- Left Rail -->
 		<aside class="hidden h-full lg:block">
@@ -86,7 +86,7 @@
 			<HeroGameCard game={proxyGame}>
 				<div
 					id="frame"
-					class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-white p-8"
+					class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-base-100 p-8"
 				>
 					<div class="text-center">
 						<h1 class="mb-4 text-4xl font-black">Private Search</h1>
@@ -95,9 +95,9 @@
 				</div>
 			</HeroGameCard>
 
-			<div class="rounded-3xl bg-white p-6 shadow-sm">
+			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-black">About Private Search</h2>
-				<p class="leading-relaxed text-neutral/80">
+				<p class="leading-relaxed text-base-content/80">
 					Browse the web privately using DuckDuckGo directly within Kazwire. Your searches are
 					proxied through our Ultraviolet service to help protect your privacy.
 				</p>
@@ -112,7 +112,7 @@
 					{#each mappedGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative aspect-square w-full overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative aspect-square w-full overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<div

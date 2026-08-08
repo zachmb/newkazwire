@@ -50,7 +50,7 @@
 >
 	<!-- Brand Tile -->
 	<div
-		class="h-[140px] w-full flex-shrink-0 overflow-hidden rounded-3xl bg-white shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
+		class="h-[140px] w-full flex-shrink-0 overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
 	>
 		<BrandNavTile />
 	</div>
@@ -58,7 +58,7 @@
 	{#each sortedGames as game}
 		<a
 			href={game.href}
-			class="block h-[140px] w-full flex-shrink-0 overflow-hidden rounded-3xl bg-white shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
+			class="block h-[140px] w-full flex-shrink-0 overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
 			title={game.title}
 		>
 			<img src={game.image} alt={game.title} class="h-full w-full object-cover" loading="lazy" />

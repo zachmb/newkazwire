@@ -235,7 +235,7 @@
 	<script src="/uv.js" defer></script>
 </svelte:head>
 
-<div class="font-sans min-h-screen bg-[#5B9BFF] p-4 text-neutral">
+<div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 		<!-- Left Rail: Navigation -->
 		<aside class="hidden h-full lg:block">
@@ -279,7 +279,7 @@
 					<!-- Proxied app -->
 					{#if data.app.embedURL != null}
 						<iframe
-							class="h-full w-full bg-white opacity-0"
+							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.app.title}
 							src={encodeURL(data.app.embedURL)}
@@ -291,9 +291,9 @@
 			</HeroGameCard>
 
 			<!-- Description / Extra Info -->
-			<div class="rounded-3xl bg-white p-6 shadow-sm">
+			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-black">About {data.app.title}</h2>
-				<p class="leading-relaxed text-neutral/80">{data.app.description}</p>
+				<p class="leading-relaxed text-base-content/80">{data.app.description}</p>
 				{#if canShare}
 					<button
 						class="btn btn-primary mt-4"
@@ -330,7 +330,7 @@
 					{#each localizedMockGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-white shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<!-- Minimal overlay -->

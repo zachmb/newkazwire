@@ -1,11 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 
 <head>
 	<meta charset="utf-8" />
 	<link rel="icon" id="favicon" href="/logo.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="theme-color" content="#0B1220" />
+	<!-- Apply saved/system theme before paint (no flash, works on every route) -->
+	<script>
+		(function () {
+			try {
+				var t = localStorage.getItem('kz-theme');
+				if (t !== 'light' && t !== 'dark') {
+					t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				}
+				document.documentElement.setAttribute('data-theme', t);
+			} catch (e) {
+				document.documentElement.setAttribute('data-theme', 'light');
+			}
+		})();
+	</script>
 	<!-- Perf: warm up the connection to the game/asset bucket + fonts -->
 	<link rel="preconnect" href="https://objectstorage.us-chicago-1.oraclecloud.com" crossorigin />
 	<link rel="dns-prefetch" href="https://objectstorage.us-chicago-1.oraclecloud.com" />

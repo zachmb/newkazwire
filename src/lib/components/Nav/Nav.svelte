@@ -3,6 +3,21 @@
 	import Icon from '@iconify/svelte';
 	import { page } from '$app/stores';
 	import { isSearchOpen, searchQuery } from '$lib/stores/search';
+	import { onMount } from 'svelte';
+
+	let theme = 'light';
+	onMount(() => {
+		theme = document.documentElement.getAttribute('data-theme') || 'light';
+	});
+	function toggleTheme() {
+		theme = theme === 'dark' ? 'light' : 'dark';
+		document.documentElement.setAttribute('data-theme', theme);
+		try {
+			localStorage.setItem('kz-theme', theme);
+		} catch (e) {
+			/* ignore */
+		}
+	}
 
 	function openSearch() {
 		isSearchOpen.set(true);
@@ -82,6 +97,16 @@
 			<Icon icon="mdi:shield-lock" class="text-lg" />
 			<span class="hidden sm:inline">Proxy</span>
 		</a>
+
+		<!-- Theme toggle (light/dark) -->
+		<button
+			on:click={toggleTheme}
+			class="grid h-10 w-10 flex-none place-items-center rounded-full text-base-content/80 transition hover:bg-primary/10 hover:text-primary"
+			aria-label="Toggle dark mode"
+			title="Toggle dark mode"
+		>
+			<Icon icon={theme === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night'} class="text-xl" />
+		</button>
 
 		<!-- Account -->
 		<a

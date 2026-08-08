@@ -24,7 +24,7 @@
 		class:box-rounded={config.styling.contentBoxStyleType === 'rounded'}
 	>
 		<img
-			class="absolute h-full w-full bg-white object-cover opacity-50"
+			class="absolute h-full w-full bg-base-100 object-cover opacity-50"
 			class:box-rounded={config.styling.contentBoxStyleType === 'rounded'}
 			loading="lazy"
 			src={image}
