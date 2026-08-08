@@ -1,19 +1,16 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { fade, fly } from 'svelte/transition';
-	import { isSearchOpen } from '$lib/stores/search';
+	import { isSearchOpen, searchQuery } from '$lib/stores/search';
 	import { games } from '$lib/data/games';
 
 	import { getCDNImageUrl } from '$lib/utils/cdn';
 
-	// Search logic
-	let searchQuery = '';
-
-	$: filteredGames = searchQuery
+	$: filteredGames = $searchQuery
 		? games.filter(
 				(g) =>
-					g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					g.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
+					g.title.toLowerCase().includes($searchQuery.toLowerCase()) ||
+					g.tags.some((t) => t.toLowerCase().includes($searchQuery.toLowerCase()))
 		  )
 		: [];
 
@@ -45,7 +42,7 @@
 				/>
 				<input
 					type="text"
-					bind:value={searchQuery}
+					bind:value={$searchQuery}
 					placeholder="Search for games..."
 					class="w-full rounded-full bg-white py-6 pl-20 pr-8 text-2xl font-bold text-neutral shadow-2xl placeholder:text-neutral/30 focus:outline-none focus:ring-4 focus:ring-primary/50"
 					autofocus

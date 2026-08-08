@@ -8,7 +8,6 @@
 	import customMessage from '$lib/console';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { themeChange } from 'theme-change';
 
 	afterNavigate(() => {
 		if (browser) {
@@ -27,7 +26,6 @@
 
 	onMount(() => {
 		customMessage();
-		themeChange(false);
 		telemetry.init();
 
 		// Check for daily reward immediately

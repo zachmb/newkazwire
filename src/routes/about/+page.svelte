@@ -1,89 +1,72 @@
 <script lang="ts">
 	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
+
+	const stats = [
+		{ value: '130+', label: 'Games' },
+		{ value: '100%', label: 'Free' },
+		{ value: '0', label: 'Downloads' }
+	];
+	const values = [
+		{ icon: 'mdi:flash', title: 'Blazing fast', body: 'Games stream from a global bucket and load instantly — no installs, no waiting.' },
+		{ icon: 'mdi:shield-lock', title: 'Unblocked anywhere', body: 'A built-in private proxy keeps the whole library playable on school and work networks.' },
+		{ icon: 'mdi:sparkles', title: 'Made by the community', body: 'Anyone can build a game with AI and publish it to the Kazwire library in seconds.' }
+	];
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - About</title>
-	<meta property="og:title" content="{config.branding.name} - About" />
-	<meta name="description" content="Master mathematics with {config.branding.name}!" />
-	<meta property="og:description" content="Master mathematics with {config.branding.name}!" />
+	<title>{config.branding.name} — About</title>
+	<meta name="description" content="About {config.branding.name} — the best place to play free, unblocked browser games." />
 </svelte:head>
 
-<div class="min-h-screen bg-[#5B9BFF] p-4 text-neutral md:p-12">
-	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-white shadow-2xl">
-		<!-- Header -->
-		<div
-			class="bg-gradient-to-br from-[#0B1B33] to-[#071022] p-8 text-center text-white md:p-16"
-		>
-			<div
-				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
-			>
-				<img src="/logo.png" alt="DuckMath" class="h-full w-full rounded-2xl object-cover" />
+<div class="mx-auto max-w-4xl px-4 py-12 sm:py-16">
+	<!-- Hero -->
+	<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B1220] to-[#2563EB] p-8 text-center text-white sm:p-14">
+		<img src="/logo.png" alt="" class="mx-auto mb-5 h-20 w-20 rounded-2xl object-contain ring-1 ring-white/20" />
+		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">About Kazwire</h1>
+		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/80">
+			{config.branding.slogan} The best place to play free, unblocked browser games — anywhere.
+		</p>
+		<div class="mx-auto mt-8 grid max-w-md grid-cols-3 gap-4">
+			{#each stats as s}
+				<div class="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
+					<div class="text-2xl font-black text-[#FF9F1C]">{s.value}</div>
+					<div class="text-xs font-bold uppercase tracking-wider text-white/70">{s.label}</div>
+				</div>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Body -->
+	<div class="mt-10 space-y-5 text-lg leading-relaxed text-base-content/80">
+		<p class="text-xl font-bold text-base-content">
+			Kazwire exists for one reason: to let you play the games you love, wherever you are, without the hassle.
+		</p>
+		<p>
+			No accounts, no downloads, no blocked pages. Every title runs right in your browser and loads in seconds. When a network gets in the way, our built-in private proxy gets you through it.
+		</p>
+	</div>
+
+	<!-- Values -->
+	<div class="mt-10 grid gap-5 sm:grid-cols-3">
+		{#each values as v}
+			<div class="rounded-2xl bg-base-200 p-6">
+				<div class="mb-3 grid h-12 w-12 place-items-center rounded-xl bg-primary/15 text-primary">
+					<Icon icon={v.icon} class="text-2xl" />
+				</div>
+				<h3 class="text-lg font-black text-base-content">{v.title}</h3>
+				<p class="mt-1 text-sm leading-relaxed text-base-content/70">{v.body}</p>
 			</div>
-			<h1 class="text-5xl font-black tracking-tight text-[#5B9BFF] md:text-6xl">
-				About Kazwire
-			</h1>
-			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
-				The premier destination for mathematical excellence.
-			</p>
-		</div>
+		{/each}
+	</div>
 
-		<!-- Content -->
-		<div class="px-8 py-12 md:px-20 md:py-20">
-			<article
-				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-[#0B1B33] prose-p:font-medium prose-p:leading-relaxed prose-p:text-neutral/70"
-			>
-				<p class="text-xl font-bold italic text-[#0B1B33]/80">
-					Mathematics is the language of the universe. At {config.branding
-						.name}, we are dedicated to helping students become fluent in this language through engaged
-					learning and interactive problem-solving.
-				</p>
-
-				<p>
-					Founded by a team of educators and mathematicians, {config.branding.name} provides a comprehensive
-					suite of tools designed to enhance numerical fluency, critical thinking, and logical reasoning.
-					We believe that learning should be accessible, rigorous, and, most importantly, effective.
-				</p>
-
-				<div class="my-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-					<div class="rounded-3xl bg-[#5B9BFF]/10 p-8">
-						<Icon icon="mdi:calculator-variant" class="mb-4 text-4xl text-[#0B1B33]" />
-						<h3 class="mt-0">Core Curriculum</h3>
-						<p class="mb-0">
-							Aligned with standard educational requirements, our resources cover everything from basic
-							arithmetic to advanced calculus concepts.
-						</p>
-					</div>
-					<div class="rounded-3xl bg-[#5B9BFF]/10 p-8">
-						<Icon icon="mdi:brain" class="mb-4 text-4xl text-[#0B1B33]" />
-						<h3 class="mt-0">Cognitive Skills</h3>
-						<p class="mb-0">
-							Beyond numbers, we focus on developing spatial reasoning, pattern recognition, and
-							strategic planning abilities.
-						</p>
-					</div>
-				</div>
-
-				<p>
-					Our platform utilizes advanced algorithms to adapt to each student's learning pace, ensuring
-					that concepts are mastered before moving on to more complex topics. Whether you are
-					studying for a test or simply looking to sharpen your mind, {config.branding.name} is your
-					trusted partner in education.
-				</p>
-
-				<p>
-					Join the millions of learners who have improved their math scores with {config.branding
-						.name}. Start your journey to mathematical mastery today.
-				</p>
-
-				<div
-					class="mt-16 flex flex-col items-center border-t border-neutral/5 pt-12 text-center italic"
-				>
-					<p class="text-2xl font-black text-[#0B1B33]">Calculate. Solve. Succeed.</p>
-					<p class="mt-2 text-lg font-bold text-neutral/40">The {config.branding.name} Educational Team</p>
-				</div>
-			</article>
-		</div>
+	<!-- CTA -->
+	<div class="mt-10 flex flex-wrap justify-center gap-3">
+		<a href="/" class="flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-black text-white transition hover:brightness-110">
+			<Icon icon="mdi:play" class="text-xl" /> Start playing
+		</a>
+		<a href="/ai" class="flex items-center gap-2 rounded-full bg-base-200 px-6 py-3 font-bold text-base-content transition hover:bg-base-300">
+			<Icon icon="mdi:sparkles" class="text-xl text-primary" /> Make a game
+		</a>
 	</div>
 </div>

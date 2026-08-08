@@ -158,7 +158,7 @@
 					<HeroGameCard
 						game={{
 							name: game.title,
-							developer: 'Froggy AI',
+							developer: 'Kazwire AI',
 							image: '/logo.png'
 						}}
 						id={game.id}

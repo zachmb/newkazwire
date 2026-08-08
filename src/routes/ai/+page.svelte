@@ -186,7 +186,7 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Froggy AI Lab</title>
+	<title>{config.branding.name} - Kazwire AI Lab</title>
 </svelte:head>
 
 <div class="font-sans min-h-screen bg-gradient-to-br from-[#5B9BFF] to-[#2563EB] p-4 text-neutral">
@@ -208,7 +208,7 @@
 						<Icon icon="mdi:robot" class="text-5xl" />
 					</div>
 					<div>
-						<h1 class="text-4xl font-black tracking-tight">Froggy AI Lab</h1>
+						<h1 class="text-4xl font-black tracking-tight">Kazwire AI Lab</h1>
 						<p class="text-lg opacity-70">Turn your ideas into playable games instantly.</p>
 					</div>
 				</div>

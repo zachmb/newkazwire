@@ -145,7 +145,7 @@
 				</div>
 			</div>
 			{#if aiGames.length}
-				<div class="row-scroll flex snap-x gap-3 overflow-x-auto pb-2">
+				<div class="row-scroll -mx-1 flex snap-x gap-3 overflow-x-auto px-1 py-3">
 					{#each aiGames as g (g.id)}
 						<a href={'/ai/user-g/' + g.id} class="group relative flex aspect-square w-36 flex-none snap-start flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/25 to-secondary/25 p-3 text-center ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-xl sm:w-40 md:w-44">
 							<Icon icon="mdi:robot-happy" class="text-4xl text-base-content/70 transition group-hover:scale-110" />

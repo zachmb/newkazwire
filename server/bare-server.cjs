@@ -6,7 +6,17 @@
 const http = require('http');
 const { createBareServer } = require('@tomphttp/bare-server-node');
 
-const bare = createBareServer('/bare/');
+// NOTE: behind nginx every request's socket IP is 127.0.0.1, so the default
+// per-IP keep-alive cap (10) is exhausted almost instantly and users get
+// CONNECTION_LIMIT_EXCEEDED. Per-IP limiting is meaningless behind a reverse
+// proxy, so raise it effectively to unlimited.
+const bare = createBareServer('/bare/', {
+	connectionLimiter: {
+		maxConnectionsPerIP: 1000000,
+		windowDuration: 60,
+		blockDuration: 1
+	}
+});
 const port = Number(process.env.BARE_PORT) || 8080;
 const host = process.env.BARE_HOST || '127.0.0.1';
 

@@ -2,13 +2,14 @@
 	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
 	import { page } from '$app/stores';
+	import { isSearchOpen, searchQuery } from '$lib/stores/search';
 
-	let searchQuery = '';
-
+	function openSearch() {
+		isSearchOpen.set(true);
+	}
 	function submitSearch(e: Event) {
 		e.preventDefault();
-		const q = searchQuery.trim();
-		window.location.href = q ? '/search?q=' + encodeURIComponent(q) : '/search';
+		isSearchOpen.set(true);
 	}
 
 	const links = [
@@ -18,8 +19,13 @@
 		{ href: '/ai/gallery', label: 'Community', icon: 'mdi:account-group' }
 	];
 
-	$: pathname = $page.url.pathname;
-	const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+	// Exact match for '/' and '/ai' (so /ai/gallery highlights Community, not Create);
+	// prefix match (href + '/') for everything else. Takes pathname as an arg so the
+	// template expression re-evaluates reactively on client-side navigation.
+	const isActive = (href: string, pathname: string) => {
+		if (href === '/' || href === '/ai') return pathname === href;
+		return pathname === href || pathname.startsWith(href + '/');
+	};
 </script>
 
 <header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/90 backdrop-blur-md">
@@ -40,7 +46,9 @@
 					<input
 						type="text"
 						placeholder="Search games…"
-						bind:value={searchQuery}
+						bind:value={$searchQuery}
+						on:focus={openSearch}
+						on:input={openSearch}
 						class="w-full bg-transparent text-sm font-medium text-base-content placeholder:text-base-content/50 focus:outline-none"
 						aria-label="Search games"
 					/>
@@ -55,9 +63,9 @@
 			{#each links as l}
 				<a
 					href={l.href}
-					class="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-bold transition {isActive(l.href)
+					class="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-bold transition {isActive(l.href, $page.url.pathname)
 						? 'bg-primary/15 text-primary'
-						: 'text-base-content/80 hover:bg-base-200 hover:text-base-content'}"
+						: 'text-base-content/80 hover:bg-primary/10 hover:text-primary'}"
 				>
 					<Icon icon={l.icon} class="text-lg" />
 					{l.label}
@@ -75,20 +83,10 @@
 			<span class="hidden sm:inline">Proxy</span>
 		</a>
 
-		<!-- Theme toggle -->
-		<button
-			data-toggle-theme="dark,light"
-			class="grid h-10 w-10 flex-none place-items-center rounded-full text-base-content/80 transition hover:bg-base-200"
-			aria-label="Toggle dark mode"
-			title="Toggle dark mode"
-		>
-			<Icon icon="mdi:theme-light-dark" class="text-xl" />
-		</button>
-
 		<!-- Account -->
 		<a
-			href="/profile"
-			class="hidden h-10 w-10 flex-none place-items-center rounded-full text-base-content/80 transition hover:bg-base-200 sm:grid"
+			href="/account"
+			class="grid h-10 w-10 flex-none place-items-center rounded-full text-base-content/80 transition hover:bg-primary/10 hover:text-primary"
 			aria-label="Account"
 			title="Account"
 		>
@@ -101,9 +99,9 @@
 		{#each links as l}
 			<a
 				href={l.href}
-				class="flex flex-none items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition {isActive(l.href)
+				class="flex flex-none items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition {isActive(l.href, $page.url.pathname)
 					? 'bg-primary/15 text-primary'
-					: 'text-base-content/80 hover:bg-base-200'}"
+					: 'text-base-content/80 hover:bg-primary/10 hover:text-primary'}"
 			>
 				<Icon icon={l.icon} class="text-base" />
 				{l.label}

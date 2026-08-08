@@ -19,12 +19,34 @@
 		return 'https://www.google.com/search?q=' + encodeURIComponent(s);
 	}
 
+	function loadScript(src: string): Promise<void> {
+		return new Promise((resolve, reject) => {
+			if (document.querySelector(`script[data-uv="${src}"]`)) return resolve();
+			const s = document.createElement('script');
+			s.src = src;
+			s.dataset.uv = src;
+			s.onload = () => resolve();
+			s.onerror = () => reject(new Error('failed to load ' + src));
+			document.head.appendChild(s);
+		});
+	}
+
+	async function loadUVConfig() {
+		if ((window as any).__uv$config) return;
+		await loadScript('/uv/uv.bundle.js');
+		await loadScript('/uv/uv.config.js');
+		for (let i = 0; i < 50 && !(window as any).__uv$config; i++) {
+			await new Promise((r) => setTimeout(r, 100));
+		}
+		if (!(window as any).__uv$config) throw new Error('proxy config failed to load');
+	}
+
 	async function ensureSW() {
 		if (swReady) return true;
 		try {
-			const cfg = (window as any).__uv$config;
-			if (!cfg) throw new Error('proxy config not loaded');
 			if (!('serviceWorker' in navigator)) throw new Error('service workers are not supported in this browser');
+			await loadUVConfig();
+			const cfg = (window as any).__uv$config;
 			const reg = await navigator.serviceWorker.register('/uv.js', { scope: cfg.prefix });
 			// Wait for the worker to ACTIVATE. We can't use navigator.serviceWorker.ready
 			// because this page (/proxy) is outside the SW scope (/service/), so ready never resolves.

@@ -45,7 +45,7 @@
 
 		<div
 			bind:this={scroller}
-			class="row-scroll flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2"
+			class="row-scroll -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-1 py-3"
 		>
 			{#each games as game (game.href)}
 				<div class="aspect-square w-36 flex-none snap-start sm:w-40 md:w-44">
