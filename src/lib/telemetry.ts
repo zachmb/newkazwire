@@ -105,7 +105,10 @@ class TelemetryManager {
 		if (!el) return 'unknown';
 		if (el.id) return `#${el.id}`;
 		let path = el.tagName.toLowerCase();
-		if (el.className) path += `.${el.className.split(' ').join('.')}`;
+		// el.className is an SVGAnimatedString (not a string) for SVG elements
+		if (typeof el.className === 'string' && el.className) {
+			path += `.${el.className.split(' ').join('.')}`;
+		}
 		return path;
 	}
 

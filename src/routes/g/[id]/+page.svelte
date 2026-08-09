@@ -12,6 +12,8 @@
 	import { enhance } from '$app/forms';
 	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
 	import GameRail from '$lib/components/GameRail.svelte';
+	import GameCard from '$lib/components/GameCard.svelte';
+	import GameRow from '$lib/components/GameRow.svelte';
 	import Icon from '@iconify/svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
@@ -23,6 +25,22 @@
 		...g,
 		image: getCDNImageUrl(g.image, 'game')
 	}));
+
+	// Related games: prefer shared tags, fall back to filling with others.
+	$: related = (() => {
+		const currentTags: string[] = data.game.tags || [];
+		const others = localizedGames.filter((g: any) => g.href.split('/').pop() !== data.game.id);
+		const byTag = others.filter((g: any) => (g.tags || []).some((t: string) => currentTags.includes(t)));
+		const seen = new Set<string>();
+		const out: any[] = [];
+		for (const g of [...byTag, ...others]) {
+			if (!seen.has(g.href)) {
+				seen.add(g.href);
+				out.push(g);
+			}
+		}
+		return out;
+	})();
 
 	// Turns a search into a valid URL
 	function search(input: string) {
@@ -80,8 +98,12 @@
 		window.scrollTo(0, 0);
 
 		registerServiceWorker();
-		if (navigator.canShare({ url: window.location.href })) {
-			canShare = true;
+		try {
+			if (typeof navigator.canShare === 'function' && navigator.canShare({ url: window.location.href })) {
+				canShare = true;
+			}
+		} catch (e) {
+			/* canShare unsupported — non-critical */
 		}
 		const event = new CustomEvent('rendered', {
 			detail: {
@@ -255,6 +277,7 @@
 					views: data.game.views || 0
 				}}
 				id={data.game.id}
+				tags={data.game.tags || []}
 				bind:playing={isPlaying}
 				on:play={expandiFrame}
 				on:share={openShareModal}
@@ -398,6 +421,9 @@
 					{/each}
 				</div>
 			</div>
+
+			<!-- More games like this -->
+			<GameRow title="More games like this" icon="mdi:controller" games={related.slice(0, 15)} />
 		</main>
 
 		<!-- Right Column: Ads & Recs -->
@@ -419,23 +445,14 @@
 
 			<!-- Recommended Games -->
 			<div class="flex flex-col gap-4">
-				<h3 class="px-2 text-lg font-black text-white drop-shadow-sm">Recommended</h3>
+				<h3 class="flex items-center gap-2 px-1 text-lg font-black text-base-content">
+					<Icon icon="mdi:thumb-up" class="text-xl text-primary" /> Recommended
+				</h3>
 				<div class="grid grid-cols-2 gap-3">
-					{#each localizedGames.slice(0, 6) as game}
-						<a
-							href={game.href}
-							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
-						>
-							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
-							<!-- Minimal overlay -->
-							<div
-								class="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-							>
-								<span class="block truncate text-[10px] font-bold text-white">
-									{game.title}
-								</span>
-							</div>
-						</a>
+					{#each related.slice(0, 6) as game (game.href)}
+						<div class="aspect-square">
+							<GameCard title={game.title} image={game.image} href={game.href} />
+						</div>
 					{/each}
 				</div>
 			</div>
