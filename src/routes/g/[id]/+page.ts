@@ -27,6 +27,8 @@ export const load: PageLoad = async ({ params }) => {
 		};
 	}
 
+	const play = (game as any).play as string | undefined;
+
 	return {
 		game: {
 			id: slug,
@@ -39,8 +41,10 @@ export const load: PageLoad = async ({ params }) => {
 			tags: game.tags || [],
 			views: 1000,
 			rating: 5,
-			embedURL: null, // Force null to trigger static path in +page.svelte
-			emulatorType: null
+			// Play type from game metadata: 'ruffle' -> Flash SWF via /g/ruffle/[id];
+			// 'embed' -> external site proxied through Ultraviolet; else static HTML.
+			embedURL: play === 'embed' ? (game as any).src : null,
+			emulatorType: play === 'ruffle' ? 'ruffle' : play === 'emulator' ? 'emulatorjs' : null
 		} as any
 	};
 };

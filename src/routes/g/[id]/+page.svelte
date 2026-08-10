@@ -223,6 +223,24 @@
 		}, 500);
 	}
 
+	// Keyboard shortcuts: F = fullscreen, Esc = exit, Space/Enter = play
+	function onKey(e: KeyboardEvent) {
+		const el = e.target as HTMLElement;
+		if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+		const k = e.key.toLowerCase();
+		if (k === 'f') {
+			e.preventDefault();
+			if (!isPlaying) expandiFrame();
+			else toggleFakeFullscreen();
+		} else if (e.key === 'Escape') {
+			if (isFakeFullscreen) toggleFakeFullscreen();
+			else if (expanded) shrinkiFrame();
+		} else if ((k === ' ' || k === 'enter') && !isPlaying) {
+			e.preventDefault();
+			expandiFrame();
+		}
+	}
+
 	let showShareModal = false;
 	function openShareModal() {
 		showShareModal = true;
@@ -232,7 +250,7 @@
 	}
 </script>
 
-<svelte:window bind:innerWidth={innerWidth} />
+<svelte:window bind:innerWidth={innerWidth} on:keydown={onKey} />
 <svelte:head>
 	<title>{config.branding.name} - {data.game.title}</title>
 	<meta property="og:title" content="{config.branding.name} - {data.game.title}" />
@@ -319,7 +337,7 @@
 						<!-- Ruffle game -->
 					{:else if data.game.emulatorType == 'ruffle'}
 						<iframe
-							src={'/games/ruffle/' + data.game.id}
+							src={'/g/ruffle/' + data.game.id}
 							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.game.title}
@@ -329,7 +347,7 @@
 						<!-- EmulatorJS game -->
 					{:else if data.game.emulatorType == 'emulatorjs'}
 						<iframe
-							src={'/games/emulator/' + data.game.id}
+							src={'/g/emulator/' + data.game.id}
 							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
 							title={data.game.title}
