@@ -7,6 +7,7 @@
 	import { games } from '$lib/data/games';
 	import { getCDNImageUrl } from '$lib/utils/cdn';
 	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
+	import { pingStreak } from '$lib/utils/streak';
 
 	let game: any = null;
 	let isLoading = true;
@@ -22,6 +23,7 @@
 	async function expandiFrame() {
 		if (!isPlaying) {
 			isPlaying = true;
+			pingStreak();
 			await tick();
 		}
 		if (!frameContainer) return;
@@ -74,6 +76,17 @@
 		}
 	}
 
+	// Lightweight toast (replaces blocking alert() dialogs).
+	let toast = '';
+	let toastKind: 'success' | 'error' = 'success';
+	let toastTimer: ReturnType<typeof setTimeout>;
+	function showToast(msg: string, kind: 'success' | 'error' = 'success') {
+		toast = msg;
+		toastKind = kind;
+		clearTimeout(toastTimer);
+		toastTimer = setTimeout(() => (toast = ''), 3200);
+	}
+
 	let showShareModal = false;
 	let shareCopied = false;
 
@@ -117,7 +130,7 @@
 
 	async function submitReview() {
 		if (rating === 0) {
-			alert('Please select a rating');
+			showToast('Pick a star rating first', 'error');
 			return;
 		}
 
@@ -130,10 +143,10 @@
 			});
 			if (!res.ok) throw new Error('Failed to submit review');
 
-			alert('Review submitted! It will appear after the next update.');
+			showToast('Thanks for reviewing! 🎉');
 			rating = 0;
 		} catch (err: any) {
-			alert(err.message);
+			showToast(err.message || 'Something went wrong', 'error');
 		} finally {
 			isSubmittingReview = false;
 		}
@@ -339,6 +352,22 @@
 				</div>
 			{/if}
 		</main>
+
+		<!-- Toast -->
+		{#if toast}
+			<div class="pointer-events-none fixed inset-x-0 bottom-6 z-[2000] flex justify-center px-4">
+				<div
+					class="pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-xl {toastKind ===
+					'success'
+						? 'bg-primary'
+						: 'bg-error'}"
+					role="status"
+				>
+					<Icon icon={toastKind === 'success' ? 'mdi:check-circle' : 'mdi:alert-circle'} class="text-lg" />
+					{toast}
+				</div>
+			</div>
+		{/if}
 
 		<!-- Right Column -->
 		<aside class="flex flex-col gap-6">

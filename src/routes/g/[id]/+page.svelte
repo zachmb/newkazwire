@@ -20,6 +20,7 @@
 	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
 	import { userProfile } from '$lib/stores/userProfile';
 	import { games } from '$lib/data/games';
+	import { pingStreak } from '$lib/utils/streak';
 
 	$: localizedGames = games.map((g: any) => ({
 		...g,
@@ -202,9 +203,10 @@
 		loadedFrame = true;
 		loadingGame = true;
 
-		// Track this game as recently played
+		// Track this game as recently played + count it toward the daily play streak
 		recentlyPlayed.addGame(data.game.id);
 		userProfile.incrementGamesPlayed();
+		pingStreak();
 
 		setTimeout(() => {
 			loadedGame();
@@ -367,6 +369,18 @@
 				</div>
 			</HeroGameCard>
 
+			<!-- Scroll tease: nudge players down to the rest of the library -->
+			{#if !expanded && !isFakeFullscreen}
+				<a
+					href="#more-games"
+					class="group -mt-1 flex items-center justify-center gap-2 text-sm font-bold text-base-content/50 transition hover:text-primary"
+				>
+					<Icon icon="mdi:gamepad-variant" class="text-lg" />
+					<span>{related.length}+ more games below</span>
+					<Icon icon="mdi:chevron-double-down" class="animate-bounce text-xl" />
+				</a>
+			{/if}
+
 			<!-- Exit Fullscreen Button -->
 			{#if expanded && !isFakeFullscreen}
 				<button
@@ -441,7 +455,9 @@
 			</div>
 
 			<!-- More games like this -->
-			<GameRow title="More games like this" icon="mdi:controller" games={related.slice(0, 15)} />
+			<div id="more-games" class="scroll-mt-24">
+				<GameRow title="More games like this" icon="mdi:controller" games={related.slice(0, 15)} />
+			</div>
 		</main>
 
 		<!-- Right Column: Ads & Recs -->

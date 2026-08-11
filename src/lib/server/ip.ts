@@ -42,10 +42,12 @@ function isPrivateIp(ip: string): boolean {
 }
 
 /**
- * Best-effort coarse location ("City, CC") from an IP for public creator
- * attribution. Never throws and never blocks the caller for long: a private/localhost
- * IP or any lookup failure yields "" (the UI just omits the location). Uses the
- * keyless ip-api.com endpoint with a short timeout.
+ * Best-effort coarse location ("City, State, CC" — e.g. "Bellevue, WA, US") from an IP
+ * for public creator attribution. Never throws and never blocks the caller for long: a
+ * private/localhost IP or any lookup failure yields "" (the UI just omits the location).
+ * Uses the keyless ip-api.com endpoint with a short timeout. The region falls back to
+ * regionName when the short code is absent, and is skipped entirely if it duplicates the
+ * city (some regions report the city as the region).
  */
 export async function geolocate(ip: string): Promise<string> {
 	if (isPrivateIp(ip)) return '';
@@ -53,17 +55,18 @@ export async function geolocate(ip: string): Promise<string> {
 		const controller = new AbortController();
 		const t = setTimeout(() => controller.abort(), 2500);
 		const res = await fetch(
-			`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,city,regionName,country,countryCode`,
+			`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,city,region,regionName,country,countryCode`,
 			{ signal: controller.signal }
 		);
 		clearTimeout(t);
 		if (!res.ok) return '';
 		const d = await res.json();
 		if (d.status !== 'success') return '';
-		const city = (d.city || d.regionName || '').toString().trim();
+		const city = (d.city || '').toString().trim();
+		const region = (d.region || d.regionName || '').toString().trim();
 		const cc = (d.countryCode || d.country || '').toString().trim();
-		if (city && cc) return `${city}, ${cc}`;
-		return cc || city || '';
+		const parts = [city, region && region !== city ? region : '', cc].filter(Boolean);
+		return parts.join(', ');
 	} catch {
 		return '';
 	}
