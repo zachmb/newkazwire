@@ -456,6 +456,16 @@ const OCI_POSTS_PATH = 'community/posts.json';
 const OCI_PROFILES_PATH = 'user-stats/profiles.json';
 const MAX_POSTS_KEPT = 500;
 
+export interface RepostRef {
+    id: string;
+    uid: string;
+    author: string;
+    text: string;
+    gameId?: string;
+    gameTitle?: string;
+    createdAt: string;
+}
+
 export interface Post {
     id: string;
     uid: string;        // author's kazwire_uid (public — used only to link to their profile)
@@ -466,6 +476,9 @@ export interface Post {
     gameTitle?: string;
     createdAt: string;
     likes: number;
+    replies?: Reply[];      // inline replies to this post
+    repostCount?: number;   // times this post was reposted
+    repostOf?: RepostRef;   // set when THIS post is a repost of another
 }
 
 export interface Reply {
@@ -535,6 +548,63 @@ export async function likePost(id: string, delta = 1): Promise<number | null> {
     post.likes = Math.max(0, (post.likes || 0) + delta);
     await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(posts), 'application/json');
     return post.likes;
+}
+
+/** Add a reply to a post. Returns the reply, or null if the post is gone. */
+export async function addPostReply(
+    postId: string,
+    r: Omit<Reply, 'id' | 'createdAt' | 'likes'>
+): Promise<Reply | null> {
+    const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return null;
+    const reply: Reply = { ...r, id: newId(), createdAt: new Date().toISOString(), likes: 0 };
+    post.replies = post.replies || [];
+    post.replies.push(reply);
+    await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(posts), 'application/json');
+    return reply;
+}
+
+/** Repost an existing post: bumps the original's repostCount and creates a new feed
+ *  entry that embeds a reference to the original. Returns the new repost. */
+export async function repostPost(
+    postId: string,
+    by: { uid: string; author: string; location?: string }
+): Promise<Post | null> {
+    const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
+    const original = posts.find((p) => p.id === postId);
+    if (!original) return null;
+    // Repost the ROOT (avoid nesting reposts of reposts).
+    const root = original.repostOf
+        ? original.repostOf
+        : {
+              id: original.id,
+              uid: original.uid,
+              author: original.author,
+              text: original.text,
+              gameId: original.gameId,
+              gameTitle: original.gameTitle,
+              createdAt: original.createdAt
+          };
+    const target = posts.find((p) => p.id === root.id);
+    if (target) target.repostCount = (target.repostCount || 0) + 1;
+
+    const repost: Post = {
+        id: newId(),
+        uid: by.uid,
+        author: by.author,
+        location: by.location,
+        text: '',
+        createdAt: new Date().toISOString(),
+        likes: 0,
+        repostOf: root
+    };
+    posts.push(repost);
+    const trimmed = posts
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, MAX_POSTS_KEPT);
+    await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(trimmed), 'application/json');
+    return repost;
 }
 
 /* ---- Per-game comments + replies ---- */
