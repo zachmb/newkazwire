@@ -881,8 +881,10 @@ export interface BuyResult {
  * ------------------------------------------------------------------ */
 
 const OCI_MARKET_PATH = 'market/assets.json';
-const PRICE_BASE = 10;      // price of the very first share
-const PRICE_SLOPE = 0.02;   // price gained per outstanding share
+const PRICE_BASE = 5;       // price of the very first share
+const PRICE_SLOPE = 0.25;   // price gained per outstanding share (steep enough that demand
+                            // moves the price meaningfully — early investors profit when
+                            // others pile in; still a symmetric curve so no instant arb).
 const MAX_HISTORY = 120;
 
 export interface PricePoint { t: number; p: number; }
