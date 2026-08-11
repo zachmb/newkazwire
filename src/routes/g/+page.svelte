@@ -23,7 +23,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Games</title>
 	<meta name="description" content="Play for free now on {config.branding.name}!" />
 	<meta property="og:description" content="Play for free now on {config.branding.name}!" />
 </svelte:head>

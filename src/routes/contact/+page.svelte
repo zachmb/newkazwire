@@ -21,7 +21,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} — Contact</title>
 	<meta name="description" content="Get in touch with the {config.branding.name} team." />
 </svelte:head>
 

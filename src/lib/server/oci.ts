@@ -476,6 +476,7 @@ export interface Post {
     text: string;
     gameId?: string;    // optional shared game (AI game id)
     gameTitle?: string;
+    link?: string;      // optional user-supplied link (http/https only, validated server-side)
     createdAt: string;
     likes: number;
     replies?: Reply[];      // inline replies to this post

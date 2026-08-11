@@ -24,7 +24,6 @@
 </script>
 
 <svelte:head>
-	<title>Blog | {config.branding.name}</title>
 	<meta
 		name="description"
 		content="Explore the latest in gaming, technology, and AI with the Kazwire blog. Deep dives, industry trends, and more."

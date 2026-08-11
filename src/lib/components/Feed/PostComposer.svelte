@@ -23,6 +23,7 @@
 		text: string;
 		gameId?: string;
 		gameTitle?: string;
+		link?: string;
 		createdAt: number | string;
 		likes: number;
 	};
@@ -33,6 +34,7 @@
 	const MAX = 500;
 
 	let text = $state('');
+	let link = $state('');
 	let posting = $state(false);
 	let error = $state('');
 
@@ -121,7 +123,8 @@
 					author: name,
 					text: text.trim(),
 					gameId: attached?.id,
-					gameTitle: attached?.title
+					gameTitle: attached?.title,
+					link: link.trim() || undefined
 				})
 			});
 			const data = await res.json().catch(() => null);
@@ -131,6 +134,7 @@
 			}
 			// Reset composer and hand the new post up.
 			text = '';
+			link = '';
 			attached = null;
 			onposted?.(data.post as Post);
 		} catch {
@@ -173,6 +177,11 @@
 			</div>
 		</form>
 	{:else}
+		<!-- How-to: anyone can post; spell out the three things a post can carry. -->
+		<p class="mb-3 flex items-start gap-1.5 text-xs leading-relaxed text-base-content/55">
+			<Icon icon="lucide:info" class="mt-0.5 h-3.5 w-3.5 shrink-0" />
+			<span>Anyone can post to the feed — write a message, attach a game, and/or paste any link (https://…). Your post shows up in the scroll feed for everyone.</span>
+		</p>
 		<div class="flex gap-3">
 			<div
 				class="mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-base-300 text-base-content/50"
@@ -211,7 +220,19 @@
 					</div>
 				{/if}
 
-				<!-- Game picker panel -->
+				<!-- Optional link: anyone can attach their own URL to a post -->
+				<label class="mt-2 flex items-center gap-2 rounded-xl bg-base-200 px-3 py-2 ring-1 ring-base-300 focus-within:ring-2 focus-within:ring-primary">
+						<Icon icon="lucide:link" class="h-4 w-4 shrink-0 text-base-content/50" />
+						<input
+							type="url"
+							inputmode="url"
+							bind:value={link}
+							placeholder="Add a link (optional) — https://…"
+							class="w-full bg-transparent text-sm text-base-content placeholder:text-base-content/40 focus:outline-none"
+						/>
+					</label>
+
+					<!-- Game picker panel -->
 				{#if showPicker}
 					<div class="mt-2 max-h-56 overflow-y-auto rounded-2xl border border-base-300 bg-base-200">
 						{#if !gamesLoaded}

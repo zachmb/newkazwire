@@ -11,10 +11,14 @@
 
 	afterNavigate(() => {
 		if (browser) {
+			// The tab title is ALWAYS just the current domain (never the brand or a
+			// keyword like "proxy"/"games") so network filters (e.g. GoGuardian) that
+			// key off the page title see only the URL the site is already served from.
+			// A user-chosen tab cloak (tabName) still wins if they set one.
 			let tabName = localStorage.getItem('tabName');
 			let tabIcon = localStorage.getItem('tabIcon');
 
-			if (tabName) document.getElementsByTagName('title')[0].innerText = tabName;
+			document.title = tabName || location.hostname;
 			if (tabIcon) (document.getElementById('favicon') as HTMLLinkElement).href = tabIcon;
 		}
 	});
@@ -56,6 +60,9 @@
 </script>
 
 <svelte:head>
+	<!-- Single source of truth for the tab title: the current domain, SSR-rendered
+	     from the request host so even the raw HTML response carries no brand/keyword. -->
+	<title>{$page.url.hostname}</title>
 	<link
 		href="https://fonts.googleapis.com/css2?family={config.fonts
 			.googleFont}:wght@100;200;300;400;500;600;700;800;900&display=swap"

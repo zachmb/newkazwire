@@ -70,7 +70,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Updates</title>
 </svelte:head>
 
 <div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">

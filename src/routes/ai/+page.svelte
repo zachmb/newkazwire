@@ -368,7 +368,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Kazwire AI Lab</title>
 </svelte:head>
 
 <div class="min-h-screen bg-base-200 p-4 font-sans text-base-content">

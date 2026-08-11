@@ -3,7 +3,6 @@
 	import { config } from '$lib/config';
 </script>
 
-<svelte:head><title>Item Shop — {config.branding.name}</title></svelte:head>
 
 <div class="min-h-screen bg-base-100">
 	<div class="mx-auto max-w-6xl px-4 py-6">

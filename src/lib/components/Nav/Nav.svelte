@@ -4,6 +4,10 @@
 	import { page } from '$app/stores';
 	import { isSearchOpen, searchQuery } from '$lib/stores/search';
 	import { onMount } from 'svelte';
+	import Cloak from '$lib/components/Cloak.svelte';
+
+	// The brand wordmark + tab title are always just the domain we're served from.
+	$: host = $page.url.hostname;
 
 	let theme = 'light';
 	onMount(() => {
@@ -64,11 +68,13 @@
 		<a
 			href="/"
 			class="brand-tile flex flex-none items-center gap-2 rounded-xl px-2 py-1.5 sm:pr-3"
-			aria-label={config.branding.name}
+			aria-label="Home"
 		>
 			<img src="/logo.png" alt="" class="h-8 w-8 rounded-lg object-contain" />
+			<!-- Wordmark is ALWAYS the current domain (works on every mirror), cloaked
+			     so the brand string isn't machine-readable/copyable. -->
 			<span class="hidden text-xl font-black leading-none tracking-tight sm:block">
-				kaz<span style="color:#FF6A1A">wire</span><span class="text-[#0B1B33]/60">.com</span>
+				<Cloak text={host} />
 			</span>
 		</a>
 
@@ -102,7 +108,7 @@
 						: 'text-base-content/80 hover:bg-primary/10 hover:text-primary'}"
 				>
 					<Icon icon={l.icon} class="text-lg" />
-					{l.label}
+					<Cloak text={l.label} />
 				</a>
 			{/each}
 		</div>
@@ -114,17 +120,17 @@
 			title="Make your own game with AI"
 		>
 			<Icon icon="mdi:sparkles" class="text-lg" />
-			<span class="hidden sm:inline">Create</span>
+			<span class="hidden sm:inline"><Cloak text="Create" /></span>
 		</a>
 
 		<!-- Proxy CTA (always visible, prominent) -->
 		<a
 			href="/proxy"
 			class="flex flex-none items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110 sm:px-4"
-			title="Open the private web proxy"
+			title="Open the private browser"
 		>
 			<Icon icon="mdi:shield-lock" class="text-lg" />
-			<span class="hidden sm:inline">Proxy</span>
+			<span class="hidden sm:inline"><Cloak text="Proxy" /></span>
 		</a>
 
 		<!-- Discord CTA (always visible), to the right of Proxy -->
@@ -172,7 +178,7 @@
 					: 'text-base-content/80 hover:bg-primary/10 hover:text-primary'}"
 			>
 				<Icon icon={l.icon} class="text-base" />
-				{l.label}
+				<Cloak text={l.label} />
 			</a>
 		{/each}
 	</div>

@@ -219,7 +219,6 @@
 
 <svelte:window bind:innerWidth={innerWidth} />
 <svelte:head>
-	<title>{config.branding.name} - {data.app.title}</title>
 	<meta property="og:title" content="{config.branding.name} - {data.app.title}" />
 	<meta
 		name="description"

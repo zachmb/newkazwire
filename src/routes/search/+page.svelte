@@ -18,7 +18,6 @@
 </script>
 
 <svelte:head>
-	<title>Search{q ? ` — ${q}` : ''} · Kazwire</title>
 </svelte:head>
 
 <div class="mx-auto max-w-[1800px] px-3 py-6 sm:px-5">

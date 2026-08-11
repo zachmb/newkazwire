@@ -13,13 +13,27 @@ export const GET: RequestHandler = async ({ url }) => {
 export const POST: RequestHandler = async ({ request, getClientAddress }) => {
     try {
         const body = await request.json();
-        const { uid, author, text, gameId, gameTitle } = body || {};
+        const { uid, author, text, gameId, gameTitle, link } = body || {};
 
         if (!uid) return json({ error: 'A player name is required to post.' }, { status: 400 });
 
         const { text: clean, blocked } = cleanText(text, { maxLength: 500 });
         if (blocked || !clean) {
             return json({ error: 'That post was blocked by our filter. Keep it friendly!' }, { status: 400 });
+        }
+
+        // Optional user link: accept only well-formed http/https URLs (blocks
+        // javascript:, data:, etc.). Anything invalid is silently dropped.
+        let safeLink: string | undefined;
+        if (typeof link === 'string' && link.trim()) {
+            try {
+                const u = new URL(link.trim());
+                if (u.protocol === 'http:' || u.protocol === 'https:') {
+                    safeLink = u.toString().slice(0, 500);
+                }
+            } catch {
+                /* not a valid URL — drop it */
+            }
         }
 
         const ip = getRealIp(request, getClientAddress);
@@ -32,7 +46,8 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
             location: location || undefined,
             text: clean,
             gameId: typeof gameId === 'string' ? gameId : undefined,
-            gameTitle: typeof gameTitle === 'string' ? gameTitle.slice(0, 120) : undefined
+            gameTitle: typeof gameTitle === 'string' ? gameTitle.slice(0, 120) : undefined,
+            link: safeLink
         });
 
         // Best-effort profile activity bump.

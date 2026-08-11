@@ -97,7 +97,6 @@
 </script>
 
 <svelte:head>
-	<title>{gameData?.title || 'Game'} - {config.branding.name}</title>
 </svelte:head>
 
 <div

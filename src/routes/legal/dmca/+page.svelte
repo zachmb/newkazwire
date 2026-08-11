@@ -3,7 +3,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - DMCA Policy</title>
 </svelte:head>
 
 <div class="min-h-screen bg-base-200 p-4 text-base-content md:p-12">

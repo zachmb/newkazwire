@@ -4,7 +4,6 @@
 </script>
 
 <svelte:head>
-	<title>Plans - {config.branding.name}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-base-100 p-6 md:p-12">

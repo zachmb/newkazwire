@@ -116,7 +116,6 @@
 </script>
 
 <svelte:head>
-	<title>{profile ? `${profile.name} · Kazwire` : 'Player · Kazwire'}</title>
 	<meta
 		name="description"
 		content={profile

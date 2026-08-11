@@ -9,6 +9,7 @@
 	import StreakBadge from '$lib/components/StreakBadge.svelte';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	export let data: any;
 
@@ -74,8 +75,7 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} — Play unblocked games</title>
-	<meta property="og:title" content={config.branding.name} />
+	<meta property="og:title" content={$page.url.hostname} />
 	<meta name="description" content={config.branding.description} />
 	<meta property="og:description" content={config.branding.description} />
 </svelte:head>

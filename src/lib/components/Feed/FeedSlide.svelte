@@ -21,8 +21,20 @@
 		chip: string; // "AI" or a category
 		postText?: string; // for kind === 'post'
 		gameTitle?: string; // attached game title on a post
+		link?: string; // optional user link on a post
 		likes?: number;
 	};
+
+	// Short, readable label for a URL (host + trimmed path).
+	function linkLabel(url: string): string {
+		try {
+			const u = new URL(url);
+			const path = u.pathname === '/' ? '' : u.pathname;
+			return (u.host + path).replace(/\/$/, '').slice(0, 42);
+		} catch {
+			return url.slice(0, 42);
+		}
+	}
 
 	let {
 		item,
@@ -86,6 +98,18 @@
 				>
 					<Icon icon="lucide:play" class="h-5 w-5" />
 					Play {item.gameTitle}
+				</a>
+			{/if}
+
+			{#if item.link}
+				<a
+					href={item.link}
+					target="_blank"
+					rel="noopener nofollow"
+					class="flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-white/15 py-3.5 text-sm font-bold text-white ring-1 ring-white/25 backdrop-blur-sm transition-transform active:scale-95"
+				>
+					<Icon icon="lucide:external-link" class="h-4 w-4" />
+					{linkLabel(item.link)}
 				</a>
 			{/if}
 		</div>

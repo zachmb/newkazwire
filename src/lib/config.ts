@@ -1,8 +1,8 @@
 export const config = {
 	branding: {
 		name: 'Kazwire',
-		description: 'Play unblocked games at school (or anywhere!) on Kazwire. The best collection of fun, free browser games — no downloads, no blocks, just play.',
-		slogan: 'Play the internet, unblocked.',
+		description: 'Play free browser games anywhere. A big collection of fun games — no downloads, just click and play.',
+		slogan: 'Play the internet.',
 		mainDomain: 'https://kazwire.com',
 		supportEmail: 'support@kazwire.com'
 	},
@@ -24,7 +24,7 @@ export const config = {
 	faq: [
 		{
 			question: 'What is Kazwire?',
-			answer: 'Kazwire is a free collection of unblocked browser games. Everything runs right in your browser — no downloads, no installs, no accounts required.'
+			answer: 'Kazwire is a free collection of browser games. Everything runs right in your browser — no downloads, no installs, no accounts required.'
 		},
 		{
 			question: 'Is Kazwire free?',

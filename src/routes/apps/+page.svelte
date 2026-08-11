@@ -21,7 +21,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Apps</title>
 	<meta name="description" content="Browse for free now on {config.branding.name}!" />
 	<meta property="og:description" content="Browse for free now on {config.branding.name}!" />
 </svelte:head>

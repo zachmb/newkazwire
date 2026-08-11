@@ -202,7 +202,6 @@
 </script>
 
 <svelte:head>
-	<title>{game?.title || 'Loading...'} - {config.branding.name}</title>
 </svelte:head>
 
 <div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">

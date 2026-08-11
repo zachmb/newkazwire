@@ -3,7 +3,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Terms of Service</title>
 	<meta property="og:title" content="{config.branding.name} - Terms of Service" />
 	<meta name="description" content="Play and browse for free now on {config.branding.name}!" />
 	<meta

@@ -260,7 +260,6 @@
 
 <svelte:window bind:innerWidth={innerWidth} on:keydown={onKey} />
 <svelte:head>
-	<title>{config.branding.name} - {data.game.title}</title>
 	<meta property="og:title" content="{config.branding.name} - {data.game.title}" />
 	<meta
 		name="description"

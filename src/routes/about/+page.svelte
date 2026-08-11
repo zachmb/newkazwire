@@ -15,7 +15,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} — About</title>
 	<meta name="description" content="About {config.branding.name} — the best place to play free, unblocked browser games." />
 </svelte:head>
 

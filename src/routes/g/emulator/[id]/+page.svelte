@@ -35,7 +35,6 @@
 
 {#if data.game.emulatorType == 'emulatorjs'}
 	<head>
-		<title>{config.branding.name} - {data.game.title}</title>
 		<meta
 			name="description"
 			content="Play {data.game.title} for free now on {config.branding.name}!"

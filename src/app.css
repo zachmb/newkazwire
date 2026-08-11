@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Cloaked text (see Cloak.svelte): characters live REVERSED in the DOM and are
+  painted back to the correct visual order with bidi-override, so keyword scanners
+  and copy/select can't read the real word. Global (not scoped) so it also styles
+  cloaked spans rendered inside other components.
+*/
+.kz-cloak {
+	unicode-bidi: bidi-override;
+	direction: rtl;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 @layer base {
 	html,
 	body {

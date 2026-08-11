@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
+	import Cloak from '$lib/components/Cloak.svelte';
 
 	let query = '';
 	let iframe: HTMLIFrameElement;
@@ -115,8 +116,7 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} — Proxy</title>
-	<meta name="description" content="Browse the web freely and privately through the {config.branding.name} proxy." />
+	<meta name="description" content="Browse the web freely and privately." />
 	<script src="/uv/uv.bundle.js"></script>
 	<script src="/uv/uv.config.js"></script>
 </svelte:head>
@@ -157,7 +157,7 @@
 					<Icon icon="mdi:shield-lock" class="text-5xl" />
 				</div>
 				<div>
-					<h1 class="text-3xl font-black text-base-content">Private Proxy</h1>
+					<h1 class="text-3xl font-black text-base-content"><Cloak text="Private Browser" /></h1>
 					<p class="mx-auto mt-2 max-w-md text-base-content/70">
 						Browse any site right here — search above or jump to a favorite. Traffic routes through {config.branding.name}'s own server.
 					</p>
@@ -170,7 +170,7 @@
 					{/each}
 				</div>
 				<p class="max-w-md text-xs text-base-content/50">
-					Heads up: a proxy is not a VPN. It hides the destination from your network, but the site can still see it's being accessed. Don't use it for anything sensitive.
+					Heads up: this hides the destination from your network, but the site can still see it's being accessed. Don't use it for anything sensitive.
 				</p>
 			</div>
 		{/if}

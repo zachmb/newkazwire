@@ -30,6 +30,7 @@
 		chip: string;
 		postText?: string;
 		gameTitle?: string;
+		link?: string;
 		likes?: number;
 	};
 
@@ -50,6 +51,7 @@
 		text: string;
 		gameId?: string;
 		gameTitle?: string;
+		link?: string;
 		createdAt: number | string;
 		likes: number;
 	};
@@ -99,6 +101,7 @@
 			chip: 'Post',
 			postText: p.text,
 			gameTitle: p.gameTitle,
+			link: p.link,
 			likes: p.likes
 		};
 	}
@@ -281,7 +284,6 @@
 </script>
 
 <svelte:head>
-	<title>Feed · Kazwire</title>
 	<meta name="description" content="Swipe through Kazwire — games, AI community creations and community posts, one at a time." />
 </svelte:head>
 

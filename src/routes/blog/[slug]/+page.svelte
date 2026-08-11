@@ -25,7 +25,6 @@
 </script>
 
 <svelte:head>
-	<title>{blog.title} | {config.branding.name}</title>
 	<meta name="description" content={blog.description} />
 	<meta name="author" content={blog.author} />
 </svelte:head>

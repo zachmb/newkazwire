@@ -39,7 +39,6 @@
 	});
 </script>
 
-<svelte:head><title>Party Rooms — {config.branding.name}</title></svelte:head>
 
 <div class="min-h-screen bg-base-100">
 	<div class="mx-auto flex max-w-lg flex-col gap-6 px-4 py-10">

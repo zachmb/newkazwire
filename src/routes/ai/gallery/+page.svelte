@@ -37,7 +37,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - AI Community Gallery</title>
 </svelte:head>
 
 <div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">

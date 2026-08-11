@@ -64,7 +64,6 @@
 </script>
 
 <svelte:head>
-	<title>{config.branding.name} - Private Search</title>
 	<meta property="og:title" content="{config.branding.name} - Private Search" />
 	<meta name="description" content="Browse the web privately using DuckDuckGo!" />
 	<meta property="og:description" content="Browse the web privately using DuckDuckGo!" />

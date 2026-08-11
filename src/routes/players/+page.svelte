@@ -99,7 +99,6 @@
 </script>
 
 <svelte:head>
-	<title>Find players{query.trim() ? ` — ${query.trim()}` : ''} · Kazwire</title>
 	<meta name="description" content="Search Kazwire players and open their public profiles." />
 </svelte:head>
 
