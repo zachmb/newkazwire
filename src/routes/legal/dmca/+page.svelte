@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { config } from '$lib/config';
 </script>
 
@@ -12,7 +13,7 @@
 			<div
 				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-base-100 p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
 			>
-				<img src="/logo.png" alt="Kazwire" class="h-full w-full rounded-2xl object-cover" />
+				<img src="/logo.png" alt="" class="h-full w-full rounded-2xl object-cover" />
 			</div>
 			<h1 class="text-5xl font-black tracking-tight text-[#5B9BFF] md:text-6xl">DMCA Policy</h1>
 			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
@@ -26,9 +27,9 @@
 				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-base-content prose-p:font-medium prose-p:leading-relaxed prose-p:text-base-content/70 prose-li:font-medium prose-li:text-base-content/70"
 			>
 				<p>
-					{config.branding.name} respects the intellectual property rights of others and expects its
+					{$page.url.hostname} respects the intellectual property rights of others and expects its
 					users to do the same. In accordance with the Digital Millennium Copyright Act of 1998, the
-					text of which may be found on the U.S. Copyright Office website, {config.branding.name}
+					text of which may be found on the U.S. Copyright Office website, {$page.url.hostname}
 					will respond expeditiously to claims of copyright infringement.
 				</p>
 
@@ -53,7 +54,7 @@
 				<p>
 					You can reach our DMCA agent at:
 					<br />
-					<strong>Email:</strong> dmca@{config.branding.mainDomain}
+					<strong>Email:</strong> dmca@https://{$page.url.hostname}
 				</p>
 			</article>
 		</div>

@@ -260,14 +260,14 @@
 
 <svelte:window bind:innerWidth={innerWidth} on:keydown={onKey} />
 <svelte:head>
-	<meta property="og:title" content="{config.branding.name} - {data.game.title}" />
+	<meta property="og:title" content="{$page.url.hostname} - {data.game.title}" />
 	<meta
 		name="description"
-		content="Play {data.game.title} for free now on {config.branding.name}!"
+		content="Play {data.game.title} for free now on {$page.url.hostname}!"
 	/>
 	<meta
 		property="og:description"
-		content="Play {data.game.title} for free now on {config.branding.name}!"
+		content="Play {data.game.title} for free now on {$page.url.hostname}!"
 	/>
 
 	<script src="/uv/uv.config.js"></script>
@@ -326,7 +326,7 @@
 								<div class="flex flex-col items-center gap-8 sm:flex-row">
 									<img src="/logo.png" alt="Loading" class="h-16 w-16 animate-bounce" />
 									<h1 class="text-center text-3xl font-bold text-white sm:text-5xl">
-										{config.branding.name}
+										{$page.url.hostname}
 									</h1>
 								</div>
 								<Icon icon="line-md:loading-alt-loop" class="text-6xl text-white" />
@@ -433,11 +433,11 @@
 
 						<div class="mb-8 rounded-xl bg-base-100 p-8 md:p-12">
 							<a
-								href="https://kazwire.com/g/{data.game.id}"
+								href="{$page.url.origin}/g/{data.game.id}"
 								class="break-all text-5xl font-black tracking-tight text-primary hover:underline md:text-7xl"
 								target="_blank"
 							>
-								kazwire.com/g/{data.game.id}
+								{$page.url.hostname}/g/{data.game.id}
 							</a>
 						</div>
 

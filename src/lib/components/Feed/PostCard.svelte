@@ -204,7 +204,7 @@
 					</span>
 					<span class="min-w-0 flex-1">
 						<span class="block truncate text-sm font-bold text-base-content">{src.gameTitle || 'Play this game'}</span>
-						<span class="block text-xs text-base-content/50">Tap to play on Kazwire</span>
+						<span class="block text-xs text-base-content/50">Tap to play</span>
 					</span>
 					<Icon icon="lucide:chevron-right" class="h-5 w-5 shrink-0 text-base-content/40" />
 				</a>

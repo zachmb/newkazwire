@@ -431,7 +431,7 @@
 						<div class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
 						<div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div>
-								<h2 class="text-2xl font-black">Kazwire AI Lab</h2>
+								<h2 class="text-2xl font-black">AI Lab</h2>
 								<p class="mt-1 opacity-80">Turn your ideas into playable games instantly.</p>
 							</div>
 							<a href="/ai" class="btn shrink-0 rounded-2xl bg-base-100 font-black text-primary shadow-md hover:bg-white/90">

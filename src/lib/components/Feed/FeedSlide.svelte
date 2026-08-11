@@ -189,7 +189,8 @@
 	<div
 		class="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 px-4 pb-8 pr-20 text-white pb-[calc(2rem+env(safe-area-inset-bottom))]"
 	>
-		<!-- Creator attribution -->
+		<!-- Creator attribution (hidden when there's no named creator, e.g. library games) -->
+		{#if item.creatorName}
 		<div class="flex items-center gap-2 text-sm font-semibold">
 			<span class="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-content">
 				<Icon
@@ -206,6 +207,7 @@
 				</span>
 			{/if}
 		</div>
+		{/if}
 
 		<!-- Title -->
 		<h2 class="text-3xl font-black leading-tight drop-shadow-lg">{item.title}</h2>

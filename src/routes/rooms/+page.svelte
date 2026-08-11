@@ -76,7 +76,7 @@
 			<div class="flex flex-col gap-1 rounded-2xl bg-base-200 p-4 ring-1 ring-base-300">
 				<Icon icon="mdi:gamepad-variant" class="text-2xl text-primary" />
 				<span class="font-bold text-base-content">Play together</span>
-				<span class="text-xs text-base-content/60">The leader pushes any Kazwire game to the whole room.</span>
+				<span class="text-xs text-base-content/60">The leader pushes any game to the whole room.</span>
 			</div>
 			<div class="flex flex-col gap-1 rounded-2xl bg-base-200 p-4 ring-1 ring-base-300">
 				<Icon icon="mdi:bomb" class="text-2xl text-primary" />

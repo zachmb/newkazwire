@@ -34,7 +34,7 @@ export const load: PageLoad = async ({ params }) => {
 			id: slug,
 			slug: slug,
 			name: game.title,
-			developer: 'Kazwire',
+			developer: '',
 			image: game.image,
 			description: game.description || 'No description available.',
 			top_color: '#000000',

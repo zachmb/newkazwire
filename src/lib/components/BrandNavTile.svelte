@@ -17,7 +17,7 @@
 		data-sveltekit-reload
 		class="brand-section flex h-[60%] flex-col items-center justify-center gap-1 p-2 no-underline"
 	>
-		<img src="/logo.png" alt="Kazwire" class="h-8 w-8 object-contain" />
+		<img src="/logo.png" alt="" class="h-8 w-8 object-contain" />
 		<h1 class="text-lg font-black lowercase leading-none tracking-tighter sm:text-xl">
 			kaz<span style="color:#FF6A1A">wire</span><span style="color:rgba(11,27,51,0.55)">.com</span>
 		</h1>

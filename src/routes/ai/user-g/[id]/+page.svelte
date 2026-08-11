@@ -234,7 +234,7 @@
 					<HeroGameCard
 						game={{
 							name: game.title,
-							developer: game.creatorName || 'Kazwire AI',
+							developer: game.creatorName || 'AI',
 							image: '/logo.png'
 						}}
 						id={game.id}

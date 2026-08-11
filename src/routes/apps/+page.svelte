@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -21,8 +22,8 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Browse for free now on {config.branding.name}!" />
-	<meta property="og:description" content="Browse for free now on {config.branding.name}!" />
+	<meta name="description" content="Browse for free now on {$page.url.hostname}!" />
+	<meta property="og:description" content="Browse for free now on {$page.url.hostname}!" />
 </svelte:head>
 
 <div class="mb-6 flex justify-center">

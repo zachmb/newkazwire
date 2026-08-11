@@ -195,7 +195,7 @@
 					bind:value={text}
 					maxlength={MAX + 200}
 					rows="2"
-					placeholder="What's happening on Kazwire?"
+					placeholder="What's happening?"
 					class="w-full resize-none border-0 bg-transparent p-0 text-[15px] leading-relaxed text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-0"
 					onkeydown={(e) => {
 						if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submit();

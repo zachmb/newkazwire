@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { config } from '$lib/config';
 </script>
 
@@ -6,11 +7,11 @@
 	<div class="hero-content flex-col lg:flex-row">
 		<img
 			src="/logo.png"
-			alt="{config.branding.name} Logo"
+			alt="{$page.url.hostname} Logo"
 			class="w-full max-w-sm rounded-lg drop-shadow-2xl"
 		/>
 		<div>
-			<h1 class="text-5xl font-bold">{config.branding.name}</h1>
+			<h1 class="text-5xl font-bold">{$page.url.hostname}</h1>
 			<p class="py-6">{config.branding.description}</p>
 			<div class="flex flex-col gap-2 md:flex-row">
 				<a href="/games">

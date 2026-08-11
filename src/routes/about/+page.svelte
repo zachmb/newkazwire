@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
+	import { page } from '$app/stores';
+	import Cloak from '$lib/components/Cloak.svelte';
+
+	// Brand identity everywhere is just the current domain (cloaked).
+	$: host = $page.url.hostname;
 
 	const stats = [
 		{ value: '130+', label: 'Games' },
@@ -10,19 +15,19 @@
 	const values = [
 		{ icon: 'mdi:flash', title: 'Blazing fast', body: 'Games stream from a global bucket and load instantly — no installs, no waiting.' },
 		{ icon: 'mdi:shield-lock', title: 'Playable anywhere', body: 'A built-in private browser keeps the whole library reachable on any network.' },
-		{ icon: 'mdi:sparkles', title: 'Made by the community', body: 'Anyone can build a game with AI and publish it to the Kazwire library in seconds.' }
+		{ icon: 'mdi:sparkles', title: 'Made by the community', body: 'Anyone can build a game with AI and publish it to the library in seconds.' }
 	];
 </script>
 
 <svelte:head>
-	<meta name="description" content="About {config.branding.name} — the best place to play free browser games." />
+	<meta name="description" content="About {$page.url.hostname} — the best place to play free browser games." />
 </svelte:head>
 
 <div class="mx-auto max-w-4xl px-4 py-12 sm:py-16">
 	<!-- Hero -->
 	<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B1220] to-[#2563EB] p-8 text-center text-white sm:p-14">
 		<img src="/logo.png" alt="" class="mx-auto mb-5 h-20 w-20 rounded-2xl object-contain ring-1 ring-white/20" />
-		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">About Kazwire</h1>
+		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">About <Cloak text={host} /></h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/80">
 			{config.branding.slogan} The best place to play free browser games — anywhere.
 		</p>
@@ -39,10 +44,10 @@
 	<!-- Body -->
 	<div class="mt-10 space-y-5 text-lg leading-relaxed text-base-content/80">
 		<p class="text-xl font-bold text-base-content">
-			Kazwire exists for one reason: to let you play the games you love, wherever you are, without the hassle.
+			<Cloak text={host} /> exists for one reason: to let you play the games you love, wherever you are, without the hassle.
 		</p>
 		<p>
-			No accounts, no downloads, no blocked pages. Every title runs right in your browser and loads in seconds. When a network gets in the way, our built-in private proxy gets you through it.
+			No accounts, no downloads. Every title runs right in your browser and loads in seconds. When a network gets in the way, our built-in private browser gets you through it.
 		</p>
 	</div>
 

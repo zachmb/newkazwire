@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
 
@@ -8,7 +9,7 @@
 
 	function send(e: Event) {
 		e.preventDefault();
-		const subject = encodeURIComponent(`Kazwire message from ${name || 'a player'}`);
+		const subject = encodeURIComponent(`Message from ${name || 'a player'}`);
 		const body = encodeURIComponent(`${message}\n\n— ${name}${email ? ` (${email})` : ''}`);
 		window.location.href = `mailto:${config.branding.supportEmail}?subject=${subject}&body=${body}`;
 	}
@@ -21,7 +22,7 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Get in touch with the {config.branding.name} team." />
+	<meta name="description" content="Get in touch with the {$page.url.hostname} team." />
 </svelte:head>
 
 <div class="mx-auto max-w-5xl px-4 py-12 sm:py-16">

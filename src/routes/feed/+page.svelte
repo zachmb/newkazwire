@@ -71,7 +71,7 @@
 			title: g.title,
 			image: getCDNImageUrl(g.image),
 			href: g.href,
-			creatorName: 'Kazwire',
+			creatorName: '',
 			rating: libRating(g.title),
 			chip: tag
 		};
@@ -284,7 +284,7 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Swipe through Kazwire — games, AI community creations and community posts, one at a time." />
+	<meta name="description" content="Swipe through games — games, AI community creations and community posts, one at a time." />
 </svelte:head>
 
 <svelte:window onkeydown={onKey} />
@@ -304,7 +304,7 @@
 	class="fixed inset-x-0 bottom-0 z-40 w-full snap-y snap-mandatory overflow-y-scroll overscroll-none bg-neutral [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 	tabindex="-1"
 	role="listbox"
-	aria-label="Kazwire feed"
+	aria-label="feed"
 >
 	{#each items as item, i (item.kind + item.href + item.title + i)}
 		<div data-idx={i}>

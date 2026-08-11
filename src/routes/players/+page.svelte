@@ -99,7 +99,7 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Search Kazwire players and open their public profiles." />
+	<meta name="description" content="Search players and open their public profiles." />
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">

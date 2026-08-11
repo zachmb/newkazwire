@@ -82,7 +82,7 @@
 			<div class="flex-1 text-center md:text-left">
 				<h3 class="mb-2 text-2xl font-bold">About {blog.author}</h3>
 				<p class="mb-4 italic text-base-content/60">
-					The Kazwire Editorial Team is dedicated to exploring the intersection of browser
+					The Editorial Team is dedicated to exploring the intersection of browser
 					performance, game mechanics, and the evolving landscape of web-based entertainment.
 				</p>
 				<div class="flex flex-wrap justify-center gap-4 md:justify-start">

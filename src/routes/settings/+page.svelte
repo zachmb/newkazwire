@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
@@ -163,9 +164,9 @@
 <svelte:window bind:innerWidth={innerWidth} />
 
 <svelte:head>
-	<meta property="og:title" content="{config.branding.name} - Search Freely" />
-	<meta name="description" content="Search freely with {config.branding.name}!" />
-	<meta property="og:description" content="Search freely with {config.branding.name}!" />
+	<meta property="og:title" content="{$page.url.hostname} - Search Freely" />
+	<meta name="description" content="Search freely with {$page.url.hostname}!" />
+	<meta property="og:description" content="Search freely with {$page.url.hostname}!" />
 </svelte:head>
 
 <div class="flex flex-row flex-wrap justify-center gap-8">

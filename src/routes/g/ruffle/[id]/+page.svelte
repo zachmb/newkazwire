@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { config } from '$lib/config';
 	import { CDN_BASE_URL } from '$lib/utils/cdn';
 	import type { PageData } from './$types';
@@ -8,11 +9,11 @@
 <svelte:head>
 	<meta
 		name="description"
-		content="Play {data.game.title} for free now on {config.branding.name}!"
+		content="Play {data.game.title} for free now on {$page.url.hostname}!"
 	/>
 	<meta
 		property="og:description"
-		content="Play {data.game.title} for free now on {config.branding.name}!"
+		content="Play {data.game.title} for free now on {$page.url.hostname}!"
 	/>
 	<script src="{CDN_BASE_URL}/game/ruffle/ruffle/ruffle.js"></script>
 </svelte:head>

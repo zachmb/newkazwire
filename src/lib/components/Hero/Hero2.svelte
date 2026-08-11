@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { config } from '$lib/config';
 </script>
 
@@ -6,7 +7,7 @@
 	<div class="hero-content flex-col gap-24 lg:flex-row">
 		<img
 			src="/logo.png"
-			alt="{config.branding.name} Logo"
+			alt="{$page.url.hostname} Logo"
 			class="w-full max-w-sm rounded-lg drop-shadow-2xl"
 		/>
 		<div class="flex skew-x-3 flex-col gap-6 text-base-content">

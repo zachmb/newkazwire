@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
 	import GameRail from '$lib/components/GameRail.svelte';
@@ -64,7 +65,7 @@
 </script>
 
 <svelte:head>
-	<meta property="og:title" content="{config.branding.name} - Private Search" />
+	<meta property="og:title" content="{$page.url.hostname} - Private Search" />
 	<meta name="description" content="Browse the web privately using DuckDuckGo!" />
 	<meta property="og:description" content="Browse the web privately using DuckDuckGo!" />
 
@@ -97,8 +98,8 @@
 			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-black">About Private Search</h2>
 				<p class="leading-relaxed text-base-content/80">
-					Browse the web privately using DuckDuckGo directly within Kazwire. Your searches are
-					proxied through our Ultraviolet service to help protect your privacy.
+					Browse the web privately using DuckDuckGo right here. Your searches are
+					routed through our own service to help protect your privacy.
 				</p>
 			</div>
 		</main>

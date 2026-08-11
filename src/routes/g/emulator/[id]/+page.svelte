@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 	export let data: PageData;
 
@@ -37,11 +38,11 @@
 	<head>
 		<meta
 			name="description"
-			content="Play {data.game.title} for free now on {config.branding.name}!"
+			content="Play {data.game.title} for free now on {$page.url.hostname}!"
 		/>
 		<meta
 			property="og:description"
-			content="Play {data.game.title} for free now on {config.branding.name}!"
+			content="Play {data.game.title} for free now on {$page.url.hostname}!"
 		/>
 	</head>
 

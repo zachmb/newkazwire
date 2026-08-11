@@ -387,7 +387,7 @@
 						<Icon icon="mdi:robot-happy" class="text-4xl" />
 					</div>
 					<div class="flex-1">
-						<h1 class="text-3xl font-black tracking-tight sm:text-4xl">Kazwire AI Lab</h1>
+						<h1 class="text-3xl font-black tracking-tight sm:text-4xl">AI Lab</h1>
 						<p class="mt-1 text-base text-base-content/60">
 							Describe a game and play it in seconds — or upload your own. Everything you make is shared to the community gallery.
 						</p>

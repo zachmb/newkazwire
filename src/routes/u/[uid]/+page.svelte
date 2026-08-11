@@ -119,8 +119,8 @@
 	<meta
 		name="description"
 		content={profile
-			? `${profile.name}'s Kazwire profile — ${profile.gamesCreated} games created, ${profile.postsCount} posts.`
-			: 'A Kazwire player profile.'}
+			? `${profile.name}'s profile — ${profile.gamesCreated} games created, ${profile.postsCount} posts.`
+			: 'A player profile.'}
 	/>
 </svelte:head>
 

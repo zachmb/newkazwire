@@ -2,8 +2,13 @@
 	import Icon from '@iconify/svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { userProfile } from '$lib/stores/userProfile';
+	import { page } from '$app/stores';
+	import Cloak from '$lib/components/Cloak.svelte';
 
 	const dispatch = createEventDispatcher();
+
+	// Fallback developer attribution is the current domain (cloaked), never the brand.
+	$: host = $page.url.hostname;
 
 	export let game: {
 		name: string;
@@ -83,7 +88,7 @@
 		<div class="flex min-w-0 flex-col gap-2">
 			<h2 class="truncate text-2xl font-black tracking-tight text-base-content">{game.name}</h2>
 			<div class="flex flex-wrap items-center gap-2">
-				<span class="text-xs font-bold uppercase tracking-wider text-base-content/50">{game.developer || 'Kazwire'}</span>
+				<span class="text-xs font-bold uppercase tracking-wider text-base-content/50">{#if game.developer}{game.developer}{:else}<Cloak text={host} />{/if}</span>
 				{#if rating > 0}
 					<span class="flex items-center gap-1 text-sm font-bold text-primary">
 						<Icon icon="mdi:star" class="text-base" />{rating}

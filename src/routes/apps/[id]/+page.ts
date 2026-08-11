@@ -19,7 +19,7 @@ export const load: PageLoad = async ({ params, data }) => {
 			id: app.id || slug,
 			title: app.title,
 			description: app.description || 'No description available',
-			developer: 'Kazwire',
+			developer: '',
 			image: app.image, // Map thumbnail_url to image for compatibility
 			embedURL: app.url || app.href, // real site to proxy (falls back to href)
 			views: 1000,

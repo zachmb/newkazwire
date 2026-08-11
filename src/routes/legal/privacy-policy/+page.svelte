@@ -1,13 +1,14 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { config } from '$lib/config';
 </script>
 
 <svelte:head>
-	<meta property="og:title" content="{config.branding.name} - Privacy Policy" />
-	<meta name="description" content="Play and browse for free now on {config.branding.name}!" />
+	<meta property="og:title" content="{$page.url.hostname} - Privacy Policy" />
+	<meta name="description" content="Play and browse for free now on {$page.url.hostname}!" />
 	<meta
 		property="og:description"
-		content="Play and browse for free now on {config.branding.name}!"
+		content="Play and browse for free now on {$page.url.hostname}!"
 	/>
 </svelte:head>
 
@@ -18,7 +19,7 @@
 			<div
 				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-base-100 p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
 			>
-				<img src="/logo.png" alt="Kazwire" class="h-full w-full rounded-2xl object-cover" />
+				<img src="/logo.png" alt="" class="h-full w-full rounded-2xl object-cover" />
 			</div>
 			<h1 class="text-5xl font-black tracking-tight text-[#5B9BFF] md:text-6xl">Privacy Policy</h1>
 			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
@@ -32,9 +33,9 @@
 				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-base-content prose-p:font-medium prose-p:leading-relaxed prose-p:text-base-content/70 prose-li:font-medium prose-li:text-base-content/70"
 			>
 				<p>
-					At {config.branding.name}, accessible from {config.branding.mainDomain}, one of our main
+					At {$page.url.hostname}, accessible from https://{$page.url.hostname}, one of our main
 					priorities is the privacy of our visitors. This Privacy Policy document contains types of
-					information that is collected and recorded by {config.branding.name} and how we use it.
+					information that is collected and recorded by {$page.url.hostname} and how we use it.
 				</p>
 
 				<h2>Contact Information</h2>
@@ -46,8 +47,7 @@
 				<h2>Scope</h2>
 				<p>
 					This Privacy Policy applies only to our online activities and is valid for visitors to our
-					website with regards to the information that they shared and/or collect in {config
-						.branding.name}. This policy is not applicable to any information collected offline or
+					website with regards to the information that they shared and/or collect in {$page.url.hostname}. This policy is not applicable to any information collected offline or
 					via channels other than this website.
 				</p>
 
@@ -81,7 +81,7 @@
 					their online activity.
 				</p>
 				<p>
-					{config.branding.name} does not knowingly collect any Personal Identifiable Information from
+					{$page.url.hostname} does not knowingly collect any Personal Identifiable Information from
 					children under the age of 13.
 				</p>
 			</article>

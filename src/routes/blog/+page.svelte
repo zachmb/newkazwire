@@ -26,7 +26,7 @@
 <svelte:head>
 	<meta
 		name="description"
-		content="Explore the latest in gaming, technology, and AI with the Kazwire blog. Deep dives, industry trends, and more."
+		content="Explore the latest in gaming, technology, and AI with the blog. Deep dives, industry trends, and more."
 	/>
 </svelte:head>
 
@@ -44,7 +44,7 @@
 				in:fly={{ y: 20, duration: 800, delay: 200 }}
 				class="mx-auto max-w-2xl text-xl text-base-content/70"
 			>
-				Deep dives into the future of gaming, the evolution of the web, and how Kazwire is
+				Deep dives into the future of gaming, the evolution of the web, and how the web is
 				redefining the entertainment landscape.
 			</p>
 		{/if}
