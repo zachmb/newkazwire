@@ -76,7 +76,7 @@
 
 		<!-- Search -->
 		{#if config.features.searchBar}
-			<form on:submit={submitSearch} class="mx-auto flex w-full max-w-xl items-center">
+			<form on:submit={submitSearch} class="mx-auto flex w-full min-w-0 max-w-xl items-center">
 				<label class="flex w-full items-center gap-2 rounded-lg bg-base-200 px-4 py-2 ring-1 ring-base-300 transition focus-within:bg-base-100 focus-within:ring-2 focus-within:ring-primary">
 					<Icon icon="mdi:magnify" class="text-xl text-base-content/60" />
 					<input

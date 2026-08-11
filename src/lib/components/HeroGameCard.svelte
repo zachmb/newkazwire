@@ -43,16 +43,21 @@
 				<slot />
 			</div>
 		{:else}
-			<!-- Blurred backdrop + crisp poster -->
+			<!-- Blurred cover backdrop fills the frame (ambient), while the actual cover is
+			     shown CENTERED and size-capped so low-res game thumbnails read as an
+			     intentional poster instead of a giant pixelated sprite. Same treatment for
+			     library + AI games so every game shows the same clean player screen. -->
 			{#if game.image}
-				<img src={game.image} alt="" aria-hidden="true" class="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-50" />
+				<img src={game.image} alt="" aria-hidden="true" class="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-[0.4]" />
 			{/if}
-			<img
-				src={game.image ? game.image : '/logo.png'}
-				alt={game.name}
-				class="relative h-full w-full object-contain transition duration-300 group-hover:scale-[1.02]"
-			/>
-			<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+			<div class="absolute inset-0 flex items-center justify-center p-6 sm:p-10">
+				<img
+					src={game.image ? game.image : '/logo.png'}
+					alt={game.name}
+					class="max-h-[72%] max-w-[68%] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10 transition duration-300 group-hover:scale-[1.03]"
+				/>
+			</div>
+			<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
 
 			<!-- Play button -->
 			<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">

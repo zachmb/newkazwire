@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+	html,
+	body {
+		/* Kill stray horizontal scroll on mobile (e.g. a nav row a few px too wide).
+		   Nothing on Kazwire scrolls the page sideways on purpose. */
+		overflow-x: hidden;
+		max-width: 100%;
+	}
 	body {
 		@apply bg-base-100 text-base-content;
 		font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
