@@ -51,6 +51,16 @@ export function getPlayerName(): string {
 	}
 }
 
+/** True only if the visitor has actually chosen a display name (for name-gating). */
+export function hasPlayerName(): boolean {
+	if (!browser) return false;
+	try {
+		return !!localStorage.getItem(NAME_KEY);
+	} catch {
+		return false;
+	}
+}
+
 /** Persists a display name (trimmed + bounded). Empty clears back to Anonymous. */
 export function setPlayerName(name: string): void {
 	if (!browser) return;

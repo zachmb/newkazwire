@@ -373,6 +373,15 @@ export async function recordStreakPing(uid: string, name: string): Promise<Strea
         console.error('Leaderboard aggregate update failed (non-fatal):', err);
     }
 
+    // Award Kazcoins for playing (best-effort): a flat per-play amount, plus a bonus
+    // when the daily streak actually increased. Never let coin errors fail the ping.
+    try {
+        const streakIncreased = !!existing && streak > (existing.streak || 0);
+        await adjustCoins(uid, COINS_PER_PLAY + (streakIncreased ? COINS_STREAK_BONUS : 0));
+    } catch (err) {
+        console.error('Coin award failed (non-fatal):', err);
+    }
+
     return record;
 }
 
@@ -686,5 +695,149 @@ export async function searchProfiles(query: string, limit = 20): Promise<PublicP
         .filter((p) => p.name.toLowerCase().includes(q))
         .sort((a, b) => new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime())
         .slice(0, Math.max(0, limit));
+}
+
+/* ------------------------------------------------------------------ *
+ * COINS + ITEM SHOP (virtual currency — NOT real money).
+ *
+ * Players earn Kazcoins by playing (hooked into the streak ping). They can list
+ * items in the shop and buy each other's items; the seller earns the coins. Storage:
+ *   user-stats/wallets.json          — { [uid]: { coins, updatedAt } }
+ *   community/shop.json              — Item[] (active listings)
+ *   user-stats/inventory/{uid}.json  — string[] of owned itemIds (idempotency key)
+ *
+ * Money-safety (even for virtual coins): buying checks balance + ownership, records
+ * ownership FIRST (idempotency — a retry can't double-buy), then debits the buyer and
+ * credits the seller. If a later step fails the buyer keeps the item uncharged
+ * (fail-toward-the-user). Coins never go negative.
+ * ------------------------------------------------------------------ */
+
+const OCI_WALLETS_PATH = 'user-stats/wallets.json';
+const OCI_SHOP_PATH = 'community/shop.json';
+
+const COINS_PER_PLAY = 5;      // awarded once per streak ping (a real game open)
+const COINS_STREAK_BONUS = 10; // extra when the daily streak increases
+const MAX_ITEM_PRICE = 100_000;
+
+export interface Wallet {
+    coins: number;
+    updatedAt: string;
+}
+
+export interface ShopItem {
+    id: string;
+    sellerUid: string;
+    sellerName: string;
+    title: string;
+    description: string;
+    icon: string;       // an iconify id or short emoji
+    price: number;      // in Kazcoins
+    createdAt: string;
+    active: boolean;
+    soldCount: number;
+}
+
+export async function getWallet(uid: string): Promise<Wallet> {
+    if (!uid) return { coins: 0, updatedAt: new Date().toISOString() };
+    const wallets = (await readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH)) || {};
+    return wallets[uid] || { coins: 0, updatedAt: new Date().toISOString() };
+}
+
+/** Adjust a uid's coin balance by delta (clamped at 0). Returns the new balance. */
+export async function adjustCoins(uid: string, delta: number): Promise<number> {
+    if (!uid) return 0;
+    const wallets = (await readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH)) || {};
+    const current = wallets[uid]?.coins || 0;
+    const next = Math.max(0, current + delta);
+    wallets[uid] = { coins: next, updatedAt: new Date().toISOString() };
+    await uploadToOCI(OCI_WALLETS_PATH, JSON.stringify(wallets), 'application/json');
+    return next;
+}
+
+async function getInventory(uid: string): Promise<string[]> {
+    if (!uid) return [];
+    return (await readJsonFromOCI<string[]>(`user-stats/inventory/${encodeURIComponent(uid)}.json`)) || [];
+}
+
+async function saveInventory(uid: string, items: string[]): Promise<void> {
+    await uploadToOCI(
+        `user-stats/inventory/${encodeURIComponent(uid)}.json`,
+        JSON.stringify(items),
+        'application/json'
+    );
+}
+
+export async function getShopItems(): Promise<ShopItem[]> {
+    const items = (await readJsonFromOCI<ShopItem[]>(OCI_SHOP_PATH)) || [];
+    return items
+        .filter((i) => i.active)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+export async function addShopItem(
+    item: Omit<ShopItem, 'id' | 'createdAt' | 'active' | 'soldCount'>
+): Promise<ShopItem> {
+    const items = (await readJsonFromOCI<ShopItem[]>(OCI_SHOP_PATH)) || [];
+    const price = Math.max(1, Math.min(MAX_ITEM_PRICE, Math.floor(item.price || 0)));
+    const newItem: ShopItem = {
+        ...item,
+        price,
+        id: newId(),
+        createdAt: new Date().toISOString(),
+        active: true,
+        soldCount: 0
+    };
+    items.push(newItem);
+    await uploadToOCI(OCI_SHOP_PATH, JSON.stringify(items), 'application/json');
+    return newItem;
+}
+
+export interface BuyResult {
+    ok: boolean;
+    error?: string;
+    balance?: number;
+    item?: ShopItem;
+}
+
+/**
+ * Buy an item: the buyer pays coins, the seller earns them. Idempotent + fail-safe:
+ *   1. validate (exists/active, not self-buy, not already owned, enough coins)
+ *   2. record ownership FIRST (a retry then short-circuits at "already owned")
+ *   3. debit buyer, credit seller (buyer keeps the item even if a credit hiccups)
+ */
+export async function buyShopItem(uid: string, itemId: string): Promise<BuyResult> {
+    if (!uid) return { ok: false, error: 'Missing player id.' };
+
+    const items = (await readJsonFromOCI<ShopItem[]>(OCI_SHOP_PATH)) || [];
+    const item = items.find((i) => i.id === itemId);
+    if (!item || !item.active) return { ok: false, error: 'That item is no longer available.' };
+    if (item.sellerUid === uid) return { ok: false, error: 'You cannot buy your own item.' };
+
+    const inventory = await getInventory(uid);
+    if (inventory.includes(itemId)) {
+        const bal = (await getWallet(uid)).coins;
+        return { ok: false, error: 'You already own this item.', balance: bal };
+    }
+
+    const wallet = await getWallet(uid);
+    if (wallet.coins < item.price) {
+        return { ok: false, error: `Not enough Kazcoins (need ${item.price}, you have ${wallet.coins}).`, balance: wallet.coins };
+    }
+
+    // 1) Ownership first = idempotency guard against double-buy on retry.
+    inventory.push(itemId);
+    await saveInventory(uid, inventory);
+
+    // 2) Debit buyer, 3) credit seller, 4) bump sold count (best-effort after ownership).
+    const balance = await adjustCoins(uid, -item.price);
+    try {
+        await adjustCoins(item.sellerUid, item.price);
+        item.soldCount = (item.soldCount || 0) + 1;
+        await uploadToOCI(OCI_SHOP_PATH, JSON.stringify(items), 'application/json');
+    } catch (err) {
+        console.error('buyShopItem: seller credit / soldCount update failed (non-fatal):', err);
+    }
+
+    return { ok: true, balance, item };
 }
 
