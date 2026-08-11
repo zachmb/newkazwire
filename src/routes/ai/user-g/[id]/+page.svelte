@@ -75,6 +75,27 @@
 	}
 
 	let showShareModal = false;
+	let shareCopied = false;
+
+	function shareLink(): string {
+		return `https://kazwire.com/ai/user-g/${game?.id ?? $page.params.id}`;
+	}
+
+	async function copyShareLink() {
+		try {
+			await navigator.clipboard.writeText(shareLink());
+			shareCopied = true;
+			setTimeout(() => (shareCopied = false), 2000);
+		} catch {
+			// clipboard blocked — the link is still shown to copy manually
+		}
+	}
+
+	// Opening Share auto-copies the link (with a "Copied!" confirmation).
+	function openShare() {
+		showShareModal = true;
+		copyShareLink();
+	}
 
 	$: mappedGames = games.map((g) => ({
 		...g,
@@ -158,13 +179,13 @@
 					<HeroGameCard
 						game={{
 							name: game.title,
-							developer: 'Kazwire AI',
+							developer: game.creatorName || 'Kazwire AI',
 							image: '/logo.png'
 						}}
 						id={game.id}
 						bind:playing={isPlaying}
 						on:play={expandiFrame}
-						on:share={() => (showShareModal = true)}
+						on:share={openShare}
 						on:fullscreen={toggleFakeFullscreen}
 					>
 						<div
@@ -220,15 +241,21 @@
 								aria-modal="true"
 								tabindex="-1"
 							>
-								<h3 class="mb-6 text-2xl font-black text-base-content">Share this game!</h3>
-								<div class="mb-8 rounded-xl bg-base-100 p-8 md:p-12">
-									<a
-										href="https://kazwire.com/ai/user-g/{game.id}"
-										class="break-all text-5xl font-black tracking-tight text-primary hover:underline md:text-7xl"
-										target="_blank"
-									>
-										kazwire.com/ai/user-g/{game.id}
-									</a>
+								<h3 class="mb-2 text-2xl font-black text-base-content">Share this game!</h3>
+								<p class="mb-6 text-sm opacity-60">
+									{#if shareCopied}<span class="font-bold text-success">Link copied to your clipboard ✓</span>{:else}Link copied — or copy it again below.{/if}
+								</p>
+								<div class="mb-6 flex items-center gap-2 rounded-xl bg-neutral/5 p-3">
+									<input
+										readonly
+										value={shareLink()}
+										class="input input-ghost w-full flex-1 truncate font-mono text-sm"
+										on:focus={(e) => e.currentTarget.select()}
+									/>
+									<button class="btn btn-primary font-bold text-white" on:click={copyShareLink}>
+										<Icon icon={shareCopied ? 'mdi:check' : 'mdi:content-copy'} />
+										{shareCopied ? 'Copied!' : 'Copy link'}
+									</button>
 								</div>
 								<button
 									class="btn btn-neutral btn-wide rounded-full font-bold"
@@ -252,9 +279,18 @@
 								</div>
 							</div>
 							<p class="leading-relaxed text-base-content/70">{game.description}</p>
-							<div class="mt-4 flex flex-col gap-2">
-								<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created on</div>
-								<div class="font-bold">{new Date(game.createdAt).toLocaleDateString()}</div>
+							<div class="mt-4 flex flex-wrap gap-8">
+								<div class="flex flex-col gap-1">
+									<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created by</div>
+									<div class="flex items-center gap-1.5 font-bold">
+										<Icon icon="mdi:account-circle" class="text-primary" />
+										{game.creatorName || 'Anonymous'}{#if game.creatorLocation}<span class="opacity-50">· {game.creatorLocation}</span>{/if}
+									</div>
+								</div>
+								<div class="flex flex-col gap-1">
+									<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created on</div>
+									<div class="font-bold">{new Date(game.createdAt).toLocaleDateString()}</div>
+								</div>
 							</div>
 
 							<div class="mt-6 flex gap-3">

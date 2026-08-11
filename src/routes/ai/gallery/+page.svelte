@@ -94,12 +94,21 @@
 								class="group flex flex-col overflow-hidden rounded-2xl border border-neutral/10 transition-all hover:scale-[1.02] hover:border-primary/30 hover:shadow-2xl"
 							>
 								<div class="relative aspect-video w-full bg-black">
-									<div class="absolute inset-0 flex items-center justify-center bg-primary/10">
-										<Icon
-											icon="mdi:robot"
-											class="text-6xl text-primary/40 transition-transform group-hover:scale-110"
+									{#if game.coverUrl}
+										<img
+											src={game.coverUrl}
+											alt={game.title}
+											loading="lazy"
+											class="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105"
 										/>
-									</div>
+									{:else}
+										<div class="absolute inset-0 flex items-center justify-center bg-primary/10">
+											<Icon
+												icon="mdi:robot"
+												class="text-6xl text-primary/40 transition-transform group-hover:scale-110"
+											/>
+										</div>
+									{/if}
 									{#if game.sourceGameId}
 										<div class="badge badge-accent absolute right-2 top-2 font-bold shadow-md">
 											REMIX
@@ -108,6 +117,11 @@
 								</div>
 								<div class="flex flex-col p-4">
 									<h3 class="truncate text-xl font-black">{game.title}</h3>
+									<!-- Creator attribution: name + coarse location for every public game. -->
+									<div class="mt-1 flex items-center gap-1 text-xs font-semibold opacity-60">
+										<Icon icon="mdi:account-circle" class="text-sm" />
+										<span class="truncate">{game.creatorName || 'Anonymous'}{#if game.creatorLocation} · {game.creatorLocation}{/if}</span>
+									</div>
 									<p class="mt-1 line-clamp-2 h-10 text-sm opacity-60">{game.description}</p>
 									<div
 										class="mt-4 flex items-center justify-between border-t border-neutral/5 pt-4"

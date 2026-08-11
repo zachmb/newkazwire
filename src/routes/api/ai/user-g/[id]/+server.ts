@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getRegistry } from '$lib/server/oci';
+import { getRegistry, toPublicGame } from '$lib/server/oci';
 
 export const GET: RequestHandler = async ({ params }) => {
     try {
@@ -11,7 +11,8 @@ export const GET: RequestHandler = async ({ params }) => {
             return json({ error: 'Game not found' }, { status: 404 });
         }
 
-        return json({ success: true, game });
+        // Strip the raw creatorIp before sending to the browser.
+        return json({ success: true, game: toPublicGame(game) });
     } catch (error: any) {
         console.error('Game fetch failure:', error);
         return json({ error: 'Failed to fetch game' }, { status: 500 });

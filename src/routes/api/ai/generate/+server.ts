@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { generateGameCodeStream } from '$lib/server/deepseek';
 
 export const POST: RequestHandler = async ({ request }) => {
-    const { prompt, title, remixContext } = await request.json();
+    const { prompt, title, remixContext, remixCode } = await request.json();
 
     if (!prompt || !title) {
         return new Response(JSON.stringify({ error: 'Prompt and title are required.' }), {
@@ -11,7 +11,9 @@ export const POST: RequestHandler = async ({ request }) => {
         });
     }
 
-    const stream = generateGameCodeStream(prompt, remixContext);
+    // remixCode (the full source HTML of the game being remixed) makes the AI edit the
+    // REAL game rather than guessing from a description.
+    const stream = generateGameCodeStream(prompt, remixContext, remixCode);
 
     return new Response(stream, {
         headers: {

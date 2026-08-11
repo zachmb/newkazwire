@@ -24,11 +24,23 @@ export interface UserGame {
     title: string;
     description: string;
     codeUrl: string;      // URL to the hosted HTML
-    creatorIp: string;
+    creatorIp: string;    // real client IP (server-only — NEVER sent to the browser)
+    creatorName?: string; // public display name of the creator ("Anonymous" if none)
+    creatorLocation?: string; // coarse "City, CC" derived from the IP (public attribution)
+    coverUrl?: string;    // PNG snapshot of the game (canvas frame) for the gallery cover
     createdAt: string;
     sourceGameId?: string; // For remixes
     avgRating: number;
     sizeBytes: number;    // Size of the game HTML file in bytes
+}
+
+/** A public view of a game with the private creatorIp stripped — what any client
+ *  (gallery, play page) is allowed to see. The raw IP must never reach the browser. */
+export type PublicUserGame = Omit<UserGame, 'creatorIp'>;
+
+export function toPublicGame(g: UserGame): PublicUserGame {
+    const { creatorIp: _omit, ...pub } = g;
+    return pub;
 }
 
 export interface IPLog {

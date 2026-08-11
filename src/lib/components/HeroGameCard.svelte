@@ -27,7 +27,10 @@
 	}
 </script>
 
-<div class="flex w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-xl ring-1 ring-black/5">
+<!-- Capped, centered player so EVERY game shows up at a consistent size (some games
+     otherwise sprawled to the full column width on wide screens). aspect-video keeps a
+     uniform 16:9 frame; max-w standardizes the footprint across all games. -->
+<div class="mx-auto flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-base-100 shadow-xl ring-1 ring-black/5">
 	<!-- Game Preview / Hero Area -->
 	<div class="group relative aspect-video w-full bg-black">
 		{#if playing}

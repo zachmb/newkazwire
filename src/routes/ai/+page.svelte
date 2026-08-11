@@ -6,12 +6,13 @@
 	import { config } from '$lib/config';
 	import GameRail from '$lib/components/GameRail.svelte';
 	import { games } from '$lib/data/games';
-	import { getCDNImageUrl } from '$lib/utils/cdn';
+	import { getCDNImageUrl, CDN_BASE_URL } from '$lib/utils/cdn';
 	import { localAiGames } from '$lib/stores/localAiGames';
 
 	let prompt = '';
 	let title = '';
 	let description = '';
+	let creatorName = ''; // public display name shown on the published community game
 	let isGenerating = false;
 	let isPublishing = false;
 	let publishSuccess = false;
@@ -19,6 +20,40 @@
 	let publishedPublicUrl = '';
 	let error = '';
 	let generatedGame: any = null;
+
+	/**
+	 * Capture the game's first canvas frame as a PNG data URL for the gallery cover.
+	 * Renders the code in a hidden SAME-ORIGIN srcdoc iframe (so we can read its
+	 * canvas — the public codeUrl is cross-origin and can't be captured), waits for it
+	 * to draw, then reads the largest canvas. Best-effort: resolves '' on any failure
+	 * so it never blocks publishing.
+	 */
+	function captureCover(code: string): Promise<string> {
+		return new Promise((resolve) => {
+			let done = false;
+			const finish = (v: string) => { if (!done) { done = true; try { iframe.remove(); } catch {} resolve(v); } };
+			const iframe = document.createElement('iframe');
+			iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+			iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;height:600px;border:0;';
+			iframe.srcdoc = code;
+			document.body.appendChild(iframe);
+			const grab = () => {
+				try {
+					const doc = iframe.contentWindow?.document;
+					const canvases = doc ? Array.from(doc.querySelectorAll('canvas')) : [];
+					const c = canvases.sort((a, b) => (b.width * b.height) - (a.width * a.height))[0];
+					if (c && c.width > 0 && c.height > 0) {
+						finish(c.toDataURL('image/png'));
+						return;
+					}
+				} catch {}
+				finish('');
+			};
+			// Give the game ~1.8s to render a frame, then snapshot.
+			setTimeout(grab, 1800);
+			setTimeout(() => finish(''), 4000); // hard cap
+		});
+	}
 
 	let communityGames: any[] = [];
 	let communityGamesLoading = true;
@@ -48,6 +83,19 @@
 		streamProgress = 0;
 
 		try {
+			// Remix: hand the AI the ACTUAL source game code (best-effort fetch of the
+			// static build) so it edits the real game, not a guess from the description.
+			let remixCode: string | undefined;
+			if (sourceGame && remixId) {
+				try {
+					const srcRes = await fetch(`${CDN_BASE_URL}/game/static/${remixId}/index.html`);
+					if (srcRes.ok) {
+						const html = await srcRes.text();
+						if (html && html.toLowerCase().includes('<html')) remixCode = html;
+					}
+				} catch { /* fall back to the description-only remix */ }
+			}
+
 			const response = await fetch('/api/ai/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -57,7 +105,8 @@
 					description,
 					remixContext: sourceGame
 						? `Title: ${sourceGame.title}, Description: ${sourceGame.description}`
-						: undefined
+						: undefined,
+					remixCode
 				})
 			});
 
@@ -126,6 +175,11 @@
 
 			// Save to sessionStorage for full-screen playback
 			sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: gameCode }));
+
+			// Every generated game is auto-published to the community gallery (with a
+			// captured cover + creator attribution). Best-effort — a publish hiccup
+			// still leaves the game playable locally.
+			await publishGame();
 		} catch (err: any) {
 			error = err.message;
 		} finally {
@@ -133,13 +187,13 @@
 		}
 	}
 
-	async function handlePublish() {
-		if (!generatedGame || isPublishing) return;
+	async function publishGame() {
+		if (!generatedGame || isPublishing || publishSuccess) return;
 
 		isPublishing = true;
-		error = '';
-
 		try {
+			// Snapshot a cover frame client-side (same-origin srcdoc) before publishing.
+			const cover = await captureCover(generatedGame.code);
 			const response = await fetch('/api/ai/user-g', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -147,7 +201,9 @@
 					title,
 					description,
 					code: generatedGame.code,
-					sourceGameId: remixId
+					sourceGameId: remixId,
+					creatorName: (creatorName || '').trim() || 'Anonymous',
+					cover
 				})
 			});
 
@@ -157,14 +213,8 @@
 			publishSuccess = true;
 			publishedId = data.gameId;
 			publishedPublicUrl = data.publicUrl || '';
-
-			const destination = data.publicPath || `/ai/user-g/${data.gameId}`;
-			// Use client routing first, then hard navigate fallback if needed.
-			await goto(destination);
-			if (window.location.pathname !== destination) {
-				window.location.assign(destination);
-			}
 		} catch (err: any) {
+			// Surface but don't block — the game is still playable from this page.
 			error = err.message;
 		} finally {
 			isPublishing = false;
@@ -173,6 +223,9 @@
 
 	onMount(async () => {
 		window.scrollTo(0, 0);
+		try {
+			creatorName = localStorage.getItem('kazwire_creator_name') || '';
+		} catch { /* ignore */ }
 		try {
 			const res = await fetch('/api/ai/gallery');
 			const data = await res.json();
@@ -249,6 +302,19 @@
 							placeholder="e.g. Neon Breakout, Zombie Survival..."
 							class="input input-bordered input-lg w-full rounded-2xl border-none bg-neutral/5 focus:bg-base-100"
 							bind:value={title}
+						/>
+
+						<label class="label p-0" for="creator-name">
+							<span class="label-text font-bold">Your name <span class="opacity-50">(shown as the creator)</span></span>
+						</label>
+						<input
+							id="creator-name"
+							type="text"
+							maxlength="32"
+							placeholder="Anonymous"
+							class="input input-bordered w-full rounded-2xl border-none bg-neutral/5 focus:bg-base-100"
+							bind:value={creatorName}
+							on:change={() => { try { localStorage.setItem('kazwire_creator_name', creatorName.trim()); } catch {} }}
 						/>
 
 						<label class="label p-0" for="game-prompt">
@@ -365,20 +431,19 @@
 							<div class="flex items-center justify-between">
 								<h3 class="text-2xl font-black text-success">Game Ready!</h3>
 								<div class="flex gap-2">
-									{#if !publishSuccess}
+									{#if isPublishing}
+										<span class="btn btn-ghost font-black no-animation">
+											<Icon icon="line-md:loading-alt-loop" />
+											Publishing to community…
+										</span>
+									{:else if !publishSuccess}
 										<button
 											type="button"
 											class="btn btn-accent font-black"
-											on:click|preventDefault={handlePublish}
-											disabled={isPublishing}
+											on:click|preventDefault={publishGame}
 										>
-											{#if isPublishing}
-												<Icon icon="line-md:loading-alt-loop" />
-												Publishing...
-											{:else}
-												<Icon icon="mdi:cloud-upload" />
-												Publish to Community
-											{/if}
+											<Icon icon="mdi:cloud-upload" />
+											Retry publish
 										</button>
 									{/if}
 									<a class="btn btn-primary text-white" href="/ai/play">
@@ -411,12 +476,6 @@
 									srcdoc={generatedGame.code}
 									sandbox="allow-scripts allow-modals allow-pointer-lock"
 								/>
-							</div>
-							<div class="skeleton h-full w-full rounded-2xl bg-neutral/5"></div>
-							<div class="rounded-2xl bg-neutral/5 p-4 text-center">
-								<p class="text-sm font-bold opacity-50">
-									This game is ephemeral and only exists in your browser right now.
-								</p>
 							</div>
 						</div>
 					{:else}
@@ -465,11 +524,12 @@
 			</div>
 
 			<div class="alert alert-info rounded-3xl bg-base-100 p-6 shadow-xl">
-				<Icon icon="mdi:information" class="text-2xl text-info" />
+				<Icon icon="mdi:earth" class="text-2xl text-info" />
 				<div>
-					<h3 class="font-black">Private Generation</h3>
+					<h3 class="font-black">Shared with the community</h3>
 					<p class="text-sm opacity-70">
-						Games are generated and sent directly to you. We don't store them on our servers.
+						Every game you make is auto-published to the community gallery with your name so
+						others can play and remix it. Add your name below to get the credit.
 					</p>
 				</div>
 			</div>

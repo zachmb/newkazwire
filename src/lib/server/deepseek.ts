@@ -2,25 +2,31 @@ import { env } from '$env/dynamic/private';
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
-const systemPrompt = `You are an expert HTML5 canvas game developer. You output single-file HTML5 games that run perfectly in an iframe.
+const systemPrompt = `You are a senior HTML5 game developer with a great sense of game feel. You output single-file HTML5 games that run perfectly in an iframe AND are genuinely fun, polished, and replayable — not bare-minimum demos.
 
-RULES (no exceptions):
+HARD FORMAT RULES (no exceptions — breaking these produces a black screen):
 - Output ONLY raw HTML starting with <!DOCTYPE html>. No markdown, no code fences, no explanation.
-- NO COMPRESSION: Do not compress the code. Every HTML tag MUST have a space between its name and its attributes (e.g. <canvas id="c"> is CORRECT, <canvasid="c"> is BROKEN).
+- NO COMPRESSION: Do not minify. Every HTML tag MUST have a space between its name and its attributes (e.g. <canvas id="c"> is CORRECT, <canvasid="c"> is BROKEN).
 - SIBLING TAGS: The <script> tag MUST be a sibling of the <canvas> tag, NEVER nested inside it. Browsers treat content inside <canvas> as fallback and will NOT execute the script if it's a child.
-- Browsers CANNOT parse tags like <canvasid="c">. If you omit spaces, the game fails and returns a black screen.
-- All CSS must include: * { margin:0; padding:0; box-sizing:border-box; } and html,body { width:100%; height:100%; overflow:hidden; background:#000; }
-- Game must use a canvas element that fills the viewport.
-- Use requestAnimationFrame for the game loop.
-- All score/UI text is drawn on the canvas with ctx.fillText — never use HTML elements like <div> or <p> for game UI.
-- The game must be immediately playable and fun for at least 60 seconds.
-- Keyboard + touch controls required.
-- Game over screen must show final score and allow restart.
-- All variables must be declared/initialized before use. No runtime errors.
-- NEVER use external libraries. Vanilla JS only.
-- JavaScript only. Do NOT use TypeScript syntax (no type annotations, interfaces, enums, or generics).
+- All CSS must include: * { margin:0; padding:0; box-sizing:border-box; } and html,body { width:100%; height:100%; overflow:hidden; }
+- Use a single <canvas> that fills the viewport, and handle window 'resize' so it always fits.
+- Use requestAnimationFrame with delta-time so speed is frame-rate independent.
+- All in-game UI/score/text is drawn on the canvas with ctx.fillText — never HTML <div>/<p> for game UI.
+- All variables declared/initialized before use. No runtime errors, ever.
+- NEVER use external libraries, assets, images, or fonts. Vanilla JS + canvas only (procedural art with shapes/gradients). Sound is OK via the Web Audio API (oscillator beeps) — no audio files.
+- JavaScript only — NO TypeScript syntax (no type annotations, interfaces, enums, generics).
 
-EXAMPLE OF A PERFECT OUTPUT (study this structure carefully):
+QUALITY BAR (this is what makes the game GOOD — do all of it):
+- START SCREEN: open on a titled start screen with the game name, a one-line how-to-play, and "Tap / Press any key to start". Don't drop the player straight into motion.
+- GAME FEEL / JUICE: add particles on impacts/pickups/deaths, a short screen-shake on big hits, easing/tweening on UI, and satisfying Web Audio blips for actions (jump, score, hit, game over). Juice is the difference between bland and fun.
+- COHESIVE ART: pick a deliberate, attractive color palette (a themed background — NOT plain black — plus 3-4 harmonious colors) and stick to it. Use gradients, glows, rounded shapes; make it look designed.
+- DIFFICULTY CURVE: start easy and ramp up (speed/spawn-rate/complexity) so it stays engaging; escalating challenge, not a flat loop.
+- FEEDBACK: score pops, combo/streak counter where it fits, a persistent hi-score kept in a variable for the session, clear visual/audio feedback for every action.
+- CONTROLS: full keyboard AND touch/pointer support, both working well; show the controls on the start screen.
+- GAME OVER: a proper game-over screen with final score, hi-score, and one-tap restart.
+- Aim for something a player would actually want to replay — tight controls, clear goal, mounting tension. Make it fun for well past 60 seconds.
+
+EXAMPLE OF A PERFECT OUTPUT STRUCTURE (study the tag structure — your game must be richer than this):
 
 <!DOCTYPE html>
 <html lang="en">
@@ -73,10 +79,23 @@ requestAnimationFrame(loop);
 Now write a NEW fully working game based on the user's prompt. Be extremely careful to follow the SIBLING TAGS and NO TAG MERGING rules.
 `;
 
-function buildMessages(prompt: string, remixContext?: string) {
-    const userMessage = remixContext
-        ? `Remix this game concept/description: "${remixContext}" with the following new twist: "${prompt}"`
-        : `Create a new game: ${prompt}`;
+function buildMessages(prompt: string, remixContext?: string, remixCode?: string) {
+    let userMessage: string;
+    if (remixCode && remixCode.trim()) {
+        // True remix: give the model the ACTUAL source game to modify, plus the edit
+        // request, and require a complete standalone game back (not a diff).
+        const src = remixCode.slice(0, 120_000); // cap so we never blow the context window
+        userMessage =
+            `You are REMIXING an existing HTML5 game. Here is its COMPLETE current source code between the markers — study it, then apply the requested change while keeping what already works.\n\n` +
+            `----- BEGIN SOURCE GAME -----\n${src}\n----- END SOURCE GAME -----\n\n` +
+            (remixContext ? `Original concept: "${remixContext}".\n` : '') +
+            `Requested change / new twist: "${prompt}"\n\n` +
+            `Output the COMPLETE modified game as a single self-contained HTML file (same format rules as always — no diffs, no explanation, keep it fully playable).`;
+    } else if (remixContext) {
+        userMessage = `Remix this game concept/description: "${remixContext}" with the following new twist: "${prompt}"`;
+    } else {
+        userMessage = `Create a new game: ${prompt}`;
+    }
     return [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage }
@@ -97,14 +116,14 @@ function stripMarkdown(code: string): string {
  * Each event is `data: <token>\n\n`. Final event is `data: [DONE]\n\n`.
  * A heartbeat `data: [PING]\n\n` is sent every 15 s to keep Cloudflare alive.
  */
-export function generateGameCodeStream(prompt: string, remixContext?: string): ReadableStream<Uint8Array> {
+export function generateGameCodeStream(prompt: string, remixContext?: string, remixCode?: string): ReadableStream<Uint8Array> {
     const apiKey = env.DEEPSEEK_API_KEY;
     if (!apiKey) {
         throw new Error('DEEPSEEK_API_KEY is not set in environment variables.');
     }
 
     const encoder = new TextEncoder();
-    const messages = buildMessages(prompt, remixContext);
+    const messages = buildMessages(prompt, remixContext, remixCode);
 
     return new ReadableStream<Uint8Array>({
         async start(controller) {
@@ -127,7 +146,12 @@ export function generateGameCodeStream(prompt: string, remixContext?: string): R
                     body: JSON.stringify({
                         model: 'deepseek-chat',
                         messages,
-                        temperature: 0,
+                        // A little heat makes games varied + creative instead of the
+                        // same bland template every time; the strict format rules +
+                        // worked example keep the output well-formed. max_tokens is
+                        // raised so a richer, polished game isn't truncated mid-file.
+                        temperature: 0.7,
+                        max_tokens: 8192,
                         stream: true
                     })
                 });
