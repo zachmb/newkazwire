@@ -80,40 +80,45 @@
 
 <div class="min-h-screen bg-base-100">
 	<div class="mx-auto flex max-w-[1800px] flex-col gap-8 px-3 py-5 sm:px-5">
-		<!-- HERO -->
+		<!--
+			HERO — full-bleed featured banner grounded in the streaming home heroes pulled
+			via Mobbin MCP: Netflix (mobbin.com/screens/651b69e1-68af-49a9-9b27-687559314100),
+			HBO Max (mobbin.com/screens/d66a0b5c-d682-4ca7-b6ce-4b7cb91f4944) and Prime Video
+			(mobbin.com/screens/3e299f78-7290-4469-a99f-0e95f9ee2b17). A real cinematic still
+			runs edge to edge with an oversized title bottom-left over a single left-to-right
+			dark scrim — no blur-orb, no thumbnail-on-blurred-bg, no multi-hue gradient (the
+			AI-template tells the old hero had).
+		-->
 		{#if featured}
-			<section class="relative overflow-hidden rounded-3xl">
-				<img src={featured.image} alt="" class="absolute inset-0 h-full w-full scale-110 object-cover blur-xl" aria-hidden="true" />
-				<div class="absolute inset-0 bg-gradient-to-r from-[#0B1220]/95 via-[#0B1220]/80 to-[#2563EB]/50"></div>
-				<div class="relative flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-10">
-					<img src={featured.image} alt={featured.title} class="h-40 w-40 flex-none rounded-2xl object-cover shadow-2xl ring-1 ring-white/20 sm:h-48 sm:w-48" />
-					<div class="flex flex-col gap-3">
-						<span class="flex items-center gap-1.5 text-sm font-black uppercase tracking-wider text-[#FF9F1C]">
-							<Icon icon="mdi:star" /> Featured
-						</span>
-						<h1 class="text-3xl font-black leading-tight text-white drop-shadow sm:text-5xl">{featured.title}</h1>
-						<p class="max-w-xl text-sm font-medium text-white/80 sm:text-base">
-							{config.branding.slogan} No downloads, no blocks — just click and play.
-						</p>
-						<div class="mt-1 flex flex-wrap items-center gap-3">
-							<a href={featured.href} class="flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-black text-white shadow-lg transition hover:brightness-110">
-								<Icon icon="mdi:play" class="text-2xl" /> Play now
-							</a>
-							<a href="/proxy" class="flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 text-base font-bold text-white backdrop-blur-sm transition hover:bg-white/25">
-								<Icon icon="mdi:shield-lock" /> Open Proxy
-							</a>
-						</div>
+			<section class="relative aspect-[16/10] overflow-hidden rounded-2xl ring-1 ring-black/10 sm:aspect-[21/9]">
+				<img src={featured.image} alt="" class="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+				<div class="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/55 to-transparent sm:bg-gradient-to-r sm:from-[#0B1220] sm:via-[#0B1220]/70 sm:to-transparent"></div>
+				<div class="absolute inset-0 flex flex-col justify-end gap-3 p-5 sm:max-w-2xl sm:justify-center sm:p-10">
+					<span class="flex w-fit items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
+						<Icon icon="mdi:fire" class="text-sm" /> Featured game
+					</span>
+					<h1 class="text-3xl font-black leading-[1.02] tracking-tight text-white sm:text-6xl">{featured.title}</h1>
+					<p class="max-w-lg text-sm font-medium text-white/85 sm:text-lg">
+						{config.branding.slogan} No downloads, no blocks — just click and play.
+					</p>
+					<div class="mt-1 flex flex-wrap items-center gap-2.5">
+						<a href={featured.href} class="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-base font-bold text-white transition hover:brightness-110">
+							<Icon icon="mdi:play" class="text-xl" /> Play now
+						</a>
+						<a href="/proxy" class="flex items-center gap-2 rounded-lg bg-white/15 px-5 py-2.5 text-base font-semibold text-white ring-1 ring-white/25 backdrop-blur-sm transition hover:bg-white/25">
+							<Icon icon="mdi:shield-lock" /> Open Proxy
+						</a>
 					</div>
 				</div>
 			</section>
 		{/if}
 
-		<!-- CATEGORY CHIPS -->
+		<!-- CATEGORY CHIPS — flat filter chips per YouTube Playables / Netflix top-of-grid filters -->
 		{#if rails.length}
 			<div class="row-scroll -mt-2 flex gap-2 overflow-x-auto pb-1">
-				<a href="#top" class="flex-none rounded-full bg-primary px-4 py-1.5 text-sm font-bold text-white">All</a>
+				<a href="#top" class="flex-none rounded-lg bg-primary px-4 py-1.5 text-sm font-semibold text-white">All</a>
 				{#each rails as r}
-					<a href={'#' + r.id} class="flex-none rounded-full bg-base-200 px-4 py-1.5 text-sm font-bold text-base-content/80 transition hover:bg-base-300 hover:text-base-content">{r.tag}</a>
+					<a href={'#' + r.id} class="flex-none rounded-lg bg-base-200 px-4 py-1.5 text-sm font-semibold text-base-content/80 ring-1 ring-base-300 transition hover:bg-base-100 hover:text-primary hover:ring-primary/40">{r.tag}</a>
 				{/each}
 			</div>
 		{/if}
@@ -136,31 +141,31 @@
 		<!-- AI COMMUNITY -->
 		<section class="flex flex-col gap-3">
 			<div class="flex items-end justify-between px-1">
-				<h2 class="flex items-center gap-2 text-xl font-black tracking-tight text-base-content sm:text-2xl">
-					<Icon icon="mdi:sparkles" class="text-2xl text-primary" /> Community creations
+				<h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-base-content sm:text-xl">
+					<Icon icon="mdi:sparkles" class="text-xl text-primary" /> Community creations
 				</h2>
 				<div class="flex items-center gap-3">
-					<a href="/ai" class="text-sm font-bold text-primary hover:underline">Create yours</a>
-					<a href="/ai/gallery" class="text-sm font-bold text-primary hover:underline">View all</a>
+					<a href="/ai" class="text-sm font-semibold text-primary hover:underline">Create yours</a>
+					<a href="/ai/gallery" class="text-sm font-semibold text-base-content/60 hover:text-primary">View all</a>
 				</div>
 			</div>
 			{#if aiGames.length}
 				<div class="row-scroll -mx-1 flex snap-x gap-3 overflow-x-auto px-1 py-3">
 					{#each aiGames as g (g.id)}
-						<a href={'/ai/user-g/' + g.id} class="group relative flex aspect-square w-36 flex-none snap-start flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/25 to-secondary/25 p-3 text-center ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-xl sm:w-40 md:w-44">
-							<Icon icon="mdi:robot-happy" class="text-4xl text-base-content/70 transition group-hover:scale-110" />
-							<span class="line-clamp-2 text-sm font-bold text-base-content">{g.title}</span>
+						<a href={'/ai/user-g/' + g.id} class="group relative flex aspect-square w-36 flex-none snap-start flex-col items-center justify-center gap-2 overflow-hidden rounded-xl bg-base-200 p-3 text-center ring-1 ring-base-300 transition hover:-translate-y-0.5 hover:ring-primary sm:w-40 md:w-44">
+							<Icon icon="mdi:robot-happy" class="text-4xl text-primary transition group-hover:scale-110" />
+							<span class="line-clamp-2 text-sm font-semibold text-base-content">{g.title}</span>
 							{#if g.avgRating}
-								<span class="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-full bg-black/50 px-2 py-0.5 text-xs font-bold text-[#FF9F1C]"><Icon icon="mdi:star" class="text-xs" />{g.avgRating}</span>
+								<span class="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md bg-black/60 px-2 py-0.5 text-xs font-bold text-[#FF9F1C]"><Icon icon="mdi:star" class="text-xs" />{g.avgRating}</span>
 							{/if}
 						</a>
 					{/each}
 				</div>
 			{:else}
-				<a href="/ai" class="flex items-center gap-4 rounded-2xl border border-dashed border-base-300 bg-base-200 p-5 transition hover:border-primary">
-					<div class="grid h-12 w-12 place-items-center rounded-xl bg-primary/15 text-primary"><Icon icon="mdi:sparkles" class="text-2xl" /></div>
+				<a href="/ai" class="flex items-center gap-4 rounded-xl border border-dashed border-base-300 bg-base-200 p-5 transition hover:border-primary hover:bg-base-100">
+					<div class="grid h-12 w-12 place-items-center rounded-lg bg-primary/15 text-primary"><Icon icon="mdi:sparkles" class="text-2xl" /></div>
 					<div>
-						<p class="font-black text-base-content">Make your own game with AI</p>
+						<p class="font-bold text-base-content">Make your own game with AI</p>
 						<p class="text-sm text-base-content/70">Describe a game and publish it to the community — no code required.</p>
 					</div>
 				</a>
@@ -174,12 +179,15 @@
 			</div>
 		{/each}
 
-		<!-- ALL GAMES GRID -->
+		<!-- ALL GAMES GRID — tight poster grid per YouTube Playables / Amazon games browse -->
 		<section class="flex flex-col gap-3">
-			<h2 class="flex items-center gap-2 px-1 text-xl font-black tracking-tight text-base-content sm:text-2xl">
-				<Icon icon="mdi:grid" class="text-2xl text-primary" /> All games
-			</h2>
-			<div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+			<div class="flex items-center justify-between border-b border-base-300 px-1 pb-2">
+				<h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-base-content sm:text-xl">
+					<Icon icon="mdi:grid" class="text-xl text-primary" /> All games
+				</h2>
+				<span class="text-sm font-medium text-base-content/50">{games.length} games</span>
+			</div>
+			<div class="grid grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-3 md:grid-cols-6 lg:grid-cols-8">
 				{#each games as game (game.href)}
 					<div class="aspect-square">
 						<GameCard title={game.title} image={game.image} href={game.href} />

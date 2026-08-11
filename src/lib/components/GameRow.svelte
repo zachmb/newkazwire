@@ -18,23 +18,23 @@
 {#if games.length}
 	<section class="flex flex-col gap-3">
 		<div class="flex items-end justify-between px-1">
-			<h2 class="flex items-center gap-2 text-xl font-black tracking-tight text-base-content sm:text-2xl">
-				{#if icon}<Icon {icon} class="text-2xl text-primary" />{/if}
+			<h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-base-content sm:text-xl">
+				{#if icon}<Icon {icon} class="text-xl text-primary" />{/if}
 				{title}
 			</h2>
 			<div class="flex items-center gap-1">
 				{#if seeAllHref}
-					<a href={seeAllHref} class="mr-1 text-sm font-bold text-primary hover:underline">View all</a>
+					<a href={seeAllHref} class="mr-1 text-sm font-semibold text-base-content/60 hover:text-primary">View all</a>
 				{/if}
 				<button
-					class="grid h-9 w-9 place-items-center rounded-full bg-base-300 text-base-content transition hover:bg-primary hover:text-white"
+					class="grid h-8 w-8 place-items-center rounded-lg bg-base-200 text-base-content/70 ring-1 ring-base-300 transition hover:bg-primary hover:text-white hover:ring-primary"
 					on:click={() => scrollBy(-1)}
 					aria-label="Scroll left"
 				>
 					<Icon icon="mdi:chevron-left" class="text-xl" />
 				</button>
 				<button
-					class="grid h-9 w-9 place-items-center rounded-full bg-base-300 text-base-content transition hover:bg-primary hover:text-white"
+					class="grid h-8 w-8 place-items-center rounded-lg bg-base-200 text-base-content/70 ring-1 ring-base-300 transition hover:bg-primary hover:text-white hover:ring-primary"
 					on:click={() => scrollBy(1)}
 					aria-label="Scroll right"
 				>

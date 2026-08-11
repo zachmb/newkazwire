@@ -43,20 +43,37 @@
 	};
 </script>
 
-<header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/90 backdrop-blur-md">
+<!--
+	Top nav grounded in real product headers pulled via Mobbin MCP:
+	Netflix (mobbin.com/screens/651b69e1-68af-49a9-9b27-687559314100) + Prime Video
+	(mobbin.com/screens/3e299f78-7290-4469-a99f-0e95f9ee2b17): flat bar, wordmark hard
+	left, links + actions right, single hairline bottom border. Search field styled after
+	YouTube Playables (mobbin.com/screens/51422fe7-611e-4ab3-a865-fa61050ff5ce).
+-->
+<header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 backdrop-blur-md">
 	<nav class="mx-auto flex h-16 max-w-[1800px] items-center gap-3 px-3 sm:px-5">
-		<!-- Brand -->
-		<a href="/" class="flex flex-none items-center gap-2" aria-label={config.branding.name}>
-			<img src="/logo.png" alt="" class="h-9 w-9 rounded-lg object-contain" />
-			<span class="hidden text-xl font-black tracking-tight text-base-content sm:block">
-				Kaz<span class="text-primary">wire</span>
+		<!--
+			BRAND TILE — explicitly self-lit so it survives OS/UA dark mode.
+			Bug fix: the wordmark previously inherited theme colors; a UA honoring
+			prefers-color-scheme:dark could render it invisible. We pin an explicit
+			light background chip + explicit dark ink on the tile so it is always
+			readable regardless of the surrounding theme or OS setting.
+		-->
+		<a
+			href="/"
+			class="brand-tile flex flex-none items-center gap-2 rounded-xl px-2 py-1.5 sm:pr-3"
+			aria-label={config.branding.name}
+		>
+			<img src="/logo.png" alt="" class="h-8 w-8 rounded-lg object-contain" />
+			<span class="hidden text-xl font-black leading-none tracking-tight sm:block">
+				kaz<span style="color:#FF6A1A">wire</span><span class="text-[#0B1B33]/60">.com</span>
 			</span>
 		</a>
 
 		<!-- Search -->
 		{#if config.features.searchBar}
 			<form on:submit={submitSearch} class="mx-auto flex w-full max-w-xl items-center">
-				<label class="flex w-full items-center gap-2 rounded-full bg-base-200 px-4 py-2 ring-1 ring-base-300 focus-within:ring-2 focus-within:ring-primary">
+				<label class="flex w-full items-center gap-2 rounded-lg bg-base-200 px-4 py-2 ring-1 ring-base-300 transition focus-within:bg-base-100 focus-within:ring-2 focus-within:ring-primary">
 					<Icon icon="mdi:magnify" class="text-xl text-base-content/60" />
 					<input
 						type="text"
@@ -134,3 +151,20 @@
 		{/each}
 	</div>
 </header>
+
+<style>
+	/*
+		Force the brand tile to a fixed light-on-dark-ink treatment. `color-scheme: light`
+		stops a dark-mode UA from re-inking form/text controls, and the explicit background +
+		color guarantee the wordmark is visible even if the document theme flips to dark.
+	*/
+	.brand-tile {
+		color-scheme: light;
+		background: #ffffff;
+		color: #0b1b33;
+		box-shadow: inset 0 0 0 1px rgba(11, 27, 51, 0.08);
+	}
+	.brand-tile:hover {
+		box-shadow: inset 0 0 0 1px rgba(255, 106, 26, 0.35);
+	}
+</style>
