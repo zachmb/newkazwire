@@ -454,7 +454,16 @@
 
 			<!-- Description / Extra Info -->
 			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
-				<h2 class="mb-2 text-xl font-black">About {data.game.title}</h2>
+				<div class="mb-2 flex items-center justify-between gap-3">
+					<h2 class="text-xl font-black">About {data.game.title}</h2>
+					<a
+						href={`/market?asset=game:${data.game.id}&kind=game&title=${encodeURIComponent(data.game.title)}`}
+						class="flex flex-none items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary hover:text-white"
+						title="Invest Kazcoins in this game on KazMarket"
+					>
+						<Icon icon="mdi:chart-line" /> Invest
+					</a>
+				</div>
 				<p class="whitespace-pre-line leading-relaxed text-base-content/80">{data.game.description}</p>
 				<div class="mt-4 flex flex-wrap gap-2">
 					{#each data.game.tags as tag}

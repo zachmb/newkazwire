@@ -370,6 +370,13 @@
 										Report broken
 									{/if}
 								</button>
+								<a
+									href={`/market?asset=ai:${game.id}&kind=ai&title=${encodeURIComponent(game.title)}`}
+									class="btn btn-outline gap-2 rounded-2xl font-black"
+									title="Invest Kazcoins in this creation on KazMarket"
+								>
+									<Icon icon="mdi:chart-line" /> Invest
+								</a>
 							</div>
 						</div>
 

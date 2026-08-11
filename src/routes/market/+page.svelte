@@ -3,6 +3,7 @@
 	// Invest Kazcoins early; if others pile in after you, the price rises and you profit.
 	// Mobbin ref: Robinhood watchlist/holdings + sparkline rows (https://mobbin.com/apps/robinhood-ios).
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 	import { config } from '$lib/config';
 	import { getUid, getPlayerName, setPlayerName, hasPlayerName } from '$lib/utils/streak';
@@ -101,7 +102,30 @@
 		try { const j = await (await fetch('/api/ai/gallery')).json(); aiGames = (j.games || []).slice(0, 30); } catch { /* */ }
 	}
 
-	onMount(async () => { uid = getUid(); await Promise.all([load(), loadAi()]); });
+	let dailyClaimed = false;
+	async function claimDaily() {
+		try {
+			const r = await fetch('/api/daily', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uid }) });
+			const j = await r.json();
+			if (j.success && j.claimed) { coins = j.coins; showToast(`Daily bonus: +${j.amount} Kazcoins!`); }
+			else { coins = j.coins ?? coins; showToast('Daily bonus already claimed today.', 'error'); }
+			dailyClaimed = true;
+		} catch { showToast('Could not claim bonus', 'error'); }
+	}
+
+	onMount(async () => {
+		uid = getUid();
+		await Promise.all([load(), loadAi()]);
+		// Deep-link: /market?asset=game:ID&kind=game&title=... opens the invest modal.
+		const sp = $page.url.searchParams;
+		const assetId = sp.get('asset');
+		if (assetId) {
+			const kind = (sp.get('kind') as any) || 'game';
+			const title = sp.get('title') || assetId;
+			const existing = assets.find((a) => a.id === assetId);
+			openTrade({ id: assetId, kind, title, price: existing?.price ?? 5 }, 'buy');
+		}
+	});
 </script>
 
 <svelte:head><title>KazMarket — {config.branding.name}</title></svelte:head>
@@ -118,6 +142,9 @@
 			</div>
 			<div class="flex items-center gap-2">
 				<div class="flex items-center gap-2 rounded-full bg-warning/15 px-4 py-2 font-black text-warning"><Icon icon="mdi:hand-coin" /> {coins.toLocaleString()}</div>
+				<button class="flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-2 text-sm font-bold text-success transition hover:bg-success hover:text-white disabled:opacity-50" on:click={claimDaily} disabled={dailyClaimed} title="Claim your daily bonus">
+					<Icon icon="mdi:gift" /> <span class="hidden sm:inline">Daily</span>
+				</button>
 				<button class="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-110" on:click={() => (showPicker = !showPicker)}>
 					<Icon icon="mdi:plus" /> Invest
 				</button>

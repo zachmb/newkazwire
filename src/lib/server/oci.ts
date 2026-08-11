@@ -792,7 +792,10 @@ const MAX_ITEM_PRICE = 100_000;
 export interface Wallet {
     coins: number;
     updatedAt: string;
+    lastDaily?: string; // YYYY-MM-DD (UTC) of the last claimed daily bonus
 }
+
+const DAILY_BONUS = 25;
 
 export interface ShopItem {
     id: string;
@@ -819,9 +822,27 @@ export async function adjustCoins(uid: string, delta: number): Promise<number> {
     const wallets = (await readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH)) || {};
     const current = wallets[uid]?.coins || 0;
     const next = Math.max(0, current + delta);
-    wallets[uid] = { coins: next, updatedAt: new Date().toISOString() };
+    // Preserve other wallet fields (e.g. lastDaily) — only touch coins/updatedAt.
+    wallets[uid] = { ...wallets[uid], coins: next, updatedAt: new Date().toISOString() };
     await uploadToOCI(OCI_WALLETS_PATH, JSON.stringify(wallets), 'application/json');
     return next;
+}
+
+export interface DailyResult { claimed: boolean; amount: number; coins: number; }
+
+/** Grant a once-per-UTC-day coin bonus. Idempotent within a day (no double claim). */
+export async function claimDaily(uid: string): Promise<DailyResult> {
+    if (!uid) return { claimed: false, amount: 0, coins: 0 };
+    const wallets = (await readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH)) || {};
+    const today = utcDateString();
+    const w = wallets[uid] || { coins: 0, updatedAt: new Date().toISOString() };
+    if (w.lastDaily === today) return { claimed: false, amount: 0, coins: w.coins };
+    w.coins = (w.coins || 0) + DAILY_BONUS;
+    w.lastDaily = today;
+    w.updatedAt = new Date().toISOString();
+    wallets[uid] = w;
+    await uploadToOCI(OCI_WALLETS_PATH, JSON.stringify(wallets), 'application/json');
+    return { claimed: true, amount: DAILY_BONUS, coins: w.coins };
 }
 
 async function getInventory(uid: string): Promise<string[]> {

@@ -244,6 +244,15 @@
 					<Icon icon="lucide:repeat-2" class="h-4 w-4" />
 					{#if repostCount > 0}<span class="tabular-nums font-semibold">{repostCount}</span>{/if}
 				</button>
+
+				<a
+					href={`/market?asset=post:${src.id}&kind=post&title=${encodeURIComponent((src.text || 'Post').slice(0, 40))}`}
+					class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-sm text-base-content/50 transition-colors hover:text-primary"
+					aria-label="Invest in this post"
+					title="Invest Kazcoins in this post"
+				>
+					<Icon icon="lucide:trending-up" class="h-4 w-4" />
+				</a>
 			</div>
 
 			<!-- Replies -->
