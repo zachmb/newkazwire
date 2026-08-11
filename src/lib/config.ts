@@ -8,7 +8,7 @@ export const config = {
 	},
 	social: {
 		tiktok: null,
-		discord: null
+		discord: 'https://joinkaz.com'
 	},
 	analytics: {
 		gtmID: 'GTM-KVGNDGZ7'

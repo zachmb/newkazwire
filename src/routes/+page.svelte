@@ -5,6 +5,8 @@
 	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
 	import GameCard from '$lib/components/GameCard.svelte';
 	import GameRow from '$lib/components/GameRow.svelte';
+	import Leaderboard from '$lib/components/Leaderboard.svelte';
+	import StreakBadge from '$lib/components/StreakBadge.svelte';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 
@@ -89,29 +91,66 @@
 			dark scrim — no blur-orb, no thumbnail-on-blurred-bg, no multi-hue gradient (the
 			AI-template tells the old hero had).
 		-->
-		{#if featured}
-			<section class="relative aspect-[16/10] overflow-hidden rounded-2xl ring-1 ring-black/10 sm:aspect-[21/9]">
-				<img src={featured.image} alt="" class="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
-				<div class="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/55 to-transparent sm:bg-gradient-to-r sm:from-[#0B1220] sm:via-[#0B1220]/70 sm:to-transparent"></div>
-				<div class="absolute inset-0 flex flex-col justify-end gap-3 p-5 sm:max-w-2xl sm:justify-center sm:p-10">
-					<span class="flex w-fit items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
-						<Icon icon="mdi:fire" class="text-sm" /> Featured game
-					</span>
-					<h1 class="text-3xl font-black leading-[1.02] tracking-tight text-white sm:text-6xl">{featured.title}</h1>
-					<p class="max-w-lg text-sm font-medium text-white/85 sm:text-lg">
-						{config.branding.slogan} No downloads, no blocks — just click and play.
-					</p>
-					<div class="mt-1 flex flex-wrap items-center gap-2.5">
-						<a href={featured.href} class="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-base font-bold text-white transition hover:brightness-110">
-							<Icon icon="mdi:play" class="text-xl" /> Play now
-						</a>
-						<a href="/proxy" class="flex items-center gap-2 rounded-lg bg-white/15 px-5 py-2.5 text-base font-semibold text-white ring-1 ring-white/25 backdrop-blur-sm transition hover:bg-white/25">
-							<Icon icon="mdi:shield-lock" /> Open Proxy
-						</a>
+		<!--
+			ABOVE THE FOLD — cinematic featured banner (left) beside a live "Popular now"
+			top-5 list (right), so the five most popular games sit in the first viewport.
+			The hero CTA row surfaces Play, Create-your-own and Join-Discord up front.
+		-->
+		<section class="grid gap-4 lg:grid-cols-[2fr_1fr]">
+			{#if featured}
+				<div class="relative aspect-[16/10] overflow-hidden rounded-2xl ring-1 ring-black/10 sm:aspect-[21/9] lg:aspect-auto lg:min-h-[360px]">
+					<img src={featured.image} alt="" class="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+					<div class="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/55 to-transparent sm:bg-gradient-to-r sm:from-[#0B1220] sm:via-[#0B1220]/70 sm:to-transparent"></div>
+					<div class="absolute inset-0 flex flex-col justify-end gap-3 p-5 sm:max-w-2xl sm:justify-center sm:p-8">
+						<span class="flex w-fit items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
+							<Icon icon="mdi:fire" class="text-sm" /> Featured game
+						</span>
+						<h1 class="text-3xl font-black leading-[1.02] tracking-tight text-white sm:text-5xl">{featured.title}</h1>
+						<p class="max-w-lg text-sm font-medium text-white/85 sm:text-base">
+							{config.branding.slogan} No downloads, no blocks — just click and play.
+						</p>
+						<div class="mt-1 flex flex-wrap items-center gap-2.5">
+							<a href={featured.href} class="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-base font-bold text-white transition hover:brightness-110">
+								<Icon icon="mdi:play" class="text-xl" /> Play now
+							</a>
+							<a href="/ai" class="flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-base font-bold text-white transition hover:brightness-110">
+								<Icon icon="mdi:sparkles" /> Create your own
+							</a>
+							{#if config.social.discord}
+								<a href={config.social.discord} target="_blank" rel="noopener" class="flex items-center gap-2 rounded-lg bg-white/15 px-5 py-2.5 text-base font-semibold text-white ring-1 ring-white/25 backdrop-blur-sm transition hover:bg-[#5865F2] hover:ring-[#5865F2]">
+									<Icon icon="ic:baseline-discord" class="text-xl" /> Join Discord
+								</a>
+							{/if}
+						</div>
 					</div>
 				</div>
-			</section>
-		{/if}
+			{/if}
+
+			<!-- Popular now — top 5, in the hero row so they're above the fold -->
+			{#if popular.length}
+				<div class="flex flex-col gap-2.5 rounded-2xl bg-base-200/60 p-3 ring-1 ring-base-300">
+					<div class="flex items-center justify-between px-1 pt-1">
+						<h2 class="flex items-center gap-2 text-base font-bold tracking-tight text-base-content">
+							<Icon icon="mdi:fire" class="text-lg text-primary" /> Popular now
+						</h2>
+						<StreakBadge pingOnMount={false} />
+					</div>
+					<div class="flex flex-col gap-2">
+						{#each popular.slice(0, 5) as g, i (g.href)}
+							<a href={g.href} class="group flex items-center gap-3 rounded-xl bg-base-100 p-2 ring-1 ring-base-300 transition hover:ring-primary">
+								<span class="grid h-6 w-6 flex-none place-items-center rounded-md bg-primary/10 text-xs font-black text-primary">{i + 1}</span>
+								<img src={g.image} alt="" class="h-12 w-12 flex-none rounded-lg object-cover" loading="lazy" />
+								<span class="min-w-0 flex-1 truncate text-sm font-bold text-base-content">{g.title}</span>
+								<Icon icon="mdi:play-circle" class="flex-none text-2xl text-base-content/20 transition group-hover:text-primary" />
+							</a>
+						{/each}
+					</div>
+					<a href="#top" class="mt-1 flex items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-bold text-base-content/50 transition hover:text-primary">
+						Browse all {games.length} games <Icon icon="mdi:arrow-down" />
+					</a>
+				</div>
+			{/if}
+		</section>
 
 		<!-- CATEGORY CHIPS — flat filter chips per YouTube Playables / Netflix top-of-grid filters -->
 		{#if rails.length}
@@ -131,11 +170,6 @@
 		{/if}
 		{#if favorites.length}
 			<GameRow title="Your favorites" icon="mdi:heart" games={favorites} />
-		{/if}
-
-		<!-- POPULAR -->
-		{#if popular.length}
-			<GameRow title="Popular now" icon="mdi:fire" games={popular} />
 		{/if}
 
 		<!-- AI COMMUNITY -->
@@ -170,6 +204,19 @@
 					</div>
 				</a>
 			{/if}
+		</section>
+
+		<!-- TOP PLAYERS — daily play-streak leaderboard -->
+		<section class="flex flex-col gap-3">
+			<div class="flex items-end justify-between px-1">
+				<h2 class="flex items-center gap-2 text-lg font-bold tracking-tight text-base-content sm:text-xl">
+					<Icon icon="mdi:trophy" class="text-xl text-primary" /> Top players
+				</h2>
+				<span class="text-sm font-medium text-base-content/50">Longest daily play streaks</span>
+			</div>
+			<div class="rounded-2xl bg-base-200/60 p-3 ring-1 ring-base-300 sm:p-4">
+				<Leaderboard title={null} />
+			</div>
 		</section>
 
 		<!-- CATEGORY RAILS -->

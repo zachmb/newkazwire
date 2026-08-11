@@ -27,10 +27,11 @@
 		isSearchOpen.set(true);
 	}
 
+	// Create lives as its own prominent CTA button (below); Community is the AI gallery.
 	const links = [
 		{ href: '/', label: 'Games', icon: 'mdi:gamepad-variant' },
+		{ href: '/feed', label: 'Feed', icon: 'mdi:cards-variant' },
 		{ href: '/apps', label: 'Apps', icon: 'ri:apps-2-fill' },
-		{ href: '/ai', label: 'Create', icon: 'mdi:sparkles' },
 		{ href: '/ai/gallery', label: 'Community', icon: 'mdi:account-group' }
 	];
 
@@ -104,6 +105,30 @@
 				</a>
 			{/each}
 		</div>
+
+		<!-- Create CTA (always visible, prominent) — make your own game with AI -->
+		<a
+			href="/ai"
+			class="flex flex-none items-center gap-1.5 rounded-full bg-secondary px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110 sm:px-4"
+			title="Make your own game with AI"
+		>
+			<Icon icon="mdi:sparkles" class="text-lg" />
+			<span class="hidden sm:inline">Create</span>
+		</a>
+
+		<!-- Discord CTA (always visible) -->
+		{#if config.social.discord}
+			<a
+				href={config.social.discord}
+				target="_blank"
+				rel="noopener"
+				class="grid h-10 w-10 flex-none place-items-center rounded-full bg-[#5865F2]/10 text-[#5865F2] transition hover:bg-[#5865F2] hover:text-white"
+				aria-label="Join our Discord"
+				title="Join our Discord community"
+			>
+				<Icon icon="ic:baseline-discord" class="text-2xl" />
+			</a>
+		{/if}
 
 		<!-- Proxy CTA (always visible, prominent) -->
 		<a
