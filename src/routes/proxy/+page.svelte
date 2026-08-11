@@ -100,9 +100,11 @@
 
 	const quickLinks = [
 		{ label: 'Google', url: 'https://google.com', icon: 'mdi:google' },
+		{ label: 'DuckDuckGo', url: 'https://duckduckgo.com', icon: 'simple-icons:duckduckgo' },
 		{ label: 'YouTube', url: 'https://youtube.com', icon: 'mdi:youtube' },
 		{ label: 'Wikipedia', url: 'https://wikipedia.org', icon: 'mdi:wikipedia' },
 		{ label: 'Reddit', url: 'https://reddit.com', icon: 'mdi:reddit' },
+		{ label: 'Snapchat', url: 'https://web.snapchat.com', icon: 'simple-icons:snapchat' },
 		{ label: 'Discord', url: 'https://discord.com', icon: 'ic:baseline-discord' },
 		{ label: 'Spotify', url: 'https://open.spotify.com', icon: 'mdi:spotify' }
 	];
