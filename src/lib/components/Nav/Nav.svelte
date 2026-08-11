@@ -33,7 +33,6 @@
 		{ href: '/feed', label: 'Feed', icon: 'mdi:cards-variant' },
 		{ href: '/rooms', label: 'Rooms', icon: 'mdi:account-group' },
 		{ href: '/market', label: 'Market', icon: 'mdi:chart-line' },
-		{ href: '/players', label: 'Players', icon: 'mdi:account-search' },
 		{ href: '/apps', label: 'Apps', icon: 'ri:apps-2-fill' },
 		{ href: '/ai/gallery', label: 'Community', icon: 'mdi:account-group' }
 	];

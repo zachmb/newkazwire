@@ -12,6 +12,7 @@
 	import { onMount } from 'svelte';
 	import { getUid, getPlayerName, setPlayerName } from '$lib/utils/streak';
 	import ItemShop from '$lib/components/ItemShop.svelte';
+	import PlayerSearch from '$lib/components/PlayerSearch.svelte';
 
 	// ── Real identity (server-keyed, account-free) ──
 	let uid = '';
@@ -112,6 +113,7 @@
 		{ id: 'profile',     label: 'Profile',     icon: 'mdi:account' },
 		{ id: 'ai-games',    label: 'AI Games',    icon: 'mdi:robot' },
 		{ id: 'shop',        label: 'Shop',        icon: 'mdi:store' },
+		{ id: 'players',     label: 'Players',     icon: 'mdi:account-search' },
 		{ id: 'leaderboard', label: 'Leaderboard', icon: 'mdi:trophy' }
 	];
 
@@ -502,6 +504,15 @@
 			{:else if activeTab === 'shop'}
 				<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
 					<ItemShop />
+				</div>
+
+			{:else if activeTab === 'players'}
+				<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+					<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
+						<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Icon icon="mdi:account-search" class="text-primary" /></span>
+						Find players
+					</h2>
+					<PlayerSearch />
 				</div>
 
 			<!-- LEADERBOARD -->
