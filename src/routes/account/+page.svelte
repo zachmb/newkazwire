@@ -9,11 +9,92 @@
 	import { games } from '$lib/data/games';
 	import { getCDNImageUrl } from '$lib/utils/cdn';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { getUid, getPlayerName, setPlayerName } from '$lib/utils/streak';
+
+	// ── Real identity (server-keyed, account-free) ──
+	let uid = '';
+	let displayName = 'Anonymous';
+
+	// ── Real stats (populated onMount from the streak + profile endpoints) ──
+	let statsLoading = true;
+	let currentStreak = 0;
+	let longestStreak = 0;
+	let gamesPlayed = 0;
+	let gamesCreated = 0;
+	let postsCount = 0;
+	let commentsCount = 0;
 
 	let isEditingUsername = false;
-	let newUsername = $userProfile.username;
+	let newUsername = '';
 	let recentGamesList = [];
 	let activeTab = 'profile';
+
+	onMount(async () => {
+		uid = getUid();
+		displayName = getPlayerName();
+		newUsername = displayName === 'Anonymous' ? '' : displayName;
+		if (!uid) {
+			statsLoading = false;
+			return;
+		}
+
+		// Streak stats: current + longest streak + total games played.
+		try {
+			const res = await fetch(`/api/streak?uid=${encodeURIComponent(uid)}`);
+			if (res.ok) {
+				const data = await res.json();
+				if (data?.success) {
+					currentStreak = data.streak ?? 0;
+					longestStreak = data.longest ?? 0;
+					gamesPlayed = data.gamesPlayed ?? 0;
+				}
+			}
+		} catch {
+			/* offline — leave zeros */
+		}
+
+		// Profile aggregate: games created, posts, comments. 404 for a brand-new user.
+		try {
+			const res = await fetch(`/api/profile/${encodeURIComponent(uid)}`);
+			if (res.ok) {
+				const data = await res.json();
+				const p = data?.profile;
+				if (p) {
+					gamesCreated = p.gamesCreated ?? 0;
+					postsCount = p.postsCount ?? 0;
+					commentsCount = p.commentsCount ?? 0;
+					// Prefer the server's streak-derived counts if they're higher (fresh source).
+					gamesPlayed = Math.max(gamesPlayed, p.gamesPlayed ?? 0);
+					currentStreak = Math.max(currentStreak, p.streak ?? 0);
+					longestStreak = Math.max(longestStreak, p.longestStreak ?? 0);
+					// Adopt the server-stored name only if this browser has none set yet.
+					if (p.name && getPlayerName() === 'Anonymous') displayName = p.name;
+				}
+			}
+			// A 404 is expected for a user with no created content — zeros stand.
+		} catch {
+			/* offline — leave zeros */
+		}
+
+		statsLoading = false;
+
+		// Real leaderboard — top players by current streak.
+		try {
+			const res = await fetch('/api/leaderboard');
+			if (res.ok) {
+				const data = await res.json();
+				if (data?.success && Array.isArray(data.leaders)) leaders = data.leaders;
+			}
+		} catch {
+			/* offline — leave empty */
+		}
+		leaderboardLoading = false;
+	});
+
+	// ── Real leaderboard (top players by streak) ──
+	let leaders = [];
+	let leaderboardLoading = true;
 
 	let publishingIds = new Set();
 	let successfullyPublishedIds = new Set();
@@ -67,12 +148,15 @@
 	}
 
 	function saveUsername() {
-		userProfile.updateUsername(newUsername);
+		setPlayerName(newUsername);
+		displayName = getPlayerName();
+		// Mirror into the local profile store so other UI (leaderboard row) stays in sync.
+		userProfile.updateUsername(displayName);
 		isEditingUsername = false;
 	}
 
 	function startEditing() {
-		newUsername = $userProfile.username;
+		newUsername = displayName === 'Anonymous' ? '' : displayName;
 		isEditingUsername = true;
 	}
 
@@ -86,6 +170,11 @@
 	}
 
 	$: xpInLevel = ($userProfile.xp ?? 0) % 100;
+
+	// Real client-store counts.
+	$: favoritesCount = ($userProfile.favoriteGames ?? []).length;
+	$: aiGamesCount = $localAiGames.length;
+	$: recentlyPlayedCount = recentGamesList.length;
 </script>
 
 <svelte:head>
@@ -139,15 +228,25 @@
 								</div>
 							{:else}
 								<div class="group flex items-center gap-2">
-									<h1 class="text-4xl font-black text-white drop-shadow">{$userProfile.username}</h1>
+									<h1 class="text-4xl font-black text-white drop-shadow">{displayName}</h1>
 									<button
 										class="rounded-full p-1.5 opacity-0 transition-opacity hover:bg-white/20 group-hover:opacity-100"
 										on:click={startEditing}
-										aria-label="Edit username"
+										aria-label="Edit display name"
 									><Icon icon="mdi:pencil" class="text-white" /></button>
 								</div>
 							{/if}
-							<p class="mt-1 text-sm font-semibold text-white/60">Joined {$userProfile.joinDate}</p>
+							<div class="mt-1 flex flex-wrap items-center gap-3">
+								<p class="text-sm font-semibold text-white/60">Joined {$userProfile.joinDate}</p>
+								{#if uid}
+									<a
+										href="/u/{uid}"
+										class="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-black text-white transition-colors hover:bg-white/25"
+									>
+										<Icon icon="mdi:open-in-new" class="text-sm" />View public profile
+									</a>
+								{/if}
+							</div>
 						</div>
 
 						<!-- Coins -->
@@ -175,18 +274,28 @@
 					</div>
 				</div>
 
-				<!-- Stat strip — inside the banner, darker bottom -->
-				<div class="grid grid-cols-2 divide-x divide-white/10 border-t border-white/10 sm:grid-cols-4">
+				<!-- Stat strip — inside the banner, darker bottom. Every value is real. -->
+				<div class="grid grid-cols-2 border-t border-white/10 sm:grid-cols-4 lg:grid-cols-8">
 					{#each [
-						{ icon: 'mdi:fire',           value: $userProfile.streak,              label: 'Day Streak',    color: 'text-orange-300' },
-						{ icon: 'mdi:gamepad-variant', value: $userProfile.gamesPlayed || 0,   label: 'Games Played',  color: 'text-sky-300'    },
-						{ icon: 'mdi:heart',           value: $userProfile.favoriteGames.length, label: 'Favorites',   color: 'text-pink-300'   },
-						{ icon: 'mdi:robot',           value: $localAiGames.length,             label: 'AI Games',     color: 'text-violet-300' }
+						{ icon: 'mdi:fire',            value: currentStreak,      label: 'Day Streak',    color: 'text-orange-300' },
+						{ icon: 'mdi:fire-circle',     value: longestStreak,      label: 'Longest Streak',color: 'text-amber-300'  },
+						{ icon: 'mdi:gamepad-variant', value: gamesPlayed,        label: 'Games Played',  color: 'text-sky-300'    },
+						{ icon: 'mdi:heart',           value: favoritesCount,     label: 'Favorites',     color: 'text-pink-300'   },
+						{ icon: 'mdi:robot',           value: aiGamesCount,        label: 'AI Games',      color: 'text-violet-300' },
+						{ icon: 'mdi:puzzle',          value: gamesCreated,       label: 'Created',       color: 'text-emerald-300'},
+						{ icon: 'mdi:message-text',    value: postsCount,         label: 'Posts',         color: 'text-cyan-300'   },
+						{ icon: 'mdi:comment-multiple',value: commentsCount,      label: 'Comments',      color: 'text-indigo-300' }
 					] as stat}
-						<div class="flex items-center gap-3 bg-black/15 px-5 py-4">
-							<Icon icon={stat.icon} class="text-2xl {stat.color} shrink-0" />
+						<div class="flex items-center gap-3 border-t border-white/5 bg-black/15 px-5 py-4">
+							<Icon icon={stat.icon} class="shrink-0 text-2xl {stat.color}" />
 							<div>
-								<div class="text-xl font-black text-white">{stat.value}</div>
+								<div class="text-xl font-black text-white">
+									{#if statsLoading}
+										<span class="inline-block h-5 w-6 animate-pulse rounded bg-white/20"></span>
+									{:else}
+										{stat.value}
+									{/if}
+								</div>
 								<div class="text-xs font-semibold text-white/50">{stat.label}</div>
 							</div>
 						</div>
@@ -222,6 +331,7 @@
 							<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Icon icon="mdi:history" class="text-primary" /></span>
 								Recently Played
+								<span class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-black text-primary">{recentlyPlayedCount}</span>
 							</h2>
 							<div class="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8">
 								{#each recentGamesList.slice(0, 8) as game}
@@ -292,6 +402,7 @@
 						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50"><Icon icon="mdi:heart" class="text-red-400" /></span>
 							Favorite Games
+							<span class="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-black text-red-400">{favoritesCount}</span>
 						</h2>
 						{#if $userProfile.favoriteGames.length === 0}
 							<div class="flex h-32 flex-col items-center justify-center gap-2 rounded-2xl bg-base-100 text-center">
@@ -439,8 +550,8 @@
 						<div class="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
 						<div class="relative flex items-center justify-between">
 							<div>
-								<h3 class="text-2xl font-black">Weekly Championship</h3>
-								<p class="mt-1 font-semibold opacity-80">Resets in 2 days · Top prize: Discord "Champion" role</p>
+								<h3 class="text-2xl font-black">Top Streaks</h3>
+								<p class="mt-1 font-semibold opacity-80">The players with the longest daily-play streaks. Play every day to climb.</p>
 							</div>
 							<Icon icon="mdi:trophy" class="text-6xl text-yellow-200 drop-shadow-lg" />
 						</div>
@@ -448,46 +559,55 @@
 
 					<!-- Table -->
 					<div class="overflow-hidden rounded-3xl bg-base-100 shadow-lg">
-						<table class="table w-full">
-							<thead>
-								<tr class="bg-neutral/5 text-xs font-black uppercase tracking-wider text-base-content/40">
-									<th class="w-14 py-4">Rank</th>
-									<th class="py-4">Player</th>
-									<th class="py-4 text-right">Level</th>
-									<th class="py-4 text-right">Coins</th>
-								</tr>
-							</thead>
-							<tbody>
-								{#each [
-									{ rank: 1, name: 'FrogMaster99', level: 42, coins: 15420, isUser: false },
-									{ rank: 2, name: 'MathWizard',   level: 38, coins: 12500, isUser: false },
-									{ rank: 3, name: 'SpeedRunner',  level: 35, coins: 9800,  isUser: false },
-									{ rank: 4, name: $userProfile.username, level: $userProfile.level, coins: $userProfile.coins, isUser: true },
-									{ rank: 5, name: 'RetroGamer',   level: 20, coins: 5000,  isUser: false }
-								] as player}
-									<tr class="border-t border-neutral/8 transition-colors {player.isUser ? 'bg-primary/5' : 'hover:bg-base-100'}">
-										<td class="py-4 font-black">
-											{#if player.rank === 1}<Icon icon="mdi:medal" class="text-2xl text-yellow-400" />
-											{:else if player.rank === 2}<Icon icon="mdi:medal" class="text-2xl text-slate-400" />
-											{:else if player.rank === 3}<Icon icon="mdi:medal" class="text-2xl text-orange-400" />
-											{:else}<span class="text-base-content/30">#{player.rank}</span>{/if}
-										</td>
-										<td class="py-4">
-											<div class="flex items-center gap-3">
-												<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black
-													{player.isUser ? 'bg-primary text-white' : 'bg-neutral/10 text-base-content/50'}">
-													{player.name.substring(0, 2).toUpperCase()}
-												</div>
-												<span class="font-bold {player.isUser ? 'text-primary' : 'text-base-content'}">{player.name}</span>
-												{#if player.isUser}<span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">You</span>{/if}
-											</div>
-										</td>
-										<td class="py-4 text-right font-mono font-bold text-base-content/60">{player.level}</td>
-										<td class="py-4 text-right font-mono font-bold text-yellow-600">{player.coins.toLocaleString()}</td>
+						{#if leaderboardLoading}
+							<div class="flex h-40 items-center justify-center">
+								<span class="loading loading-spinner loading-lg text-primary"></span>
+							</div>
+						{:else if leaders.length === 0}
+							<div class="flex h-48 flex-col items-center justify-center gap-3 text-center">
+								<Icon icon="mdi:trophy-outline" class="text-5xl text-base-content/15" />
+								<p class="text-sm font-bold text-base-content/40">No ranked players yet — play a game today to start a streak and claim a spot.</p>
+							</div>
+						{:else}
+							<table class="table w-full">
+								<thead>
+									<tr class="bg-neutral/5 text-xs font-black uppercase tracking-wider text-base-content/40">
+										<th class="w-14 py-4">Rank</th>
+										<th class="py-4">Player</th>
+										<th class="py-4 text-right">Streak</th>
+										<th class="py-4 text-right">Longest</th>
+										<th class="py-4 text-right">Played</th>
 									</tr>
-								{/each}
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									{#each leaders as player, i}
+										{@const rank = i + 1}
+										{@const isUser = displayName !== 'Anonymous' && player.name === displayName}
+										<tr class="border-t border-neutral/8 transition-colors {isUser ? 'bg-primary/5' : 'hover:bg-base-200'}">
+											<td class="py-4 font-black">
+												{#if rank === 1}<Icon icon="mdi:medal" class="text-2xl text-yellow-400" />
+												{:else if rank === 2}<Icon icon="mdi:medal" class="text-2xl text-slate-400" />
+												{:else if rank === 3}<Icon icon="mdi:medal" class="text-2xl text-orange-400" />
+												{:else}<span class="text-base-content/30">#{rank}</span>{/if}
+											</td>
+											<td class="py-4">
+												<div class="flex items-center gap-3">
+													<div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black
+														{isUser ? 'bg-primary text-white' : 'bg-neutral/10 text-base-content/50'}">
+														{(player.name || '??').substring(0, 2).toUpperCase()}
+													</div>
+													<span class="font-bold {isUser ? 'text-primary' : 'text-base-content'}">{player.name || 'Anonymous'}</span>
+													{#if isUser}<span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">You</span>{/if}
+												</div>
+											</td>
+											<td class="py-4 text-right font-mono font-bold text-orange-500">{player.streak}</td>
+											<td class="py-4 text-right font-mono font-bold text-base-content/60">{player.longest}</td>
+											<td class="py-4 text-right font-mono font-bold text-base-content/60">{player.gamesPlayed}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						{/if}
 					</div>
 				</div>
 			{/if}
