@@ -249,3 +249,159 @@ export async function saveTelemetry(sessionId: string, payload: any) {
     await uploadToOCI(path, JSON.stringify(sessionData), 'application/json');
 }
 
+/* ------------------------------------------------------------------ *
+ * Play streaks + leaderboard (DB-free, account-free)
+ *
+ * Storage shape in the frogbase bucket:
+ *   user-stats/streaks/{uid}.json   — one file per visitor (private, holds name)
+ *       { uid, name, streak, longest, gamesPlayed, lastPlayedDate, updatedAt }
+ *   user-stats/leaderboard.json     — a single compact aggregate map, read-modify-write
+ *       { [uid]: { name, streak, longest, gamesPlayed, updatedAt } }
+ *
+ * Listing a bucket isn't available via a PAR, so the leaderboard is maintained
+ * as one aggregate file updated best-effort on every ping (mirrors the ip-log
+ * read-modify-write pattern above).
+ * ------------------------------------------------------------------ */
+
+const OCI_LEADERBOARD_PATH = 'user-stats/leaderboard.json';
+
+/** Per-visitor streak record, stored at user-stats/streaks/{uid}.json */
+export interface StreakRecord {
+    uid: string;
+    name: string;
+    streak: number;
+    longest: number;
+    gamesPlayed: number;
+    lastPlayedDate: string; // YYYY-MM-DD (UTC)
+    updatedAt: string;      // ISO timestamp
+}
+
+/** One row in the compact leaderboard aggregate map. */
+export interface LeaderboardRow {
+    name: string;
+    streak: number;
+    longest: number;
+    gamesPlayed: number;
+    updatedAt: string;
+}
+
+/** The public leaderboard entry sent to the browser — no uid, no private fields. */
+export interface PublicLeaderboardEntry {
+    name: string;
+    streak: number;
+    longest: number;
+    gamesPlayed: number;
+}
+
+/** UTC calendar date (YYYY-MM-DD) for a given instant. Streaks roll over at UTC midnight. */
+function utcDateString(d: Date = new Date()): string {
+    return d.toISOString().split('T')[0];
+}
+
+/** Whether `prev` (YYYY-MM-DD) is exactly the calendar day before `today` (YYYY-MM-DD). */
+function isYesterday(prev: string, today: string): boolean {
+    const t = new Date(`${today}T00:00:00.000Z`);
+    const y = new Date(t.getTime() - 24 * 60 * 60 * 1000);
+    return utcDateString(y) === prev;
+}
+
+/** Clamp/sanitize a display name to something safe + bounded for public display. */
+function sanitizeName(name: unknown): string {
+    if (typeof name !== 'string') return 'Anonymous';
+    const trimmed = name.replace(/[ -]/g, '').trim().slice(0, 24);
+    return trimmed || 'Anonymous';
+}
+
+/** Reads a single visitor's streak record. Returns null if they've never played. */
+export async function getStreak(uid: string): Promise<StreakRecord | null> {
+    if (!uid) return null;
+    return readJsonFromOCI<StreakRecord>(`user-stats/streaks/${encodeURIComponent(uid)}.json`);
+}
+
+/**
+ * Records a daily play ping for a visitor and updates the streak.
+ *  - lastPlayedDate === today  -> no streak change, gamesPlayed++ (still a play)
+ *  - lastPlayedDate === yesterday -> streak++
+ *  - otherwise (gap / first play) -> streak = 1
+ * Persists the per-user file, then best-effort updates the leaderboard aggregate.
+ * Returns the updated record.
+ */
+export async function recordStreakPing(uid: string, name: string): Promise<StreakRecord> {
+    const today = utcDateString();
+    const now = new Date().toISOString();
+    const displayName = sanitizeName(name);
+
+    const existing = await getStreak(uid);
+
+    let streak: number;
+    if (!existing) {
+        streak = 1;
+    } else if (existing.lastPlayedDate === today) {
+        streak = existing.streak; // already counted today
+    } else if (isYesterday(existing.lastPlayedDate, today)) {
+        streak = existing.streak + 1;
+    } else {
+        streak = 1; // missed a day (or more) — reset
+    }
+
+    const gamesPlayed = (existing?.gamesPlayed || 0) + 1;
+    const longest = Math.max(existing?.longest || 0, streak);
+
+    const record: StreakRecord = {
+        uid,
+        name: displayName,
+        streak,
+        longest,
+        gamesPlayed,
+        lastPlayedDate: today,
+        updatedAt: now
+    };
+
+    await uploadToOCI(
+        `user-stats/streaks/${encodeURIComponent(uid)}.json`,
+        JSON.stringify(record),
+        'application/json'
+    );
+
+    // Best-effort leaderboard aggregate update — never let this fail the ping.
+    try {
+        await updateLeaderboardEntry(record);
+    } catch (err) {
+        console.error('Leaderboard aggregate update failed (non-fatal):', err);
+    }
+
+    return record;
+}
+
+/** Read-modify-write the compact leaderboard aggregate for a single visitor. */
+async function updateLeaderboardEntry(record: StreakRecord): Promise<void> {
+    const board =
+        (await readJsonFromOCI<Record<string, LeaderboardRow>>(OCI_LEADERBOARD_PATH)) || {};
+    board[record.uid] = {
+        name: record.name,
+        streak: record.streak,
+        longest: record.longest,
+        gamesPlayed: record.gamesPlayed,
+        updatedAt: record.updatedAt
+    };
+    await uploadToOCI(OCI_LEADERBOARD_PATH, JSON.stringify(board), 'application/json');
+}
+
+/**
+ * Returns the top N leaderboard entries by current streak (tiebreak: gamesPlayed),
+ * with all uid / private fields stripped.
+ */
+export async function getLeaderboard(limit: number = 20): Promise<PublicLeaderboardEntry[]> {
+    const board =
+        (await readJsonFromOCI<Record<string, LeaderboardRow>>(OCI_LEADERBOARD_PATH)) || {};
+    return Object.values(board)
+        .sort((a, b) => b.streak - a.streak || b.gamesPlayed - a.gamesPlayed)
+        .slice(0, Math.max(0, limit))
+        .map((r) => ({
+            name: r.name,
+            streak: r.streak,
+            longest: r.longest,
+            gamesPlayed: r.gamesPlayed
+        }));
+}
+
