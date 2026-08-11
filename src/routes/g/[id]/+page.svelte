@@ -292,8 +292,11 @@
 			<GameRail games={localizedGames} />
 		</aside>
 
-		<!-- Main Content: Game Player -->
-		<main class="flex flex-col gap-6">
+		<!-- Main Content: Game Player.
+		     min-w-0 is REQUIRED: grid items default to min-width:auto, so the wide
+		     "More games" row was expanding this 5fr track to ~2808px and shoving the
+		     player card off the right edge. min-w-0 lets the track keep its fraction. -->
+		<main class="flex min-w-0 flex-col gap-6">
 			<HeroGameCard
 				game={{
 					name: data.game.title,

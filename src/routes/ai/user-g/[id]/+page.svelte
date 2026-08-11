@@ -213,7 +213,7 @@
 		</aside>
 
 		<!-- Main Content -->
-		<main class="flex flex-col gap-6">
+		<main class="flex min-w-0 flex-col gap-6">
 			{#if isLoading}
 				<div
 					class="flex h-96 flex-col items-center justify-center gap-4 rounded-3xl bg-base-100 opacity-50 shadow-xl"
@@ -352,7 +352,7 @@
 							<div class="mt-6 flex flex-wrap gap-3">
 								<a
 									href="/ai?remix={game.id}"
-									class="btn btn-primary flex-1 rounded-2xl font-black text-white"
+									class="btn btn-primary gap-2 whitespace-nowrap rounded-2xl font-black text-white"
 								>
 									<Icon icon="mdi:auto-fix" />
 									Remix this Game
