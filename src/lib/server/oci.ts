@@ -869,6 +869,235 @@ export interface BuyResult {
     item?: ShopItem;
 }
 
+/* ------------------------------------------------------------------ *
+ * KAZMARKET — a "stock market" for games/creations/posts (Giggles-style).
+ * Players invest Kazcoins early; if others pile in afterward the price rises and
+ * they can sell for a profit. Prices follow a LINEAR BONDING CURVE integrated
+ * symmetrically for buy & sell, so there's no instant round-trip arbitrage — you
+ * only profit when demand actually grows after you. Storage:
+ *   market/assets.json          — { [assetId]: MarketAsset }
+ *   market/positions/{uid}.json — { [assetId]: { shares, cost } }
+ * Virtual coins only; buy debits the wallet, sell credits it (fail-toward-user).
+ * ------------------------------------------------------------------ */
+
+const OCI_MARKET_PATH = 'market/assets.json';
+const PRICE_BASE = 10;      // price of the very first share
+const PRICE_SLOPE = 0.02;   // price gained per outstanding share
+const MAX_HISTORY = 120;
+
+export interface PricePoint { t: number; p: number; }
+export interface MarketAsset {
+    id: string;              // e.g. "game:retro-bowl", "ai:{uuid}", "post:{id}"
+    kind: 'game' | 'ai' | 'post';
+    title: string;
+    shares: number;          // total outstanding shares
+    invested: number;        // lifetime coins invested (for volume display)
+    priceHistory: PricePoint[];
+    createdAt: string;
+    updatedAt: string;
+}
+export interface Position { shares: number; cost: number; }
+
+function priceAt(shares: number): number {
+    return PRICE_BASE + PRICE_SLOPE * Math.max(0, shares);
+}
+/** Coins to buy `ds` shares starting from `s0` (integral of the price curve). */
+function costToBuy(s0: number, ds: number): number {
+    return PRICE_BASE * ds + PRICE_SLOPE * (s0 * ds + (ds * ds) / 2);
+}
+/** Shares obtained for spending `coins` starting from `s0` (invert the integral). */
+function sharesForCoins(s0: number, coins: number): number {
+    const b = PRICE_BASE + PRICE_SLOPE * s0;
+    return (Math.sqrt(b * b + 2 * PRICE_SLOPE * coins) - b) / PRICE_SLOPE;
+}
+
+async function getMarket(): Promise<Record<string, MarketAsset>> {
+    return (await readJsonFromOCI<Record<string, MarketAsset>>(OCI_MARKET_PATH)) || {};
+}
+async function saveMarket(m: Record<string, MarketAsset>): Promise<void> {
+    await uploadToOCI(OCI_MARKET_PATH, JSON.stringify(m), 'application/json');
+}
+async function getPositions(uid: string): Promise<Record<string, Position>> {
+    if (!uid) return {};
+    return (await readJsonFromOCI<Record<string, Position>>(`market/positions/${encodeURIComponent(uid)}.json`)) || {};
+}
+async function savePositions(uid: string, p: Record<string, Position>): Promise<void> {
+    await uploadToOCI(`market/positions/${encodeURIComponent(uid)}.json`, JSON.stringify(p), 'application/json');
+}
+
+export interface PublicAsset {
+    id: string; kind: string; title: string; price: number; shares: number;
+    invested: number; history: PricePoint[]; change: number;
+}
+function toPublicAsset(a: MarketAsset): PublicAsset {
+    const price = priceAt(a.shares);
+    const first = a.priceHistory[0]?.p ?? price;
+    const change = first > 0 ? ((price - first) / first) * 100 : 0;
+    return {
+        id: a.id, kind: a.kind, title: a.title, price: Math.round(price * 100) / 100,
+        shares: Math.round(a.shares * 100) / 100, invested: Math.round(a.invested),
+        history: a.priceHistory.slice(-40), change: Math.round(change * 10) / 10
+    };
+}
+
+/** Top market assets by lifetime volume (then recency). */
+export async function listMarket(limit = 60): Promise<PublicAsset[]> {
+    const m = await getMarket();
+    return Object.values(m)
+        .sort((a, b) => b.invested - a.invested || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+        .slice(0, limit)
+        .map(toPublicAsset);
+}
+
+export interface MarketPortfolio {
+    coins: number;
+    positions: Array<{ assetId: string; kind: string; title: string; shares: number; cost: number; price: number; value: number }>;
+}
+export async function getPortfolio(uid: string): Promise<MarketPortfolio> {
+    const coins = (await getWallet(uid)).coins;
+    const positions = await getPositions(uid);
+    const m = await getMarket();
+    const out = Object.entries(positions)
+        .filter(([, p]) => p.shares > 0)
+        .map(([assetId, p]) => {
+            const a = m[assetId];
+            const price = a ? priceAt(a.shares) : 0;
+            return {
+                assetId, kind: a?.kind || 'game', title: a?.title || assetId,
+                shares: Math.round(p.shares * 100) / 100, cost: Math.round(p.cost),
+                price: Math.round(price * 100) / 100, value: Math.round(p.shares * price)
+            };
+        });
+    return { coins, positions: out };
+}
+
+/* ------------------------------------------------------------------ *
+ * Admin stats — aggregate counts across every store (password-gated caller).
+ * ------------------------------------------------------------------ */
+export interface AdminStats {
+    aiGames: number;
+    totalStorageMB: number;
+    posts: number;
+    players: number;
+    coinsInCirculation: number;
+    wallets: number;
+    shopItems: number;
+    shopSales: number;
+    marketAssets: number;
+    marketInvested: number;
+    topStreaks: PublicLeaderboardEntry[];
+    recentGames: Array<{ id: string; title: string; creatorName?: string; creatorLocation?: string; createdAt: string; source?: string }>;
+}
+
+export async function getAdminStats(): Promise<AdminStats> {
+    const [registry, posts, profiles, wallets, shop, market, leaderboard] = await Promise.all([
+        getRegistry(),
+        readJsonFromOCI<Post[]>(OCI_POSTS_PATH),
+        readJsonFromOCI<Record<string, PublicProfile>>(OCI_PROFILES_PATH),
+        readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH),
+        readJsonFromOCI<ShopItem[]>(OCI_SHOP_PATH),
+        readJsonFromOCI<Record<string, MarketAsset>>(OCI_MARKET_PATH),
+        getLeaderboard(10)
+    ]);
+    const walletMap = wallets || {};
+    const shopArr = shop || [];
+    const marketMap = market || {};
+    const totalBytes = registry.reduce((s, g) => s + (g.sizeBytes || 0), 0);
+
+    return {
+        aiGames: registry.length,
+        totalStorageMB: Math.round((totalBytes / (1024 * 1024)) * 10) / 10,
+        posts: (posts || []).length,
+        players: Object.keys(profiles || {}).length,
+        coinsInCirculation: Object.values(walletMap).reduce((s, w) => s + (w.coins || 0), 0),
+        wallets: Object.keys(walletMap).length,
+        shopItems: shopArr.length,
+        shopSales: shopArr.reduce((s, i) => s + (i.soldCount || 0), 0),
+        marketAssets: Object.keys(marketMap).length,
+        marketInvested: Object.values(marketMap).reduce((s, a) => s + (a.invested || 0), 0),
+        topStreaks: leaderboard,
+        recentGames: registry
+            .slice()
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, 10)
+            .map((g) => ({ id: g.id, title: g.title, creatorName: g.creatorName, creatorLocation: g.creatorLocation, createdAt: g.createdAt, source: g.source }))
+    };
+}
+
+export interface TradeResult { ok: boolean; error?: string; balance?: number; asset?: PublicAsset; shares?: number; }
+
+export async function tradeMarket(
+    uid: string,
+    args: { assetId: string; kind?: 'game' | 'ai' | 'post'; title?: string; action: 'buy' | 'sell'; amount: number }
+): Promise<TradeResult> {
+    if (!uid) return { ok: false, error: 'Missing player id.' };
+    const { assetId, action } = args;
+    const amount = Number(args.amount);
+    if (!assetId || !Number.isFinite(amount) || amount <= 0) return { ok: false, error: 'Invalid trade.' };
+
+    const m = await getMarket();
+    const now = new Date().toISOString();
+    let asset = m[assetId];
+
+    if (action === 'buy') {
+        const coins = Math.floor(amount);
+        const wallet = await getWallet(uid);
+        if (wallet.coins < coins) return { ok: false, error: `Not enough Kazcoins (need ${coins}, you have ${wallet.coins}).`, balance: wallet.coins };
+        if (!asset) {
+            if (!args.kind || !args.title) return { ok: false, error: 'Unknown asset.' };
+            asset = { id: assetId, kind: args.kind, title: String(args.title).slice(0, 80), shares: 0, invested: 0, priceHistory: [{ t: Date.now(), p: priceAt(0) }], createdAt: now, updatedAt: now };
+        }
+        const ds = sharesForCoins(asset.shares, coins);
+        if (!Number.isFinite(ds) || ds <= 0) return { ok: false, error: 'Trade too small.' };
+
+        // Debit first (checked above), then grant shares; refund if the write fails.
+        const balance = await adjustCoins(uid, -coins);
+        try {
+            asset.shares += ds;
+            asset.invested += coins;
+            asset.updatedAt = now;
+            asset.priceHistory.push({ t: Date.now(), p: priceAt(asset.shares) });
+            if (asset.priceHistory.length > MAX_HISTORY) asset.priceHistory = asset.priceHistory.slice(-MAX_HISTORY);
+            m[assetId] = asset;
+            await saveMarket(m);
+            const positions = await getPositions(uid);
+            const pos = positions[assetId] || { shares: 0, cost: 0 };
+            pos.shares += ds; pos.cost += coins;
+            positions[assetId] = pos;
+            await savePositions(uid, positions);
+        } catch (err) {
+            await adjustCoins(uid, coins); // refund
+            return { ok: false, error: 'Trade failed, refunded.' };
+        }
+        return { ok: true, balance, asset: toPublicAsset(asset), shares: Math.round(ds * 100) / 100 };
+    }
+
+    // SELL
+    if (!asset) return { ok: false, error: 'Asset not found.' };
+    const positions = await getPositions(uid);
+    const pos = positions[assetId];
+    if (!pos || pos.shares <= 0) return { ok: false, error: 'You have no shares to sell.' };
+    const ds = Math.min(Number(amount), pos.shares);
+    const refund = Math.max(0, Math.floor(costToBuy(asset.shares - ds, ds)));
+
+    asset.shares = Math.max(0, asset.shares - ds);
+    asset.updatedAt = now;
+    asset.priceHistory.push({ t: Date.now(), p: priceAt(asset.shares) });
+    if (asset.priceHistory.length > MAX_HISTORY) asset.priceHistory = asset.priceHistory.slice(-MAX_HISTORY);
+    m[assetId] = asset;
+    await saveMarket(m);
+
+    const remaining = pos.shares - ds;
+    pos.cost = remaining > 0 ? Math.round(pos.cost * (remaining / pos.shares)) : 0;
+    pos.shares = remaining;
+    if (pos.shares <= 0) delete positions[assetId];
+    else positions[assetId] = pos;
+    await savePositions(uid, positions);
+
+    const balance = await adjustCoins(uid, refund);
+    return { ok: true, balance, asset: toPublicAsset(asset), shares: Math.round(ds * 100) / 100 };
+}
+
 /**
  * Buy an item: the buyer pays coins, the seller earns them. Idempotent + fail-safe:
  *   1. validate (exists/active, not self-buy, not already owned, enough coins)
