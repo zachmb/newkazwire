@@ -8,6 +8,7 @@
 	import { config } from '$lib/config';
 	import { getUid, getPlayerName, setPlayerName, hasPlayerName } from '$lib/utils/streak';
 	import { games } from '$lib/data/games';
+	import StockChart from '$lib/components/StockChart.svelte';
 
 	let uid = '';
 	let coins = 0;
@@ -81,19 +82,24 @@
 		} catch (e: any) { showToast(e.message || 'Trade failed', 'error'); } finally { trading = false; }
 	}
 
-	// Build an SVG polyline from a price history.
-	function spark(history: any[]): string {
-		if (!history || history.length < 2) return '';
-		const ps = history.map((h) => h.p);
-		const min = Math.min(...ps), max = Math.max(...ps);
-		const span = max - min || 1;
-		const W = 120, H = 36;
-		return history.map((h, i) => {
-			const x = (i / (history.length - 1)) * W;
-			const y = H - ((h.p - min) / span) * H;
-			return `${x.toFixed(1)},${y.toFixed(1)}`;
-		}).join(' ');
-	}
+	// The "KazMarket Index" (S&P-style composite): each asset's history normalized to a
+	// base of 100 at its start, then averaged across assets at each step (shorter series
+	// hold their last value). Gives one market-wide index curve.
+	$: indexValues = (() => {
+		const series = (assets || [])
+			.map((a) => (a.history || []).map((h: any) => h.p))
+			.filter((s: number[]) => s.length >= 2 && s[0] > 0);
+		if (!series.length) return [] as number[];
+		const norm = series.map((s: number[]) => s.map((p) => (p / s[0]) * 100));
+		const maxLen = Math.max(...norm.map((s: number[]) => s.length));
+		const out: number[] = [];
+		for (let i = 0; i < maxLen; i++) {
+			const vals = norm.map((s: number[]) => s[Math.min(i, s.length - 1)]);
+			out.push(vals.reduce((a: number, b: number) => a + b, 0) / vals.length);
+		}
+		return out;
+	})();
+	$: indexChange = indexValues.length >= 2 ? indexValues[indexValues.length - 1] - indexValues[0] : 0;
 
 	const portfolioValue = () => positions.reduce((s, p) => s + p.value, 0);
 	const portfolioCost = () => positions.reduce((s, p) => s + p.cost, 0);
@@ -166,6 +172,23 @@
 			</div>
 		{/if}
 
+		<!-- KazMarket Index — S&P-style composite chart -->
+		{#if indexValues.length >= 2}
+			<div class="rounded-2xl bg-base-200 p-4 ring-1 ring-base-300">
+				<div class="mb-2 flex items-end justify-between">
+					<div>
+						<div class="text-xs font-bold uppercase tracking-wider text-base-content/50">KazMarket Index</div>
+						<div class="text-2xl font-black text-base-content">{indexValues[indexValues.length - 1].toFixed(1)}</div>
+					</div>
+					<div class="text-right text-sm font-bold {indexChange >= 0 ? 'text-success' : 'text-error'}">
+						{indexChange >= 0 ? '▲' : '▼'} {Math.abs(indexChange).toFixed(1)} ({(indexChange).toFixed(1)}%)
+						<div class="text-xs font-medium text-base-content/40">since inception (base 100)</div>
+					</div>
+				</div>
+				<StockChart values={indexValues} height={200} />
+			</div>
+		{/if}
+
 		<!-- Portfolio -->
 		{#if positions.length}
 			{@const val = portfolioValue()}
@@ -212,9 +235,9 @@
 							<div class="truncate font-bold text-base-content">{a.title}</div>
 							<div class="text-xs text-base-content/50">{a.invested.toLocaleString()} invested</div>
 						</div>
-						<svg width="120" height="36" viewBox="0 0 120 36" class="hidden flex-none sm:block">
-							<polyline points={spark(a.history)} fill="none" stroke="currentColor" stroke-width="2" class={a.change >= 0 ? 'text-success' : 'text-error'} stroke-linejoin="round" stroke-linecap="round" />
-						</svg>
+						<div class="hidden w-32 flex-none sm:block">
+							<StockChart values={(a.history || []).map((h: any) => h.p)} height={40} showGrid={false} />
+						</div>
 						<div class="w-20 flex-none text-right">
 							<div class="font-black text-base-content">{a.price}</div>
 							<div class="text-xs font-bold {a.change >= 0 ? 'text-success' : 'text-error'}">{a.change >= 0 ? '▲' : '▼'} {Math.abs(a.change)}%</div>
@@ -231,6 +254,11 @@
 		<div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" on:click={() => (trade = null)} on:keydown role="button" tabindex="0">
 			<div class="w-full max-w-sm rounded-3xl bg-base-100 p-6 shadow-2xl" on:click|stopPropagation on:keydown|stopPropagation role="dialog" aria-modal="true" tabindex="-1">
 				<h3 class="mb-1 text-xl font-black text-base-content">{trade.action === 'buy' ? 'Invest in' : 'Sell'} {trade.title}</h3>
+				{#if (assets.find((a) => a.id === trade.assetId)?.history || []).length >= 2}
+					<div class="mb-3 rounded-xl bg-base-200 p-2">
+						<StockChart values={(assets.find((a) => a.id === trade.assetId)?.history || []).map((h: any) => h.p)} height={120} />
+					</div>
+				{/if}
 				<p class="mb-4 text-sm text-base-content/60">Current price <span class="font-bold text-base-content">{trade.price}</span> / share · you have <span class="font-bold text-warning">{coins.toLocaleString()}</span> coins</p>
 				<label class="mb-4 flex flex-col gap-1">
 					<span class="text-xs font-bold uppercase tracking-wider text-base-content/50">{trade.action === 'buy' ? 'Kazcoins to invest' : 'Shares to sell'}</span>
