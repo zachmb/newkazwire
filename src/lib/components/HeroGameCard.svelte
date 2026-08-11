@@ -18,6 +18,8 @@
 	export let playing = false;
 	/** Optional category tags shown in the metadata bar. */
 	export let tags: string[] = [];
+	/** Optional numeric rating. Shown as a star + value ONLY when > 0 (never fabricated). */
+	export let rating: number = 0;
 
 	$: isFavorite = $userProfile.favoriteGames.includes(id);
 
@@ -77,6 +79,11 @@
 			<h2 class="truncate text-2xl font-black tracking-tight text-base-content">{game.name}</h2>
 			<div class="flex flex-wrap items-center gap-2">
 				<span class="text-xs font-bold uppercase tracking-wider text-base-content/50">{game.developer || 'Kazwire'}</span>
+				{#if rating > 0}
+					<span class="flex items-center gap-1 text-sm font-bold text-primary">
+						<Icon icon="mdi:star" class="text-base" />{rating}
+					</span>
+				{/if}
 				{#each tags.slice(0, 3) as t}
 					<span class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">{t}</span>
 				{/each}

@@ -11,6 +11,7 @@
 	import { onMount, tick } from 'svelte';
 	import { enhance } from '$app/forms';
 	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
+	import CommentSection from '$lib/components/social/CommentSection.svelte';
 	import GameRail from '$lib/components/GameRail.svelte';
 	import GameCard from '$lib/components/GameCard.svelte';
 	import GameRow from '$lib/components/GameRow.svelte';
@@ -458,6 +459,11 @@
 					{/each}
 				</div>
 			</div>
+
+			<!-- Comments: works for any game id (library or AI). Mobbin ref: Steam game
+			     detail page — user reviews/discussion list sits directly under the "About"
+			     description block. -->
+			<CommentSection gameId={data.game.id} />
 
 			<!-- More games like this -->
 			<div id="more-games" class="scroll-mt-24">

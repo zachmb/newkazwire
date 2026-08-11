@@ -8,6 +8,8 @@
 	import { getCDNImageUrl } from '$lib/utils/cdn';
 	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
 	import { pingStreak } from '$lib/utils/streak';
+	import CommunityNotes from '$lib/components/social/CommunityNotes.svelte';
+	import CommentSection from '$lib/components/social/CommentSection.svelte';
 
 	let game: any = null;
 	let isLoading = true;
@@ -150,6 +152,46 @@
 			showToast(err.message || 'Something went wrong', 'error');
 		} finally {
 			isSubmittingReview = false;
+		}
+	}
+
+	// --- Report broken → regenerate ---
+	let isReporting = false;
+
+	async function reportBroken() {
+		if (isReporting) return;
+		isReporting = true;
+		try {
+			const res = await fetch(`/api/ai/user-g/${$page.params.id}/report`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({})
+			});
+			const data = await res.json();
+
+			if (res.status === 429) {
+				showToast(data.error || 'This game has hit its regeneration limit for now.', 'error');
+				return;
+			}
+			if (!res.ok || !data?.success) {
+				throw new Error(data?.error || 'Could not regenerate the game');
+			}
+
+			const remaining = data.remaining ?? 0;
+			showToast(`Fixed the game! ${remaining} regeneration${remaining === 1 ? '' : 's'} left`);
+
+			// Reload the fixed build: re-fetch, then cache-bust the iframe src so the
+			// browser doesn't serve the old broken bundle.
+			await fetchGame();
+			if (game?.codeUrl) {
+				const sep = game.codeUrl.includes('?') ? '&' : '?';
+				// Reassign `game` (not just the property) so the iframe `src` re-renders.
+				game = { ...game, codeUrl: `${game.codeUrl}${sep}v=${Date.now()}` };
+			}
+		} catch (err: any) {
+			showToast(err.message || 'Something went wrong', 'error');
+		} finally {
+			isReporting = false;
 		}
 	}
 
@@ -307,7 +349,7 @@
 								</div>
 							</div>
 
-							<div class="mt-6 flex gap-3">
+							<div class="mt-6 flex flex-wrap gap-3">
 								<a
 									href="/ai?remix={game.id}"
 									class="btn btn-primary flex-1 rounded-2xl font-black text-white"
@@ -315,6 +357,19 @@
 									<Icon icon="mdi:auto-fix" />
 									Remix this Game
 								</a>
+								<button
+									class="btn btn-outline rounded-2xl font-black"
+									on:click={reportBroken}
+									disabled={isReporting}
+								>
+									{#if isReporting}
+										<Icon icon="line-md:loading-alt-loop" />
+										Regenerating…
+									{:else}
+										<Icon icon="mdi:wrench-outline" />
+										Report broken
+									{/if}
+								</button>
 							</div>
 						</div>
 
@@ -350,6 +405,10 @@
 							</button>
 						</div>
 					</div>
+
+					<!-- Community context + discussion -->
+					<CommunityNotes gameId={game.id} />
+					<CommentSection gameId={game.id} />
 				</div>
 			{/if}
 		</main>
