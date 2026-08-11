@@ -1,0 +1,18 @@
+[Unit]
+Description=Kazwire Party server (multiplayer rooms + BombParty)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/kazwire
+Environment=NODE_ENV=production
+Environment=PARTY_HOST=127.0.0.1
+Environment=PARTY_PORT=8091
+ExecStart=/usr/bin/node server/party-server.cjs
+Restart=always
+RestartSec=3
+User=kazwire
+Group=kazwire
+
+[Install]
+WantedBy=multi-user.target

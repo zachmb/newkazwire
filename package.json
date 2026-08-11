@@ -44,6 +44,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.2.9",
 		"@tomphttp/bare-server-node": "^2.0.6",
-		"dotenv": "^17.3.1"
+		"dotenv": "^17.3.1",
+		"ws": "^8.21.3"
 	}
 }
