@@ -30,9 +30,12 @@
 <!-- Capped, centered player so EVERY game shows up at a consistent size (some games
      otherwise sprawled to the full column width on wide screens). aspect-video keeps a
      uniform 16:9 frame; max-w standardizes the footprint across all games. -->
-<div class="mx-auto flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-base-100 shadow-xl ring-1 ring-black/5">
-	<!-- Game Preview / Hero Area -->
-	<div class="group relative aspect-video w-full bg-black">
+<div class="mx-auto flex w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-xl ring-1 ring-black/5 {playing ? 'max-w-7xl' : 'max-w-5xl'}">
+	<!-- Game Preview / Hero Area.
+	     While PLAYING we swap the fixed 16:9 aspect box for a tall viewport-height frame:
+	     many games (e.g. Retro Bowl) render their play field taller than 16:9 and were
+	     getting clipped off the bottom of the aspect-video frame (iframe has no scroll). -->
+	<div class="group relative w-full bg-black {playing ? 'h-[82vh] max-h-[1000px] min-h-[540px]' : 'aspect-video'}">
 		{#if playing}
 			<div class="h-full w-full">
 				<slot />
