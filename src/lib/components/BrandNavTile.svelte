@@ -9,15 +9,17 @@
 <div
 	class="group relative flex h-full w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-sm"
 >
-	<!-- Top Section: Brand (Compact) -->
+	<!-- Top Section: Brand (Compact).
+	     Explicitly self-lit (white bg + dark ink) so the wordmark stays readable in the
+	     real dark theme — base-100 is deep navy in dark mode and text-black vanished. -->
 	<a
 		href="/"
 		data-sveltekit-reload
-		class="flex h-[60%] flex-col items-center justify-center gap-1 bg-base-100 p-2 no-underline transition-colors hover:bg-neutral/5"
+		class="brand-section flex h-[60%] flex-col items-center justify-center gap-1 p-2 no-underline"
 	>
 		<img src="/logo.png" alt="Kazwire" class="h-8 w-8 object-contain" />
-		<h1 class="text-lg font-black lowercase leading-none tracking-tighter text-black sm:text-xl">
-			kazwire.com
+		<h1 class="text-lg font-black lowercase leading-none tracking-tighter sm:text-xl">
+			kaz<span style="color:#FF6A1A">wire</span><span style="color:rgba(11,27,51,0.55)">.com</span>
 		</h1>
 	</a>
 
@@ -66,3 +68,17 @@
 		</button>
 	</div>
 </div>
+
+<style>
+	/* Pin the brand section to a light chip regardless of the document/OS theme so the
+	   kazwire.com wordmark never disappears on the dark navy base in dark mode. */
+	.brand-section {
+		color-scheme: light;
+		background: #ffffff;
+		color: #0b1b33;
+		transition: background-color 0.15s ease;
+	}
+	.brand-section:hover {
+		background: #f3f6fc;
+	}
+</style>
