@@ -11,6 +11,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { getUid, getPlayerName, setPlayerName } from '$lib/utils/streak';
+	import ItemShop from '$lib/components/ItemShop.svelte';
 
 	// ── Real identity (server-keyed, account-free) ──
 	let uid = '';
@@ -29,6 +30,7 @@
 	let newUsername = '';
 	let recentGamesList = [];
 	let activeTab = 'profile';
+	let walletCoins = 0; // real server Kazcoin balance (earned by playing)
 
 	onMount(async () => {
 		uid = getUid();
@@ -38,6 +40,12 @@
 			statsLoading = false;
 			return;
 		}
+
+		// Real Kazcoin wallet balance (server-authoritative).
+		try {
+			const res = await fetch(`/api/wallet?uid=${encodeURIComponent(uid)}`);
+			if (res.ok) { const d = await res.json(); if (d?.success) walletCoins = d.coins ?? 0; }
+		} catch { /* offline */ }
 
 		// Streak stats: current + longest streak + total games played.
 		try {
@@ -105,15 +113,6 @@
 		{ id: 'ai-games',    label: 'AI Games',    icon: 'mdi:robot' },
 		{ id: 'shop',        label: 'Shop',        icon: 'mdi:store' },
 		{ id: 'leaderboard', label: 'Leaderboard', icon: 'mdi:trophy' }
-	];
-
-	const SHOP_ITEMS = [
-		{ id: 'b_neon',    name: 'Neon Background', price: 500,  icon: 'mdi:image-filter-hdr', type: 'Background', color: 'from-violet-500 to-purple-600'  },
-		{ id: 'c_gold',    name: 'Gold Cursor',     price: 1000, icon: 'mdi:cursor-default',   type: 'Cursor',     color: 'from-yellow-400 to-amber-500'   },
-		{ id: 'r_vip',     name: 'VIP Role',        price: 5000, icon: 'mdi:crown',            type: 'Role',       color: 'from-orange-500 to-red-500'     },
-		{ id: 'l_discord', name: 'Discord Link',    price: 100,  icon: 'mdi:link-variant',     type: 'Link',       color: 'from-indigo-400 to-blue-500'    },
-		{ id: 'c_trail',   name: 'Mouse Trail',     price: 750,  icon: 'mdi:auto-fix',         type: 'Effect',     color: 'from-pink-500 to-rose-500'      },
-		{ id: 'a_frog',    name: 'Frog Avatar',     price: 250,  icon: 'mdi:face-man-profile', type: 'Avatar',     color: 'from-orange-500 to-blue-500'   }
 	];
 
 	function playLocalGame(game) {
@@ -253,7 +252,7 @@
 						<div class="flex shrink-0 items-center gap-3 rounded-2xl bg-black/20 px-5 py-3 backdrop-blur-sm">
 							<Icon icon="mdi:currency-usd-circle" class="text-3xl text-yellow-300" />
 							<div>
-								<div class="text-2xl font-black leading-none text-white">{$userProfile.coins.toLocaleString()}</div>
+								<div class="text-2xl font-black leading-none text-white">{walletCoins.toLocaleString()}</div>
 								<div class="text-xs font-bold text-white/50">Coins</div>
 							</div>
 						</div>
@@ -501,45 +500,8 @@
 
 			<!-- SHOP -->
 			{:else if activeTab === 'shop'}
-				<div class="flex flex-col gap-4">
-					<div class="flex items-center justify-between rounded-3xl bg-base-100 px-6 py-4 shadow-lg">
-						<h2 class="flex items-center gap-2 text-xl font-black text-base-content">
-							<span class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent/15"><Icon icon="mdi:store" class="text-amber-600" /></span>
-							Item Shop
-						</h2>
-						<div class="flex items-center gap-2 rounded-2xl bg-yellow-50 px-4 py-2">
-							<Icon icon="mdi:currency-usd-circle" class="text-xl text-yellow-500" />
-							<span class="font-black text-yellow-700">{$userProfile.coins.toLocaleString()} coins</span>
-						</div>
-					</div>
-					<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
-						{#each SHOP_ITEMS as item}
-							<div class="group flex flex-col overflow-hidden rounded-3xl bg-base-100 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl">
-								<div class="relative flex h-32 items-center justify-center bg-gradient-to-br {item.color}">
-									<Icon icon={item.icon} class="text-5xl text-white drop-shadow-lg" />
-									<span class="absolute right-3 top-3 rounded-full bg-black/20 px-2.5 py-1 text-xs font-black text-white backdrop-blur-sm">{item.type}</span>
-								</div>
-								<div class="flex flex-1 flex-col p-4">
-									<div class="mb-3 font-black text-base-content">{item.name}</div>
-									<div class="mt-auto">
-										{#if $userProfile.inventory.includes(item.id)}
-											<div class="flex items-center gap-1.5 text-sm font-bold text-success">
-												<Icon icon="mdi:check-circle" />Owned
-											</div>
-										{:else}
-											<button
-												class="btn btn-primary btn-sm btn-block rounded-xl font-black text-white"
-												on:click={() => userProfile.purchaseItem(item.id, item.price)}
-												disabled={$userProfile.coins < item.price}
-											>
-												<Icon icon="mdi:currency-usd-circle" />{item.price}
-											</button>
-										{/if}
-									</div>
-								</div>
-							</div>
-						{/each}
-					</div>
+				<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+					<ItemShop />
 				</div>
 
 			<!-- LEADERBOARD -->
