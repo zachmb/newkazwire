@@ -11,8 +11,11 @@
 
 	/** Optional heading; pass `title={null}` to render the list bare. */
 	export let title: string | null = 'Top Streaks';
+	/** How many ranked players to show (top N). */
+	export let limit: number = 3;
 
 	let leaders: Entry[] = [];
+	$: shown = leaders.slice(0, limit);
 	let loading = true;
 	let failed = false;
 
@@ -80,7 +83,7 @@
 		</p>
 	{:else}
 		<ul class="space-y-1.5">
-			{#each leaders as entry, i}
+			{#each shown as entry, i}
 				{@const rank = i + 1}
 				<li
 					class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors {rank <= 3

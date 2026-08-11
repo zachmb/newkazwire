@@ -11,7 +11,7 @@
 	import Icon from '@iconify/svelte';
 
 	type FeedItem = {
-		kind: 'ai' | 'library';
+		kind: 'ai' | 'library' | 'post';
 		title: string;
 		image: string; // resolved cover/image URL
 		href: string;
@@ -19,6 +19,9 @@
 		creatorLocation?: string;
 		rating: number; // 0..5
 		chip: string; // "AI" or a category
+		postText?: string; // for kind === 'post'
+		gameTitle?: string; // attached game title on a post
+		likes?: number;
 	};
 
 	let {
@@ -41,6 +44,52 @@
 	aria-roledescription="slide"
 	aria-label={item.title}
 >
+	{#if item.kind === 'post'}
+		<!-- POST slide: a community post surfaced inside the vertical game feed -->
+		<div class="absolute inset-0 bg-gradient-to-br from-primary/25 via-neutral to-secondary/25"></div>
+		<div
+			class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+		></div>
+
+		<!-- Top chip -->
+		<div class="absolute left-4 top-4 z-10 flex items-center gap-2 pt-[env(safe-area-inset-top)]">
+			<span
+				class="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm"
+			>
+				<Icon icon="lucide:message-square-text" class="h-3.5 w-3.5" />
+				Post
+			</span>
+		</div>
+
+		<!-- Centered post text -->
+		<div class="absolute inset-0 flex items-center justify-center px-6">
+			<p class="max-w-xl text-center text-2xl font-black leading-snug text-white drop-shadow-lg sm:text-3xl">
+				{item.postText || item.title}
+			</p>
+		</div>
+
+		<!-- Bottom stack: author + optional attached game -->
+		<div
+			class="absolute inset-x-0 bottom-0 z-10 flex flex-col gap-3 px-4 pb-8 text-white pb-[calc(2rem+env(safe-area-inset-bottom))]"
+		>
+			<div class="flex items-center gap-2 text-sm font-semibold">
+				<span class="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-content">
+					<Icon icon="lucide:user" class="h-4 w-4" />
+				</span>
+				<span>{item.creatorName}</span>
+			</div>
+
+			{#if item.href && item.gameTitle}
+				<a
+					href={item.href}
+					class="flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-black uppercase tracking-wide text-primary-content shadow-xl transition-transform active:scale-95"
+				>
+					<Icon icon="lucide:play" class="h-5 w-5" />
+					Play {item.gameTitle}
+				</a>
+			{/if}
+		</div>
+	{:else}
 	<!-- Media (lazy: only paint when this slide is in the render window) -->
 	{#if visible && item.image && !imgFailed}
 		<img
@@ -156,4 +205,5 @@
 			Play
 		</a>
 	</div>
+	{/if}
 </section>

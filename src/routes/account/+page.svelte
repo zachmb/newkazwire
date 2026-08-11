@@ -12,6 +12,7 @@
 	import { onMount } from 'svelte';
 	import { getUid, getPlayerName, setPlayerName } from '$lib/utils/streak';
 	import ItemShop from '$lib/components/ItemShop.svelte';
+	import KazMarket from '$lib/components/KazMarket.svelte';
 	import PlayerSearch from '$lib/components/PlayerSearch.svelte';
 
 	// ── Real identity (server-keyed, account-free) ──
@@ -31,6 +32,7 @@
 	let newUsername = '';
 	let recentGamesList = [];
 	let activeTab = 'profile';
+	let shopView = 'items'; // 'items' (Kazcoin item shop) | 'market' (KazMarket)
 	let walletCoins = 0; // real server Kazcoin balance (earned by playing)
 
 	onMount(async () => {
@@ -503,7 +505,27 @@
 			<!-- SHOP -->
 			{:else if activeTab === 'shop'}
 				<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
-					<ItemShop />
+					<!-- Sub-toggle: the Kazcoin item shop and the KazMarket both live here -->
+					<div class="mb-6 inline-flex rounded-2xl bg-base-200 p-1">
+						<button
+							class="rounded-xl px-4 py-2 text-sm font-black transition-colors {shopView === 'items' ? 'bg-primary text-white shadow' : 'text-base-content/60 hover:text-base-content'}"
+							on:click={() => { shopView = 'items'; }}
+						>
+							<Icon icon="mdi:store" class="mr-1 inline text-base" />Item Shop
+						</button>
+						<button
+							class="rounded-xl px-4 py-2 text-sm font-black transition-colors {shopView === 'market' ? 'bg-primary text-white shadow' : 'text-base-content/60 hover:text-base-content'}"
+							on:click={() => { shopView = 'market'; }}
+						>
+							<Icon icon="mdi:chart-line" class="mr-1 inline text-base" />Market
+						</button>
+					</div>
+
+					{#if shopView === 'items'}
+						<ItemShop />
+					{:else}
+						<KazMarket embedded={true} />
+					{/if}
 				</div>
 
 			{:else if activeTab === 'players'}
