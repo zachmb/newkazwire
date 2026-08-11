@@ -125,12 +125,17 @@
 	let expanded: boolean = false;
 
 	async function expandiFrame() {
-		if (!isPlaying) {
-			isPlaying = true;
+		// NOTE: HeroGameCard's two-way bind:playing flips isPlaying to true *before* it
+		// dispatches 'play', so an `if (!isPlaying)` guard here would skip the awaited
+		// tick() and we'd hit the frameContainer null-check before the slot rendered —
+		// leaving the game in the short inline frame (games rendered off-screen). Always
+		// await the render, and load once via the loadedFrame flag.
+		isPlaying = true;
+		if (!loadedFrame) {
 			addView();
 			loadFrame();
-			await tick();
 		}
+		await tick();
 
 		if (!frameContainer) return;
 

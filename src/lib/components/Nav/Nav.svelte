@@ -116,7 +116,17 @@
 			<span class="hidden sm:inline">Create</span>
 		</a>
 
-		<!-- Discord CTA (always visible) -->
+		<!-- Proxy CTA (always visible, prominent) -->
+		<a
+			href="/proxy"
+			class="flex flex-none items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110 sm:px-4"
+			title="Open the private web proxy"
+		>
+			<Icon icon="mdi:shield-lock" class="text-lg" />
+			<span class="hidden sm:inline">Proxy</span>
+		</a>
+
+		<!-- Discord CTA (always visible), to the right of Proxy -->
 		{#if config.social.discord}
 			<a
 				href={config.social.discord}
@@ -129,16 +139,6 @@
 				<Icon icon="ic:baseline-discord" class="text-2xl" />
 			</a>
 		{/if}
-
-		<!-- Proxy CTA (always visible, prominent) -->
-		<a
-			href="/proxy"
-			class="flex flex-none items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110 sm:px-4"
-			title="Open the private web proxy"
-		>
-			<Icon icon="mdi:shield-lock" class="text-lg" />
-			<span class="hidden sm:inline">Proxy</span>
-		</a>
 
 		<!-- Theme toggle (light/dark) -->
 		<button

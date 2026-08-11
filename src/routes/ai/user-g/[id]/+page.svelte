@@ -21,11 +21,12 @@
 	let expanded: boolean = false;
 
 	async function expandiFrame() {
-		if (!isPlaying) {
-			isPlaying = true;
-			pingStreak();
-			await tick();
-		}
+		// Always await the render before touching frameContainer: HeroGameCard's
+		// bind:playing sets isPlaying before dispatching 'play', so a guarded tick()
+		// would be skipped and the fullscreen styling would never apply (game off-screen).
+		isPlaying = true;
+		pingStreak();
+		await tick();
 		if (!frameContainer) return;
 		document.body.style.overflow = 'hidden';
 		frameContainer.style.position = 'fixed';
