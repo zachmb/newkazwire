@@ -20,7 +20,7 @@ export const apps: AppEntry[] = [
     {
         id: "instagram",
         title: "Instagram Reels",
-        description: "Scroll Instagram Reels through Kazwire.",
+        description: "Scroll Instagram Reels.",
         image: "https://www.google.com/s2/favicons?domain=instagram.com&sz=128",
         href: "/apps/instagram",
         url: "https://www.instagram.com/reels/"
@@ -43,8 +43,8 @@ export const apps: AppEntry[] = [
     },
     {
         id: "kazwire-browser",
-        title: "Kazwire Browser",
-        description: "Browse any site through the Kazwire proxy.",
+        title: "Private Browser",
+        description: "Browse any site privately.",
         image: "/logo.png",
         href: "/proxy",
         internal: true

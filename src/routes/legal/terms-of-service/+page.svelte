@@ -49,8 +49,7 @@
 
 				<h2>Disclaimer</h2>
 				<p>
-					The materials on {$page.url.hostname}'s website are provided "as is". {config.branding
-						.name} makes no warranties, expressed or implied, and hereby disclaims and negates all other
+					The materials on {$page.url.hostname}'s website are provided "as is". {$page.url.hostname} makes no warranties, expressed or implied, and hereby disclaims and negates all other
 					warranties.
 				</p>
 

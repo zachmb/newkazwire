@@ -6,19 +6,19 @@ export const GET = async () => {
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>${config.branding.mainDomain}</loc>
+        <loc>$https://{$page.url.hostname}</loc>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
     ${games.map(game => `
     <url>
-        <loc>${config.branding.mainDomain}${game.href}</loc>
+        <loc>$https://{$page.url.hostname}${game.href}</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>`).join('')}
     ${blogs.map(blog => `
     <url>
-        <loc>${config.branding.mainDomain}/blog/${blog.slug}</loc>
+        <loc>$https://{$page.url.hostname}/blog/${blog.slug}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>`).join('')}

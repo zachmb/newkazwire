@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
@@ -159,7 +160,7 @@
 				<div>
 					<h1 class="text-3xl font-black text-base-content"><Cloak text="Private Browser" /></h1>
 					<p class="mx-auto mt-2 max-w-md text-base-content/70">
-						Browse any site right here — search above or jump to a favorite. Traffic routes through {config.branding.name}'s own server.
+						Browse any site right here — search above or jump to a favorite. Traffic routes through {$page.url.hostname}'s own server.
 					</p>
 				</div>
 				<div class="flex flex-wrap justify-center gap-2">
@@ -183,7 +184,7 @@
 
 		<iframe
 			bind:this={iframe}
-			title="Proxy browser"
+			title="Browser"
 			class="h-full w-full border-0 {browsing ? 'block' : 'hidden'}"
 			on:load={() => (loading = false)}
 		></iframe>
