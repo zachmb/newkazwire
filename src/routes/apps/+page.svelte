@@ -53,8 +53,8 @@
 			name={app.title}
 			developer={'Unknown'}
 			id={'appPage-' + app.id}
-			image={getCDNImageUrl(app.image, 'app')}
-			link={'/apps/' + app.id}
+			image={app.image.startsWith('http') || app.image.startsWith('/') ? app.image : getCDNImageUrl(app.image, 'app')}
+			link={app.internal ? app.href : '/apps/' + app.id}
 		/>
 	{/each}
 </grid>
