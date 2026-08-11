@@ -32,6 +32,9 @@ export interface UserGame {
     sourceGameId?: string; // For remixes
     avgRating: number;
     sizeBytes: number;    // Size of the game HTML file in bytes
+    creatorUid?: string;  // public social identity (kazwire_uid) — links a game to a profile
+    source?: 'ai' | 'upload'; // how the game entered the gallery (default 'ai')
+    regenCount?: number;  // times "report broken" has regenerated this game (cap 2)
 }
 
 /** A public view of a game with the private creatorIp stripped — what any client
@@ -403,5 +406,285 @@ export async function getLeaderboard(limit: number = 20): Promise<PublicLeaderbo
             longest: r.longest,
             gamesPlayed: r.gamesPlayed
         }));
+}
+
+/* ------------------------------------------------------------------ *
+ * Registry helpers for updating a single game in place (report-broken regen).
+ * ------------------------------------------------------------------ */
+
+export async function getGameById(id: string): Promise<UserGame | null> {
+    const registry = await getRegistry();
+    return registry.find((g) => g.id === id) || null;
+}
+
+/** Patch a single registry entry (read-modify-write). Returns the updated game or null. */
+export async function updateGameInRegistry(
+    id: string,
+    patch: Partial<UserGame>
+): Promise<UserGame | null> {
+    const registry = await getRegistry();
+    const idx = registry.findIndex((g) => g.id === id);
+    if (idx < 0) return null;
+    registry[idx] = { ...registry[idx], ...patch };
+    await uploadToOCI(OCI_REGISTRY_PATH, JSON.stringify(registry), 'application/json');
+    return registry[idx];
+}
+
+/* ------------------------------------------------------------------ *
+ * SOCIAL LAYER (DB-free, account-free) — posts feed, per-game comments +
+ * replies, community notes, and public profiles. All keyed by the client's
+ * kazwire_uid + a public display name. Storage in the frogbase bucket:
+ *
+ *   community/posts.json                         — global posts feed (capped array)
+ *   user-content/comments/{gameId}.json          — threaded comments for a game
+ *   user-content/notes/{gameId}.json             — community notes for a game
+ *   user-stats/profiles.json                     — { [uid]: PublicProfile } aggregate
+ *
+ * All user text is expected to be moderated by the caller (src/lib/server/moderation).
+ * ------------------------------------------------------------------ */
+
+const OCI_POSTS_PATH = 'community/posts.json';
+const OCI_PROFILES_PATH = 'user-stats/profiles.json';
+const MAX_POSTS_KEPT = 500;
+
+export interface Post {
+    id: string;
+    uid: string;        // author's kazwire_uid (public — used only to link to their profile)
+    author: string;
+    location?: string;
+    text: string;
+    gameId?: string;    // optional shared game (AI game id)
+    gameTitle?: string;
+    createdAt: string;
+    likes: number;
+}
+
+export interface Reply {
+    id: string;
+    uid: string;
+    author: string;
+    location?: string;
+    text: string;
+    createdAt: string;
+    likes: number;
+}
+
+export interface Comment extends Reply {
+    replies: Reply[];
+}
+
+export interface CommunityNote {
+    id: string;
+    uid: string;
+    author: string;
+    text: string;
+    createdAt: string;
+    helpful: number;
+    notHelpful: number;
+}
+
+export interface PublicProfile {
+    uid: string;
+    name: string;
+    location?: string;
+    gamesCreated: number;
+    postsCount: number;
+    commentsCount: number;
+    joinedAt: string;
+    lastActiveAt: string;
+}
+
+function newId(): string {
+    return (globalThis.crypto?.randomUUID?.() as string) || Math.random().toString(36).slice(2);
+}
+
+/* ---- Posts feed ---- */
+
+export async function getPosts(limit = 100): Promise<Post[]> {
+    const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
+    return posts
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, Math.max(0, limit));
+}
+
+export async function addPost(p: Omit<Post, 'id' | 'createdAt' | 'likes'>): Promise<Post> {
+    const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
+    const post: Post = { ...p, id: newId(), createdAt: new Date().toISOString(), likes: 0 };
+    posts.push(post);
+    // Keep the feed bounded (newest kept) so the file never grows without limit.
+    const trimmed = posts
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, MAX_POSTS_KEPT);
+    await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(trimmed), 'application/json');
+    return post;
+}
+
+export async function likePost(id: string, delta = 1): Promise<number | null> {
+    const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
+    const post = posts.find((p) => p.id === id);
+    if (!post) return null;
+    post.likes = Math.max(0, (post.likes || 0) + delta);
+    await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(posts), 'application/json');
+    return post.likes;
+}
+
+/* ---- Per-game comments + replies ---- */
+
+function commentsPath(gameId: string): string {
+    return `user-content/comments/${encodeURIComponent(gameId)}.json`;
+}
+
+export async function getComments(gameId: string): Promise<Comment[]> {
+    const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
+    return comments.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+}
+
+export async function addComment(
+    gameId: string,
+    c: Omit<Comment, 'id' | 'createdAt' | 'likes' | 'replies'>
+): Promise<Comment> {
+    const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
+    const comment: Comment = {
+        ...c,
+        id: newId(),
+        createdAt: new Date().toISOString(),
+        likes: 0,
+        replies: []
+    };
+    comments.push(comment);
+    await uploadToOCI(commentsPath(gameId), JSON.stringify(comments), 'application/json');
+    return comment;
+}
+
+export async function addReply(
+    gameId: string,
+    commentId: string,
+    r: Omit<Reply, 'id' | 'createdAt' | 'likes'>
+): Promise<Reply | null> {
+    const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
+    const parent = comments.find((c) => c.id === commentId);
+    if (!parent) return null;
+    const reply: Reply = { ...r, id: newId(), createdAt: new Date().toISOString(), likes: 0 };
+    parent.replies = parent.replies || [];
+    parent.replies.push(reply);
+    await uploadToOCI(commentsPath(gameId), JSON.stringify(comments), 'application/json');
+    return reply;
+}
+
+export async function likeComment(
+    gameId: string,
+    commentId: string,
+    replyId?: string,
+    delta = 1
+): Promise<number | null> {
+    const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
+    const parent = comments.find((c) => c.id === commentId);
+    if (!parent) return null;
+    let target: Reply | Comment | undefined = parent;
+    if (replyId) target = (parent.replies || []).find((r) => r.id === replyId);
+    if (!target) return null;
+    target.likes = Math.max(0, (target.likes || 0) + delta);
+    await uploadToOCI(commentsPath(gameId), JSON.stringify(comments), 'application/json');
+    return target.likes;
+}
+
+/* ---- Community notes ---- */
+
+function notesPath(gameId: string): string {
+    return `user-content/notes/${encodeURIComponent(gameId)}.json`;
+}
+
+export async function getNotes(gameId: string): Promise<CommunityNote[]> {
+    const notes = (await readJsonFromOCI<CommunityNote[]>(notesPath(gameId))) || [];
+    // Most-helpful first (helpful minus notHelpful), then newest.
+    return notes.sort(
+        (a, b) =>
+            b.helpful - b.notHelpful - (a.helpful - a.notHelpful) ||
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+}
+
+export async function addNote(
+    gameId: string,
+    n: Omit<CommunityNote, 'id' | 'createdAt' | 'helpful' | 'notHelpful'>
+): Promise<CommunityNote> {
+    const notes = (await readJsonFromOCI<CommunityNote[]>(notesPath(gameId))) || [];
+    const note: CommunityNote = {
+        ...n,
+        id: newId(),
+        createdAt: new Date().toISOString(),
+        helpful: 0,
+        notHelpful: 0
+    };
+    notes.push(note);
+    await uploadToOCI(notesPath(gameId), JSON.stringify(notes), 'application/json');
+    return note;
+}
+
+export async function voteNote(
+    gameId: string,
+    noteId: string,
+    vote: 'helpful' | 'notHelpful'
+): Promise<CommunityNote | null> {
+    const notes = (await readJsonFromOCI<CommunityNote[]>(notesPath(gameId))) || [];
+    const note = notes.find((n) => n.id === noteId);
+    if (!note) return null;
+    if (vote === 'helpful') note.helpful = (note.helpful || 0) + 1;
+    else note.notHelpful = (note.notHelpful || 0) + 1;
+    await uploadToOCI(notesPath(gameId), JSON.stringify(notes), 'application/json');
+    return note;
+}
+
+/* ---- Public profiles + search ---- */
+
+export async function getProfile(uid: string): Promise<PublicProfile | null> {
+    if (!uid) return null;
+    const profiles =
+        (await readJsonFromOCI<Record<string, PublicProfile>>(OCI_PROFILES_PATH)) || {};
+    return profiles[uid] || null;
+}
+
+/**
+ * Upsert a profile and optionally bump activity counters. Best-effort read-modify-write.
+ * `bump` keys: gamesCreated | postsCount | commentsCount.
+ */
+export async function upsertProfile(
+    uid: string,
+    name: string,
+    location: string | undefined,
+    bump: Partial<Pick<PublicProfile, 'gamesCreated' | 'postsCount' | 'commentsCount'>> = {}
+): Promise<PublicProfile | null> {
+    if (!uid) return null;
+    const profiles =
+        (await readJsonFromOCI<Record<string, PublicProfile>>(OCI_PROFILES_PATH)) || {};
+    const now = new Date().toISOString();
+    const existing = profiles[uid];
+    const profile: PublicProfile = {
+        uid,
+        name: name || existing?.name || 'Anonymous',
+        location: location || existing?.location,
+        gamesCreated: (existing?.gamesCreated || 0) + (bump.gamesCreated || 0),
+        postsCount: (existing?.postsCount || 0) + (bump.postsCount || 0),
+        commentsCount: (existing?.commentsCount || 0) + (bump.commentsCount || 0),
+        joinedAt: existing?.joinedAt || now,
+        lastActiveAt: now
+    };
+    profiles[uid] = profile;
+    await uploadToOCI(OCI_PROFILES_PATH, JSON.stringify(profiles), 'application/json');
+    return profile;
+}
+
+/** Search public profiles by name substring (case-insensitive). */
+export async function searchProfiles(query: string, limit = 20): Promise<PublicProfile[]> {
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return [];
+    const profiles =
+        (await readJsonFromOCI<Record<string, PublicProfile>>(OCI_PROFILES_PATH)) || {};
+    return Object.values(profiles)
+        .filter((p) => p.name.toLowerCase().includes(q))
+        .sort((a, b) => new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime())
+        .slice(0, Math.max(0, limit));
 }
 

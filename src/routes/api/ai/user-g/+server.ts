@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { uploadToOCI, addToRegistry, getRegistry, checkStorageLimits } from '$lib/server/oci';
+import { uploadToOCI, addToRegistry, getRegistry, checkStorageLimits, upsertProfile } from '$lib/server/oci';
 import type { UserGame } from '$lib/server/oci';
 import { getRealIp, geolocate } from '$lib/server/ip';
 
@@ -11,7 +11,8 @@ function cleanName(raw: unknown): string {
 
 export const POST: RequestHandler = async ({ request, getClientAddress, url }) => {
     try {
-        const { title, description, code, sourceGameId, creatorName, cover } = await request.json();
+        const { title, description, code, sourceGameId, creatorName, cover, creatorUid, source } =
+            await request.json();
 
         if (!title || !code) {
             return json({ error: 'Title and code are required' }, { status: 400 });
@@ -56,22 +57,37 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         }
 
         // Add to registry with size tracked
+        const cleanCreator = cleanName(creatorName);
         const newGame: UserGame = {
             id,
             title,
             description: description || '',
             codeUrl,
             creatorIp: ip,
-            creatorName: cleanName(creatorName),
+            creatorName: cleanCreator,
             creatorLocation,
             coverUrl,
             createdAt: new Date().toISOString(),
             sourceGameId,
             avgRating: 0,
-            sizeBytes
+            sizeBytes,
+            creatorUid: typeof creatorUid === 'string' ? creatorUid : undefined,
+            source: source === 'upload' ? 'upload' : 'ai',
+            regenCount: 0
         };
 
         await addToRegistry(newGame);
+
+        // Best-effort: attribute this creation to the player's public profile.
+        if (typeof creatorUid === 'string' && creatorUid) {
+            try {
+                await upsertProfile(creatorUid, cleanCreator, creatorLocation || undefined, {
+                    gamesCreated: 1
+                });
+            } catch {
+                /* non-fatal */
+            }
+        }
 
         const publicPath = `/ai/user-g/${id}`;
         const publicUrl = new URL(publicPath, url.origin).toString();

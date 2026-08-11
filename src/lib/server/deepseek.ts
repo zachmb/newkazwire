@@ -112,6 +112,46 @@ function stripMarkdown(code: string): string {
 }
 
 /**
+ * Non-streaming generation — returns the complete game HTML string. Used by the
+ * "report broken" flow, which regenerates a game server-side (analyze + fix) without
+ * a live token stream. Throws on API error or empty output so the caller can refund
+ * the regeneration slot (never consume a cap on failure).
+ */
+export async function generateGameCode(
+    prompt: string,
+    remixContext?: string,
+    remixCode?: string
+): Promise<string> {
+    const apiKey = env.DEEPSEEK_API_KEY;
+    if (!apiKey) throw new Error('DEEPSEEK_API_KEY is not set in environment variables.');
+
+    const messages = buildMessages(prompt, remixContext, remixCode);
+    const response = await fetch(DEEPSEEK_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages,
+            temperature: 0.6,
+            max_tokens: 8192
+        })
+    });
+
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`DeepSeek API error: ${response.status} ${err}`);
+    }
+
+    const data = await response.json();
+    const raw = data.choices?.[0]?.message?.content;
+    const code = stripMarkdown((raw || '').trim());
+    if (!code || !code.toLowerCase().includes('<!doctype html')) {
+        throw new Error('DeepSeek returned an empty or invalid game.');
+    }
+    return code;
+}
+
+/**
  * Streaming version — returns a ReadableStream of SSE text events.
  * Each event is `data: <token>\n\n`. Final event is `data: [DONE]\n\n`.
  * A heartbeat `data: [PING]\n\n` is sent every 15 s to keep Cloudflare alive.
