@@ -42,32 +42,11 @@ function isPrivateIp(ip: string): boolean {
 }
 
 /**
- * Best-effort coarse location ("City, State, CC" — e.g. "Bellevue, WA, US") from an IP
- * for public creator attribution. Never throws and never blocks the caller for long: a
- * private/localhost IP or any lookup failure yields "" (the UI just omits the location).
- * Uses the keyless ip-api.com endpoint with a short timeout. The region falls back to
- * regionName when the short code is absent, and is skipped entirely if it duplicates the
- * city (some regions report the city as the region).
+ * Public creator/player location is intentionally DISABLED — Kazwire no longer shows
+ * where anyone is. Always returns "" so nothing is captured or displayed. (Kept as a
+ * function so every caller keeps working; the getReal­Ip path above still runs for
+ * rate-limiting/attribution by IP, which is server-only and never shown.)
  */
-export async function geolocate(ip: string): Promise<string> {
-	if (isPrivateIp(ip)) return '';
-	try {
-		const controller = new AbortController();
-		const t = setTimeout(() => controller.abort(), 2500);
-		const res = await fetch(
-			`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,city,region,regionName,country,countryCode`,
-			{ signal: controller.signal }
-		);
-		clearTimeout(t);
-		if (!res.ok) return '';
-		const d = await res.json();
-		if (d.status !== 'success') return '';
-		const city = (d.city || '').toString().trim();
-		const region = (d.region || d.regionName || '').toString().trim();
-		const cc = (d.countryCode || d.country || '').toString().trim();
-		const parts = [city, region && region !== city ? region : '', cc].filter(Boolean);
-		return parts.join(', ');
-	} catch {
-		return '';
-	}
+export async function geolocate(_ip: string): Promise<string> {
+	return '';
 }

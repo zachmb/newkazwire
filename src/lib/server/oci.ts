@@ -42,7 +42,9 @@ export interface UserGame {
 export type PublicUserGame = Omit<UserGame, 'creatorIp'>;
 
 export function toPublicGame(g: UserGame): PublicUserGame {
-    const { creatorIp: _omit, ...pub } = g;
+    // Strip the private IP AND the public location — Kazwire no longer shows where
+    // creators are (also scrubs any location baked into older records).
+    const { creatorIp: _omit, creatorLocation: _loc, ...pub } = g;
     return pub;
 }
 
@@ -526,7 +528,8 @@ export async function getPosts(limit = 100): Promise<Post[]> {
     const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
     return posts
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, Math.max(0, limit));
+        .slice(0, Math.max(0, limit))
+        .map(({ location: _l, ...p }) => (p.repostOf ? { ...p, repostOf: { ...p.repostOf } } : p)); // location removed
 }
 
 export async function addPost(p: Omit<Post, 'id' | 'createdAt' | 'likes'>): Promise<Post> {
@@ -615,9 +618,12 @@ function commentsPath(gameId: string): string {
 
 export async function getComments(gameId: string): Promise<Comment[]> {
     const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
-    return comments.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return comments
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .map(({ location: _l, replies, ...c }) => ({
+            ...c,
+            replies: (replies || []).map(({ location: _rl, ...r }) => r) // location removed
+        }));
 }
 
 export async function addComment(
@@ -722,7 +728,10 @@ export async function getProfile(uid: string): Promise<PublicProfile | null> {
     if (!uid) return null;
     const profiles =
         (await readJsonFromOCI<Record<string, PublicProfile>>(OCI_PROFILES_PATH)) || {};
-    return profiles[uid] || null;
+    const p = profiles[uid];
+    if (!p) return null;
+    const { location: _l, ...rest } = p; // location removed from public profiles
+    return rest as PublicProfile;
 }
 
 /**
@@ -764,7 +773,8 @@ export async function searchProfiles(query: string, limit = 20): Promise<PublicP
     return Object.values(profiles)
         .filter((p) => p.name.toLowerCase().includes(q))
         .sort((a, b) => new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime())
-        .slice(0, Math.max(0, limit));
+        .slice(0, Math.max(0, limit))
+        .map(({ location: _l, ...p }) => p as PublicProfile); // location removed
 }
 
 /* ------------------------------------------------------------------ *
