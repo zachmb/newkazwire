@@ -31,6 +31,19 @@
 	let wordInput = '';
 	let wordError = '';
 
+	// Stable per-player identity color (live-presence style, à la Framer/Miro):
+	// each player keeps the same hue everywhere — sidebar chip AND bomb ring — so
+	// you can track who's who at a glance. Deterministic hash of the id.
+	const PLAYER_HUES = [8, 200, 145, 275, 44, 320, 175, 255, 95, 20];
+	function phue(id: string): number {
+		let h = 0;
+		for (let i = 0; i < (id || '').length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+		return PLAYER_HUES[h % PLAYER_HUES.length];
+	}
+	const pbg = (id: string) => `hsl(${phue(id)} 85% 96%)`;
+	const pfg = (id: string) => `hsl(${phue(id)} 65% 38%)`;
+	const pring = (id: string) => `hsl(${phue(id)} 70% 55%)`;
+
 	// Game picker (leader push mode)
 	let showPicker = false;
 	let pickerQuery = '';
@@ -177,7 +190,6 @@
 	$: currentPlayerName = bomb ? bomb.players.find((p: any) => p.id === bomb.currentPlayerId)?.name : '';
 </script>
 
-<svelte:head><title>Room {code} — {config.branding.name}</title></svelte:head>
 
 <div class="min-h-screen bg-base-200">
 	<div class="mx-auto grid max-w-[1400px] grid-cols-1 gap-4 p-3 lg:grid-cols-[1fr_320px] lg:p-4">
@@ -246,8 +258,12 @@
 					<div class="flex flex-1 flex-col items-center justify-center gap-6 p-6">
 						<div class="flex flex-wrap justify-center gap-3">
 							{#each bomb.players as p (p.id)}
-								<div class="flex flex-col items-center gap-1 rounded-2xl px-4 py-3 ring-2 transition {p.id === bomb.currentPlayerId ? 'bg-primary/10 ring-primary' : 'bg-base-200 ring-transparent'} {p.lives <= 0 ? 'opacity-40' : ''}">
-									<span class="font-bold text-base-content">{p.name}</span>
+								<div
+									class="flex flex-col items-center gap-1 rounded-2xl px-4 py-3 ring-2 transition-all duration-200 {p.id === bomb.currentPlayerId ? 'scale-110 shadow-lg' : ''} {p.lives <= 0 ? 'opacity-40 grayscale' : ''}"
+									style="background:{p.id === bomb.currentPlayerId ? pbg(p.id) : 'var(--fallback-b2,#f2f2f2)'};box-shadow:{p.id === bomb.currentPlayerId ? `0 0 0 3px ${pring(p.id)}` : 'none'}"
+								>
+									<span class="grid h-8 w-8 place-items-center rounded-full text-sm font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
+									<span class="text-sm font-bold text-base-content">{p.name}</span>
 									<span class="flex gap-0.5 text-error">
 										{#each Array(Math.max(0, p.lives)) as _}<Icon icon="mdi:heart" />{/each}
 										{#if p.lives <= 0}<Icon icon="mdi:skull" class="text-base-content/40" />{/if}
@@ -256,18 +272,18 @@
 							{/each}
 						</div>
 
-						<!-- Bomb + prompt -->
-						<div class="relative grid h-40 w-40 place-items-center">
+						<!-- Bomb + prompt (turns red + shakes in the last 3 seconds) -->
+						<div class="relative grid h-44 w-44 place-items-center {bomb.timeLeft <= 3 ? 'bomb-danger' : ''}">
 							<svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 100 100">
 								<circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" class="text-base-300" stroke-width="6" />
-								<circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" class="text-primary" stroke-width="6"
+								<circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" class="{bomb.timeLeft <= 3 ? 'text-error' : 'text-primary'} transition-colors" stroke-width="6"
 									stroke-dasharray={2 * Math.PI * 45}
 									stroke-dashoffset={2 * Math.PI * 45 * (1 - bomb.timeLeft / bomb.turnTime)}
 									stroke-linecap="round" />
 							</svg>
 							<div class="flex flex-col items-center">
-								<span class="text-4xl font-black uppercase tracking-wide text-primary">{bomb.prompt}</span>
-								<span class="text-sm font-bold text-base-content/50">{bomb.timeLeft}s</span>
+								<span class="text-5xl font-black uppercase tracking-wide {bomb.timeLeft <= 3 ? 'text-error' : 'text-primary'}">{bomb.prompt}</span>
+								<span class="text-sm font-black {bomb.timeLeft <= 3 ? 'text-error' : 'text-base-content/50'}">{bomb.timeLeft}s</span>
 							</div>
 						</div>
 
@@ -275,8 +291,9 @@
 						{#if bomb.lastWord}<div class="text-sm text-base-content/50">last: <span class="font-bold text-base-content/70">{bomb.lastWord}</span></div>{/if}
 
 						{#if myTurn}
-							<div class="flex w-full max-w-md flex-col gap-2">
-								<div class="flex gap-2">
+							<div class="flex w-full max-w-md flex-col items-center gap-2">
+								<span class="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-widest text-white animate-pulse">Your turn</span>
+								<div class="flex w-full gap-2">
 									<input
 										class="input input-bordered flex-1 text-center text-lg font-bold uppercase"
 										placeholder="type a word with {bomb.prompt.toUpperCase()}"
@@ -305,10 +322,19 @@
 				{:else}
 					<!-- Lobby idle -->
 					<div class="flex flex-1 flex-col items-center justify-center gap-4 p-10 text-center">
-						<Icon icon="mdi:sofa" class="text-6xl text-base-content/20" />
-						<p class="text-lg font-bold text-base-content">Waiting in the lobby</p>
+						<Icon icon="mdi:bomb" class="text-6xl text-primary/30" />
+						<p class="text-xl font-black text-base-content">Everyone's here — let's play</p>
+						<!-- Who's in the room, at a glance (colored avatar stack). -->
+						<div class="flex flex-wrap items-center justify-center gap-2">
+							{#each room.players as p (p.id)}
+								<span class="flex items-center gap-1.5 rounded-full py-1 pl-1 pr-3" style="background:{pbg(p.id)}">
+									<span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-black" style="background:{pfg(p.id)};color:#fff">{p.name?.[0]?.toUpperCase() || '?'}</span>
+									<span class="text-xs font-bold" style="color:{pfg(p.id)}">{p.name}</span>
+								</span>
+							{/each}
+						</div>
 						<p class="max-w-sm text-sm text-base-content/60">
-							{#if me.isLeader}Pick a game to play together, or start a game of BombParty.{:else}The room leader will start a game soon. Invite friends with the code above!{/if}
+							{#if me.isLeader}Pick a game to play together, or drop the bomb and start BombParty.{:else}The leader starts the game. Grab a friend — tap Invite up top to share the room.{/if}
 						</p>
 					</div>
 				{/if}
@@ -324,7 +350,7 @@
 				<div class="flex flex-col gap-1">
 					{#each room.players as p (p.id)}
 						<div class="flex items-center gap-2 rounded-lg px-2 py-1.5 {p.id === me.id ? 'bg-primary/5' : ''}">
-							<span class="grid h-7 w-7 flex-none place-items-center rounded-full bg-primary/15 text-xs font-black text-primary">{p.name?.[0]?.toUpperCase() || '?'}</span>
+							<span class="grid h-7 w-7 flex-none place-items-center rounded-full text-xs font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
 							<span class="flex-1 truncate text-sm font-semibold text-base-content">{p.name}{#if p.id === me.id}<span class="text-base-content/40"> (you)</span>{/if}</span>
 							{#if p.isLeader}<Icon icon="mdi:crown" class="text-warning" title="Leader" />{/if}
 							{#if p.score > 0}<span class="text-xs font-bold text-base-content/50">{p.score}</span>{/if}
@@ -366,3 +392,16 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	/* Last-3-seconds bomb tension: a tight shake so the timer FEELS urgent. */
+	.bomb-danger { animation: bombShake 0.4s ease-in-out infinite; }
+	@keyframes bombShake {
+		0%, 100% { transform: translate(0, 0) rotate(0); }
+		25% { transform: translate(-2px, 1px) rotate(-1.5deg); }
+		75% { transform: translate(2px, -1px) rotate(1.5deg); }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bomb-danger { animation: none; }
+	}
+</style>
