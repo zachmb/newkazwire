@@ -9,13 +9,13 @@
 	];
 	const values = [
 		{ icon: 'mdi:flash', title: 'Blazing fast', body: 'Games stream from a global bucket and load instantly — no installs, no waiting.' },
-		{ icon: 'mdi:shield-lock', title: 'Unblocked anywhere', body: 'A built-in private proxy keeps the whole library playable on school and work networks.' },
+		{ icon: 'mdi:shield-lock', title: 'Playable anywhere', body: 'A built-in private browser keeps the whole library reachable on any network.' },
 		{ icon: 'mdi:sparkles', title: 'Made by the community', body: 'Anyone can build a game with AI and publish it to the Kazwire library in seconds.' }
 	];
 </script>
 
 <svelte:head>
-	<meta name="description" content="About {config.branding.name} — the best place to play free, unblocked browser games." />
+	<meta name="description" content="About {config.branding.name} — the best place to play free browser games." />
 </svelte:head>
 
 <div class="mx-auto max-w-4xl px-4 py-12 sm:py-16">
@@ -24,7 +24,7 @@
 		<img src="/logo.png" alt="" class="mx-auto mb-5 h-20 w-20 rounded-2xl object-contain ring-1 ring-white/20" />
 		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">About Kazwire</h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/80">
-			{config.branding.slogan} The best place to play free, unblocked browser games — anywhere.
+			{config.branding.slogan} The best place to play free browser games — anywhere.
 		</p>
 		<div class="mx-auto mt-8 grid max-w-md grid-cols-3 gap-4">
 			{#each stats as s}

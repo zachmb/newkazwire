@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
+	import { page } from '$app/stores';
+	import Cloak from '$lib/components/Cloak.svelte';
+
+	// Brand/copyright show the live domain (works on any mirror), cloaked.
+	$: host = $page.url.hostname;
 
 	const year = new Date().getFullYear();
 
@@ -46,10 +50,10 @@
 		<div class="flex flex-col gap-4 sm:col-span-2">
 			<a href="/" class="flex items-center gap-3">
 				<img src="/logo.png" alt="" class="h-11 w-11 rounded-xl object-contain" />
-				<span class="text-2xl font-black tracking-tight">Kaz<span class="text-primary">wire</span></span>
+				<span class="text-2xl font-black tracking-tight"><Cloak text={host} /></span>
 			</a>
 			<p class="max-w-xs text-sm leading-relaxed text-white/60">
-				The ultimate destination for unblocked games and interactive entertainment. Jump in and play — no downloads, no blocks.
+				The ultimate destination for browser games and interactive entertainment. Jump in and play — no downloads.
 			</p>
 			<div class="mt-1 flex gap-3">
 				{#each socials as s}
@@ -71,7 +75,7 @@
 			<nav class="flex flex-col gap-3">
 				<span class="text-xs font-black uppercase tracking-widest text-white/40">{col.title}</span>
 				{#each col.links as l}
-					<a href={l.href} class="text-sm font-semibold text-white/70 transition hover:text-primary">{l.label}</a>
+					<a href={l.href} class="text-sm font-semibold text-white/70 transition hover:text-primary"><Cloak text={l.label} /></a>
 				{/each}
 			</nav>
 		{/each}
@@ -79,8 +83,8 @@
 
 	<div class="border-t border-white/5">
 		<div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-2 px-6 py-5 text-sm sm:flex-row lg:px-10">
-			<p class="font-semibold text-white/70">© {year} {config.branding.name}</p>
-			<p class="text-white/40">Proudly unblocked & faster than ever.</p>
+			<p class="font-semibold text-white/70">© {year} <Cloak text={host} /></p>
+			<p class="text-white/40">Fast. Free. Just play.</p>
 		</div>
 	</div>
 </footer>
