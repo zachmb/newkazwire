@@ -9,7 +9,7 @@
 <div class="min-h-screen bg-base-200 p-4 text-base-content md:p-12">
 	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-base-100 shadow-2xl">
 		<!-- Header -->
-		<div class="bg-gradient-to-br from-[#0B1B33] to-[#071022] p-8 text-center text-white md:p-16">
+		<div class="bg-neutral p-8 text-center text-white md:p-16">
 			<div
 				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-base-100 p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
 			>

@@ -42,47 +42,53 @@ export const config = {
 	styling: {
 		// Options: "boxy", "rounded"
 		contentBoxStyleType: 'rounded',
+		// Restored to the ORIGINAL kazwire.com DaisyUI theme (recovered exactly from the
+		// April-2026 archive of the live site): amber-orange primary/secondary, steel-blue
+		// accent/neutral "View more" pills, UPPERCASE buttons, 0.75rem rounding. These HSL
+		// values are byte-for-byte the tokens DaisyUI compiled on the old site.
 		daisyUITheme: {
-			primary: '#FF6A1A', // Kazwire orange
-			secondary: '#2563EB', // Kazwire blue
-			accent: '#3B82F6', // Bright blue accent
-			neutral: '#0B1B33', // Deep navy (text / dark surfaces)
-			'base-100': '#F5F8FF', // Light blue-white background
-			info: '#2563EB',
-			success: '#2563EB',
-			warning: '#FF6A1A',
-			error: '#EF4444',
-			'--rounded-box': '1rem', // More rounded
-			'--rounded-btn': '0.75rem'
-			// "--rounded-badge": "1.9rem", // border radius rounded-badge utility class, used in badges and similar
-			// "--animation-btn": "0.25s", // duration of animation when you click on button
-			// "--animation-input": "0.2s", // duration of animation for inputs like checkbox, toggle, radio, etc
-			// "--btn-text-case": "uppercase", // set default text transform for buttons
-			// "--btn-focus-scale": "0.95", // scale transform of button when you focus on it
-			// "--border-btn": "1px", // border width of buttons
-			// "--tab-border": "1px", // border width of tabs
-			// "--tab-radius": "0.5rem", // border radius of tabs
+			primary: 'hsl(33, 90%, 55%)', // Kazwire amber-orange
+			secondary: 'hsl(33, 90%, 55%)', // amber-orange (matches primary, as on the old site)
+			accent: 'hsl(202, 70%, 40%)', // steel blue (the "View more" pills)
+			neutral: 'hsl(202, 70%, 40%)', // steel blue
+			'base-100': 'hsl(220, 13%, 91%)', // light cool-grey canvas
+			'base-content': 'hsl(220, 1%, 18%)', // near-black ink
+			info: 'hsl(197, 73%, 59%)',
+			success: 'hsl(176, 39%, 50%)',
+			warning: 'hsl(33, 59%, 55%)',
+			error: 'hsl(351, 66%, 74%)',
+			'--rounded-box': '0.75rem',
+			'--rounded-btn': '0.75rem',
+			'--rounded-badge': '1.9rem',
+			'--animation-btn': '0.25s',
+			'--animation-input': '0.2s',
+			'--btn-text-case': 'uppercase',
+			'--btn-focus-scale': '0.95',
+			'--border-btn': '1px',
+			'--tab-border': '1px',
+			'--tab-radius': '0.5rem'
 		},
 		daisyUIDarkTheme: {
-			primary: '#FF7A2E', // Kazwire orange (brighter for dark)
-			secondary: '#3B82F6', // Kazwire blue
-			accent: '#60A5FA', // Light blue accent
-			neutral: '#E5ECF7', // Light text on dark
-			'base-100': '#0B1220', // Deep navy canvas
-			info: '#3B82F6',
-			success: '#3B82F6',
-			warning: '#FF7A2E',
-			error: '#F87171',
-			'--rounded-box': '1rem',
-			'--rounded-btn': '0.75rem'
-			// "--rounded-badge": "1.9rem", // border radius rounded-badge utility class, used in badges and similar
-			// "--animation-btn": "0.25s", // duration of animation when you click on button
-			// "--animation-input": "0.2s", // duration of animation for inputs like checkbox, toggle, radio, etc
-			// "--btn-text-case": "uppercase", // set default text transform for buttons
-			// "--btn-focus-scale": "0.95", // scale transform of button when you focus on it
-			// "--border-btn": "1px", // border width of buttons
-			// "--tab-border": "1px", // border width of tabs
-			// "--tab-radius": "0.5rem", // border radius of tabs
+			primary: 'hsl(33, 90%, 55%)', // same amber-orange in dark
+			secondary: 'hsl(33, 90%, 55%)',
+			accent: 'hsl(202, 70%, 40%)', // steel blue
+			neutral: 'hsl(202, 70%, 40%)',
+			'base-100': 'hsl(225, 6%, 13%)', // near-black canvas
+			'base-content': 'hsl(226, 1%, 81%)', // light ink
+			info: 'hsl(197, 73%, 59%)',
+			success: 'hsl(176, 39%, 50%)',
+			warning: 'hsl(33, 59%, 55%)',
+			error: 'hsl(351, 66%, 74%)',
+			'--rounded-box': '0.75rem',
+			'--rounded-btn': '0.75rem',
+			'--rounded-badge': '1.9rem',
+			'--animation-btn': '0.25s',
+			'--animation-input': '0.2s',
+			'--btn-text-case': 'uppercase',
+			'--btn-focus-scale': '0.95',
+			'--border-btn': '1px',
+			'--tab-border': '1px',
+			'--tab-radius': '0.5rem'
 		}
 	},
 	fonts: {

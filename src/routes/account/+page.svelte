@@ -195,7 +195,7 @@
 		<main class="flex flex-col gap-4">
 
 			<!-- ── HERO BANNER ── -->
-			<div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#2563EB] to-[#2563EB] shadow-xl">
+			<div class="relative overflow-hidden rounded-3xl bg-neutral shadow-xl">
 				<!-- Decorative blobs -->
 				<div class="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-[#FF6A1A] opacity-25 blur-3xl"></div>
 				<div class="pointer-events-none absolute -bottom-6 left-1/4 h-32 w-32 rounded-full bg-accent opacity-20 blur-2xl"></div>

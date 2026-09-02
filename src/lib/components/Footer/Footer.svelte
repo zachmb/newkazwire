@@ -44,7 +44,7 @@
 	];
 </script>
 
-<footer class="border-t border-white/5 bg-gradient-to-b from-[#0B1B33] to-[#071022] text-white">
+<footer class="border-t border-base-300 bg-base-200 text-base-content">
 	<div class="mx-auto grid w-full max-w-[1800px] gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:px-10">
 		<!-- Brand -->
 		<div class="flex flex-col gap-4 sm:col-span-2">
@@ -52,7 +52,7 @@
 				<img src="/logo.png" alt="" class="h-11 w-11 rounded-xl object-contain" />
 				<span class="text-2xl font-black tracking-tight"><Cloak text={host} /></span>
 			</a>
-			<p class="max-w-xs text-sm leading-relaxed text-white/60">
+			<p class="max-w-xs text-sm leading-relaxed text-base-content/60">
 				The ultimate destination for browser games and interactive entertainment. Jump in and play — no downloads.
 			</p>
 			<div class="mt-1 flex gap-3">
@@ -62,7 +62,7 @@
 						target="_blank"
 						rel="noopener noreferrer"
 						aria-label={s.label}
-						class="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-white/80 transition hover:bg-primary hover:text-white"
+						class="grid h-10 w-10 place-items-center rounded-btn bg-base-300 text-base-content/80 transition hover:bg-primary hover:text-primary-content"
 					>
 						<Icon icon={s.icon} class="text-xl" />
 					</a>
@@ -73,18 +73,18 @@
 		<!-- Link columns -->
 		{#each columns as col}
 			<nav class="flex flex-col gap-3">
-				<span class="text-xs font-black uppercase tracking-widest text-white/40">{col.title}</span>
+				<span class="text-xs font-black uppercase tracking-widest text-base-content/40">{col.title}</span>
 				{#each col.links as l}
-					<a href={l.href} class="text-sm font-semibold text-white/70 transition hover:text-primary"><Cloak text={l.label} /></a>
+					<a href={l.href} class="text-sm font-semibold text-base-content/70 transition hover:text-primary"><Cloak text={l.label} /></a>
 				{/each}
 			</nav>
 		{/each}
 	</div>
 
-	<div class="border-t border-white/5">
+	<div class="border-t border-base-300">
 		<div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-2 px-6 py-5 text-sm sm:flex-row lg:px-10">
-			<p class="font-semibold text-white/70">© {year} <Cloak text={host} /></p>
-			<p class="text-white/40">Fast. Free. Just play.</p>
+			<p class="font-semibold text-base-content/70">© {year} <Cloak text={host} /></p>
+			<p class="text-base-content/40">Fast. Free. Just play.</p>
 		</div>
 	</div>
 </footer>

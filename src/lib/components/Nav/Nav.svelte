@@ -56,7 +56,7 @@
 	left, links + actions right, single hairline bottom border. Search field styled after
 	YouTube Playables (mobbin.com/screens/51422fe7-611e-4ab3-a865-fa61050ff5ce).
 -->
-<header class="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 backdrop-blur-md">
+<header class="sticky top-0 z-50 border-b border-base-300 bg-base-200">
 	<nav class="mx-auto flex h-16 max-w-[1800px] items-center gap-3 px-3 sm:px-5">
 		<!--
 			BRAND TILE — explicitly self-lit so it survives OS/UA dark mode.
@@ -67,12 +67,13 @@
 		-->
 		<a
 			href="/"
-			class="brand-tile flex flex-none items-center gap-2 rounded-xl px-2 py-1.5 sm:pr-3"
+			class="flex flex-none items-center gap-2 rounded-btn px-2 py-1.5 text-base-content sm:pr-3"
 			aria-label="Home"
 		>
 			<img src="/logo.png" alt="" class="h-8 w-8 rounded-lg object-contain" />
 			<!-- Wordmark is ALWAYS the current domain (works on every mirror), cloaked
-			     so the brand string isn't machine-readable/copyable. -->
+			     so the brand string isn't machine-readable/copyable. Uses base-content ink
+			     so it stays legible in BOTH the light and dark theme. -->
 			<span class="hidden text-xl font-black leading-none tracking-tight sm:block">
 				<Cloak text={host} />
 			</span>
@@ -81,17 +82,20 @@
 		<!-- Search -->
 		{#if config.features.searchBar}
 			<form on:submit={submitSearch} class="mx-auto flex w-full min-w-0 max-w-xl items-center">
-				<label class="flex w-full items-center gap-2 rounded-lg bg-base-200 px-4 py-2 ring-1 ring-base-300 transition focus-within:bg-base-100 focus-within:ring-2 focus-within:ring-primary">
+				<label class="flex w-full items-center gap-2 rounded-btn bg-base-100 px-4 py-2 ring-1 ring-base-300 transition focus-within:ring-2 focus-within:ring-primary">
 					<Icon icon="mdi:magnify" class="text-xl text-base-content/60" />
 					<input
 						type="text"
-						placeholder="Search games…"
+						placeholder="Search here"
 						bind:value={$searchQuery}
 						on:focus={openSearch}
 						on:input={openSearch}
 						class="w-full bg-transparent text-sm font-medium text-base-content placeholder:text-base-content/50 focus:outline-none"
 						aria-label="Search games"
 					/>
+					<span class="hidden min-w-fit gap-1 sm:flex">
+						<kbd class="kbd kbd-sm">ctrl</kbd><kbd class="kbd kbd-sm">k</kbd>
+					</span>
 				</label>
 			</form>
 		{:else}
@@ -184,19 +188,3 @@
 	</div>
 </header>
 
-<style>
-	/*
-		Force the brand tile to a fixed light-on-dark-ink treatment. `color-scheme: light`
-		stops a dark-mode UA from re-inking form/text controls, and the explicit background +
-		color guarantee the wordmark is visible even if the document theme flips to dark.
-	*/
-	.brand-tile {
-		color-scheme: light;
-		background: #ffffff;
-		color: #0b1b33;
-		box-shadow: inset 0 0 0 1px rgba(11, 27, 51, 0.08);
-	}
-	.brand-tile:hover {
-		box-shadow: inset 0 0 0 1px rgba(255, 106, 26, 0.35);
-	}
-</style>

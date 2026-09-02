@@ -29,7 +29,7 @@
 	<div class="overflow-hidden rounded-3xl bg-base-200 shadow-sm ring-1 ring-black/5">
 		<div class="grid grid-cols-1 md:grid-cols-2">
 			<!-- Info -->
-			<div class="bg-gradient-to-br from-[#0B1220] to-[#2563EB] p-8 text-white md:p-12">
+			<div class="bg-neutral p-8 text-white md:p-12">
 				<h1 class="text-4xl font-black tracking-tight">Get in touch</h1>
 				<p class="mt-4 text-lg text-white/80">
 					Questions, feedback, or a game to request? We'd love to hear from you.

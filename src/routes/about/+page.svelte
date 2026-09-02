@@ -25,7 +25,7 @@
 
 <div class="mx-auto max-w-4xl px-4 py-12 sm:py-16">
 	<!-- Hero -->
-	<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B1220] to-[#2563EB] p-8 text-center text-white sm:p-14">
+	<div class="relative overflow-hidden rounded-3xl bg-neutral p-8 text-center text-white sm:p-14">
 		<img src="/logo.png" alt="" class="mx-auto mb-5 h-20 w-20 rounded-2xl object-contain ring-1 ring-white/20" />
 		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">About <Cloak text={host} /></h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/80">
