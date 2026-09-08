@@ -14,8 +14,6 @@
 	# This is what stops the on-demand endpoint from being abused into unlimited certs.
 	on_demand_tls {
 		ask http://127.0.0.1:3000/api/domains/verify
-		interval 2m
-		burst 8
 	}
 	email admin@kazwire.com
 }
