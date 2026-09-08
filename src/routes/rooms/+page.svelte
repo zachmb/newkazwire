@@ -43,14 +43,14 @@
 <div class="min-h-screen bg-base-100">
 	<div class="mx-auto flex max-w-lg flex-col gap-6 px-4 py-10">
 		<div class="text-center">
-			<div class="mx-auto mb-3 grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-4xl text-primary">
+			<div class="mx-auto mb-3 grid h-16 w-16 place-items-center rounded-xl bg-primary/10 text-4xl text-primary">
 				<Icon icon="mdi:account-group" />
 			</div>
 			<h1 class="text-3xl font-black tracking-tight text-base-content">Party Rooms</h1>
 			<p class="mt-1 text-sm text-base-content/60">Create a room, invite friends with the code, and play together — the leader picks a game and everyone jumps in. Or battle it out in BombParty.</p>
 		</div>
 
-		<div class="flex flex-col gap-4 rounded-3xl bg-base-200 p-6 ring-1 ring-base-300">
+		<div class="flex flex-col gap-4 rounded-box border border-base-content/10 bg-base-200 p-6">
 			<label class="flex flex-col gap-1">
 				<span class="text-xs font-bold uppercase tracking-wider text-base-content/50">Your name</span>
 				<input class="input input-bordered w-full" placeholder="Enter a display name" maxlength="24" bind:value={name} />
@@ -73,12 +73,12 @@
 		</div>
 
 		<div class="grid grid-cols-2 gap-3">
-			<div class="flex flex-col gap-1 rounded-2xl bg-base-200 p-4 ring-1 ring-base-300">
+			<div class="flex flex-col gap-1 rounded-box border border-base-content/10 bg-base-200 p-4">
 				<Icon icon="mdi:gamepad-variant" class="text-2xl text-primary" />
 				<span class="font-bold text-base-content">Play together</span>
 				<span class="text-xs text-base-content/60">The leader pushes any game to the whole room.</span>
 			</div>
-			<div class="flex flex-col gap-1 rounded-2xl bg-base-200 p-4 ring-1 ring-base-300">
+			<div class="flex flex-col gap-1 rounded-box border border-base-content/10 bg-base-200 p-4">
 				<Icon icon="mdi:bomb" class="text-2xl text-primary" />
 				<span class="font-bold text-base-content">BombParty</span>
 				<span class="text-xs text-base-content/60">Type a word with the syllable before the bomb blows. Last one standing wins.</span>

@@ -8,7 +8,7 @@
 		<img
 			src="/logo.png"
 			alt="{$page.url.hostname} Logo"
-			class="w-full max-w-sm rounded-lg drop-shadow-2xl"
+			class="w-full max-w-sm rounded-box border border-base-content/10 shadow-sm"
 		/>
 		<div>
 			<h1 class="text-5xl font-bold">{$page.url.hostname}</h1>

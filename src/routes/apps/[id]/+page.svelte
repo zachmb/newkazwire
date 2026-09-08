@@ -290,8 +290,8 @@
 			</HeroGameCard>
 
 			<!-- Description / Extra Info -->
-			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
-				<h2 class="mb-2 text-xl font-black">About {data.app.title}</h2>
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
+				<h2 class="mb-2 text-xl font-black tracking-tight">About {data.app.title}</h2>
 				<p class="leading-relaxed text-base-content/80">{data.app.description}</p>
 				{#if canShare}
 					<button
@@ -310,7 +310,7 @@
 			<a
 				href="https://joinkaz.com"
 				target="_blank"
-				class="group flex h-64 w-full flex-col items-center justify-center gap-4 rounded-3xl bg-primary text-center transition-all hover:scale-[1.02] hover:shadow-xl"
+				class="group flex h-64 w-full flex-col items-center justify-center gap-4 rounded-box border border-base-content/10 bg-primary text-center transition-all hover:-translate-y-0.5 hover:shadow-md"
 			>
 				<Icon
 					icon="ic:baseline-discord"
@@ -324,12 +324,12 @@
 
 			<!-- Recommended Apps/Games -->
 			<div class="flex flex-col gap-4">
-				<h3 class="px-2 text-lg font-black text-white drop-shadow-sm">Recommended</h3>
+				<h3 class="px-2 text-lg font-black tracking-tight text-white">Recommended</h3>
 				<div class="grid grid-cols-2 gap-3">
 					{#each localizedMockGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative h-[140px] w-full overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<!-- Minimal overlay -->
@@ -347,4 +347,3 @@
 		</aside>
 	</div>
 </div>
-```

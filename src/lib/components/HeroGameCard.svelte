@@ -37,7 +37,7 @@
 <!-- Capped, centered player so EVERY game shows up at a consistent size (some games
      otherwise sprawled to the full column width on wide screens). aspect-video keeps a
      uniform 16:9 frame; max-w standardizes the footprint across all games. -->
-<div class="mx-auto flex w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-xl ring-1 ring-black/5 {playing ? 'max-w-7xl' : 'max-w-5xl'}">
+<div class="mx-auto flex w-full flex-col overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm {playing ? 'max-w-7xl' : 'max-w-5xl'}">
 	<!-- Game Preview / Hero Area.
 	     While PLAYING we swap the fixed 16:9 aspect box for a tall viewport-height frame:
 	     many games (e.g. Retro Bowl) render their play field taller than 16:9 and were
@@ -59,26 +59,26 @@
 				<img
 					src={game.image ? game.image : '/logo.png'}
 					alt={game.name}
-					class="max-h-[72%] max-w-[68%] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10 transition duration-300 group-hover:scale-[1.03]"
+					class="max-h-[72%] max-w-[68%] rounded-xl object-contain shadow-sm ring-1 ring-white/10 transition duration-300 group-hover:scale-[1.03]"
 				/>
 			</div>
-			<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+			<div class="pointer-events-none absolute inset-0 bg-black/40"></div>
 
 			<!-- Play button -->
 			<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
 				<button
-					class="pointer-events-auto grid h-20 w-20 place-items-center rounded-full bg-primary text-white shadow-[0_0_40px_-5px] shadow-primary/70 transition-transform duration-300 hover:scale-110"
+					class="pointer-events-auto grid h-20 w-20 place-items-center rounded-full bg-primary text-white shadow-sm transition-transform duration-300 hover:scale-[1.05]"
 					on:click={startGame}
 					aria-label="Play {game.name}"
 				>
 					<Icon icon="carbon:play-filled" class="h-10 w-10" />
 				</button>
-				<span class="text-2xl font-black uppercase tracking-wide text-white drop-shadow-lg">Play Now</span>
+				<span class="text-2xl font-black uppercase tracking-wide text-white">Play Now</span>
 			</div>
 
 			<!-- Title on poster -->
 			<div class="pointer-events-none absolute inset-x-0 bottom-0 p-5">
-				<h1 class="text-2xl font-black tracking-tight text-white drop-shadow sm:text-3xl">{game.name}</h1>
+				<h1 class="text-2xl font-black tracking-tight text-white sm:text-3xl">{game.name}</h1>
 			</div>
 		{/if}
 	</div>

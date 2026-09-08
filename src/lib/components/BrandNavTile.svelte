@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="group relative flex h-full w-full flex-col overflow-hidden rounded-3xl bg-base-100 shadow-sm"
+	class="group relative flex h-full w-full flex-col overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm"
 >
 	<!-- Top Section: Brand (Compact).
 	     Explicitly self-lit (white bg + dark ink) so the wordmark stays readable in the
@@ -19,7 +19,7 @@
 	>
 		<img src="/logo.png" alt="" class="h-8 w-8 object-contain" />
 		<h1 class="text-lg font-black lowercase leading-none tracking-tighter sm:text-xl">
-			kaz<span style="color:#FF6A1A">wire</span><span style="color:rgba(11,27,51,0.55)">.com</span>
+			kaz<span class="text-primary">wire</span><span style="color:rgba(11,27,51,0.55)">.com</span>
 		</h1>
 	</a>
 
@@ -28,7 +28,7 @@
 		<!-- Account Button -->
 		<a
 			href="/account"
-			class="group/btn relative flex flex-1 items-center justify-center rounded-bl-3xl bg-[#FF8A3D] transition-colors hover:bg-[#FF6A1A]"
+			class="group/btn relative flex flex-1 items-center justify-center rounded-bl-3xl bg-primary transition hover:brightness-110"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +48,7 @@
 
 		<!-- Search Button -->
 		<button
-			class="group/btn relative flex flex-1 items-center justify-center rounded-br-3xl border-l border-white/20 bg-[#FF8A3D] transition-colors hover:bg-[#FF6A1A]"
+			class="group/btn relative flex flex-1 items-center justify-center rounded-br-3xl border-l border-white/20 bg-primary transition hover:brightness-110"
 			on:click={openSearch}
 		>
 			<svg

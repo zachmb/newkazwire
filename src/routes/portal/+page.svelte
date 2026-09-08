@@ -90,8 +90,8 @@
 
 <div class="mx-auto max-w-4xl px-4 py-12 sm:py-16">
 	<!-- Hero -->
-	<div class="relative overflow-hidden rounded-3xl bg-neutral p-8 text-center text-white sm:p-14">
-		<div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+	<div class="relative overflow-hidden rounded-box border border-base-content/10 bg-neutral p-8 text-center text-white sm:p-14">
+		<div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-xl bg-white/10 ring-1 ring-white/20">
 			<Icon icon="mdi:web-plus" class="text-3xl" />
 		</div>
 		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">Add your own link</h1>
@@ -101,7 +101,7 @@
 		</p>
 		{#if count > 0}
 			<div class="mx-auto mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
-				<Icon icon="mdi:earth" class="text-lg text-[#FF9F1C]" />
+				<Icon icon="mdi:earth" class="text-lg text-primary" />
 				{count.toLocaleString()} community {count === 1 ? 'mirror' : 'mirrors'} online
 			</div>
 		{/if}

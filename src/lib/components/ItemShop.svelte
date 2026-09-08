@@ -113,7 +113,7 @@
 	</div>
 
 	{#if showList}
-		<div class="flex flex-col gap-3 rounded-2xl bg-base-200 p-5 ring-1 ring-base-300">
+		<div class="flex flex-col gap-3 rounded-box border border-base-content/10 bg-base-200 p-5">
 			<div class="flex flex-wrap gap-2">
 				{#each ICONS as ic}
 					<button class="grid h-11 w-11 place-items-center rounded-xl text-xl transition {fIcon === ic ? 'bg-primary text-white' : 'bg-base-100 text-base-content hover:bg-base-300'}" on:click={() => (fIcon = ic)} aria-label="Pick icon"><Icon icon={ic} /></button>
@@ -122,7 +122,7 @@
 			<input class="input input-bordered w-full" placeholder="Item title (e.g. Gold Crown flair)" maxlength="60" bind:value={fTitle} />
 			<textarea class="textarea textarea-bordered w-full" placeholder="Description (optional)" maxlength="240" rows="2" bind:value={fDesc}></textarea>
 			<div class="flex items-center gap-3">
-				<label class="flex items-center gap-2 rounded-xl bg-base-100 px-3 py-2 ring-1 ring-base-300">
+				<label class="flex items-center gap-2 rounded-xl border border-base-content/10 bg-base-100 px-3 py-2">
 					<Icon icon="mdi:hand-coin" class="text-warning" />
 					<input class="w-28 bg-transparent font-bold focus:outline-none" type="number" min="1" placeholder="Price" bind:value={fPrice} />
 				</label>
@@ -133,10 +133,10 @@
 
 	{#if loading}
 		<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-			{#each Array(8) as _}<div class="h-44 animate-pulse rounded-2xl bg-base-200"></div>{/each}
+			{#each Array(8) as _}<div class="h-44 animate-pulse rounded-box bg-base-200"></div>{/each}
 		</div>
 	{:else if items.length === 0}
-		<div class="flex flex-col items-center gap-3 rounded-2xl bg-base-200 p-10 text-center">
+		<div class="flex flex-col items-center gap-3 rounded-box bg-base-200 p-10 text-center">
 			<Icon icon="mdi:storefront-outline" class="text-5xl text-base-content/30" />
 			<p class="font-bold text-base-content">The shop is empty</p>
 			<p class="text-sm text-base-content/60">Be the first to list an item for other players to buy.</p>
@@ -144,8 +144,8 @@
 	{:else}
 		<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
 			{#each items as item (item.id)}
-				<div class="flex flex-col gap-2 rounded-2xl bg-base-200 p-4 ring-1 ring-base-300 transition hover:ring-primary">
-					<div class="grid h-16 w-16 place-items-center self-center rounded-2xl bg-primary/10 text-4xl text-primary"><Icon icon={item.icon || 'mdi:package-variant'} /></div>
+				<div class="flex flex-col gap-2 rounded-box border border-base-content/10 bg-base-200 p-4 transition hover:-translate-y-0.5 hover:shadow-md">
+					<div class="grid h-16 w-16 place-items-center self-center rounded-xl bg-primary/10 text-4xl text-primary"><Icon icon={item.icon || 'mdi:package-variant'} /></div>
 					<h3 class="truncate text-center font-black text-base-content" title={item.title}>{item.title}</h3>
 					{#if item.description}<p class="line-clamp-2 text-center text-xs text-base-content/60">{item.description}</p>{/if}
 					<a href={`/u/${item.sellerUid}`} class="truncate text-center text-xs font-semibold text-base-content/50 hover:text-primary">by {item.sellerName}</a>
@@ -163,7 +163,7 @@
 
 {#if toast}
 	<div class="pointer-events-none fixed inset-x-0 bottom-6 z-[2000] flex justify-center px-4">
-		<div class="pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-xl {toastKind === 'success' ? 'bg-primary' : 'bg-error'}" role="status">
+		<div class="pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-md {toastKind === 'success' ? 'bg-primary' : 'bg-error'}" role="status">
 			<Icon icon={toastKind === 'success' ? 'mdi:check-circle' : 'mdi:alert-circle'} class="text-lg" /> {toast}
 		</div>
 	</div>

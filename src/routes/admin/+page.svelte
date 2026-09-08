@@ -50,8 +50,8 @@
 <div class="min-h-screen bg-base-200">
 	<div class="mx-auto max-w-4xl px-4 py-8">
 		{#if !stats}
-			<div class="mx-auto max-w-sm rounded-3xl bg-base-100 p-8 shadow-xl">
-				<h1 class="mb-1 flex items-center gap-2 text-2xl font-black text-base-content"><Icon icon="mdi:shield-lock" class="text-primary" /> Admin</h1>
+			<div class="mx-auto max-w-sm rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm">
+				<h1 class="mb-1 flex items-center gap-2 text-2xl font-black tracking-tight text-base-content"><Icon icon="mdi:shield-lock" class="text-primary" /> Admin</h1>
 				<p class="mb-5 text-sm text-base-content/60">Enter the admin password to view server stats.</p>
 				<input class="input input-bordered mb-3 w-full" type="password" placeholder="Password" bind:value={password} on:keydown={(e) => e.key === 'Enter' && login()} />
 				{#if error}<p class="mb-3 text-sm font-bold text-error">{error}</p>{/if}
@@ -59,13 +59,13 @@
 			</div>
 		{:else}
 			<div class="mb-5 flex items-center justify-between">
-				<h1 class="flex items-center gap-2 text-2xl font-black text-base-content"><Icon icon="mdi:view-dashboard" class="text-primary" /> Server stats</h1>
-				<button class="rounded-full bg-base-100 px-4 py-2 text-sm font-bold text-base-content shadow hover:bg-base-300" on:click={login}><Icon icon="mdi:refresh" /> Refresh</button>
+				<h1 class="flex items-center gap-2 text-2xl font-black tracking-tight text-base-content"><Icon icon="mdi:view-dashboard" class="text-primary" /> Server stats</h1>
+				<button class="rounded-full border border-base-content/10 bg-base-100 px-4 py-2 text-sm font-bold text-base-content shadow-sm hover:bg-base-300" on:click={login}><Icon icon="mdi:refresh" /> Refresh</button>
 			</div>
 
 			<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 				{#each STAT_TILES(stats, party) as t}
-					<div class="flex flex-col gap-1 rounded-2xl bg-base-100 p-4 shadow">
+					<div class="flex flex-col gap-1 rounded-xl border border-base-content/10 bg-base-100 p-4 shadow-sm">
 						<Icon icon={t.icon} class="text-2xl text-primary" />
 						<div class="text-2xl font-black text-base-content">{typeof t.value === 'number' ? t.value.toLocaleString() : t.value}</div>
 						<div class="text-xs font-bold uppercase tracking-wider text-base-content/50">{t.label}</div>
@@ -74,7 +74,7 @@
 			</div>
 
 			<div class="mt-6 grid gap-4 md:grid-cols-2">
-				<div class="rounded-2xl bg-base-100 p-4 shadow">
+				<div class="rounded-xl border border-base-content/10 bg-base-100 p-4 shadow-sm">
 					<h2 class="mb-3 font-black text-base-content">Top streaks</h2>
 					<div class="flex flex-col divide-y divide-base-200">
 						{#each stats.topStreaks as r, i}
@@ -87,7 +87,7 @@
 						{/each}
 					</div>
 				</div>
-				<div class="rounded-2xl bg-base-100 p-4 shadow">
+				<div class="rounded-xl border border-base-content/10 bg-base-100 p-4 shadow-sm">
 					<h2 class="mb-3 font-black text-base-content">Recent games</h2>
 					<div class="flex flex-col divide-y divide-base-200">
 						{#each stats.recentGames as g}

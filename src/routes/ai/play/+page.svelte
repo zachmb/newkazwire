@@ -102,11 +102,6 @@
 <div
 	class="font-sans relative min-h-screen overflow-hidden bg-base-200 p-4 text-base-content"
 >
-	<!-- Animated Background Pattern -->
-	<div
-		class="animated-pattern pointer-events-none absolute inset-0 z-0 opacity-[0.15] mix-blend-overlay"
-	/>
-
 	<div
 		class="relative z-10 mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]"
 	>
@@ -169,14 +164,14 @@
 				<!-- Share Modal -->
 				{#if showShareModal}
 					<div
-						class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+						class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4"
 						on:click={() => (showShareModal = false)}
 						on:keydown={(e) => e.key === 'Escape' && (showShareModal = false)}
 						role="button"
 						tabindex="0"
 					>
 						<div
-							class="w-full max-w-2xl rounded-3xl bg-base-100 p-8 text-center shadow-2xl"
+							class="w-full max-w-2xl rounded-box border border-base-content/10 bg-base-100 p-8 text-center shadow-md"
 							on:click|stopPropagation
 							on:keydown|stopPropagation
 							role="dialog"
@@ -198,7 +193,7 @@
 				{/if}
 
 				<!-- Info & Attribution -->
-				<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
+				<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 					<div class="flex flex-col justify-between gap-6 md:flex-row md:items-center">
 						<div class="flex items-center gap-4">
 							<div
@@ -223,7 +218,7 @@
 				</div>
 			{:else}
 				<div
-					class="flex h-[60vh] flex-col items-center justify-center gap-6 rounded-3xl bg-base-100 text-center shadow-sm"
+					class="flex h-[60vh] flex-col items-center justify-center gap-6 rounded-box border border-base-content/10 bg-base-100 text-center shadow-sm"
 				>
 					<Icon icon="mdi:robot-dead" class="text-9xl opacity-10" />
 					<div>
@@ -244,7 +239,7 @@
 					{#each mappedGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative h-[140px] w-full overflow-hidden rounded-3xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative h-[140px] w-full overflow-hidden rounded-xl border border-base-content/10 bg-base-100 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<div
@@ -261,20 +256,3 @@
 		</aside>
 	</div>
 </div>
-
-<style>
-	@keyframes move-pattern {
-		0% {
-			background-position: 0 0;
-		}
-		100% {
-			background-position: 100px 100px;
-		}
-	}
-
-	.animated-pattern {
-		background-image: url('/bg-pattern.png');
-		background-size: 800px;
-		animation: move-pattern 60s linear infinite;
-	}
-</style>

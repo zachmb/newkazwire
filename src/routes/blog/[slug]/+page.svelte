@@ -42,7 +42,7 @@
 			alt={blog.title}
 			class="absolute inset-0 h-full w-full object-cover brightness-50"
 		/>
-		<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-base-100" />
+		<div class="absolute inset-0 bg-black/40" />
 
 		<div class="relative z-10 mx-auto max-w-4xl px-4 text-center">
 			<div
@@ -55,7 +55,7 @@
 			</div>
 			<h1
 				in:fly={{ y: 20, duration: 800, delay: 200 }}
-				class="mb-8 text-4xl font-black text-white drop-shadow-2xl md:text-6xl lg:text-7xl"
+				class="mb-8 text-4xl font-black tracking-tight text-white md:text-6xl lg:text-7xl"
 			>
 				{blog.title}
 			</h1>
@@ -70,7 +70,7 @@
 	<!-- Content -->
 	<div class="relative z-20 mx-auto -mt-32 max-w-4xl px-6">
 		<div
-			class="prose prose-lg max-w-none rounded-3xl border border-base-content/5 bg-base-100 p-8 shadow-2xl lg:prose-xl md:p-16"
+			class="prose prose-lg max-w-none rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm lg:prose-xl md:p-16"
 		>
 			{@html blog.content}
 		</div>
@@ -100,12 +100,12 @@
 			{#each relatedBlogs as related}
 				<a href="/blog/{related.slug}" class="group block">
 					<div
-						class="mb-4 aspect-video overflow-hidden rounded-2xl shadow-lg transition-shadow group-hover:shadow-xl"
+						class="mb-4 aspect-video overflow-hidden rounded-xl border border-base-content/10 shadow-sm transition-shadow group-hover:shadow-md"
 					>
 						<img
 							src={related.image}
 							alt={related.title}
-							class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+							class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
 						/>
 					</div>
 					<h3 class="line-clamp-2 text-xl font-bold transition-colors group-hover:text-primary">
@@ -121,12 +121,10 @@
 	/* Premium Typography and Formatting for Blog Content */
 	:global(.prose h1, .prose h2, .prose h3) {
 		font-weight: 900;
+		letter-spacing: -0.02em;
 		margin-top: 2.5em;
 		margin-bottom: 0.5em;
-		background: linear-gradient(135deg, currentColor, rgba(var(--p), 1));
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: rgb(var(--bc));
 	}
 	:global(.prose p) {
 		line-height: 1.8;

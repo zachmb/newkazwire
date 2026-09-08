@@ -25,9 +25,9 @@
 	}
 </script>
 
-<div class="rounded-3xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
+<div class="rounded-box border border-primary/20 bg-primary/5 p-6 sm:p-8">
 	<div class="flex flex-col items-center gap-4 text-center">
-		<div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg">
+		<div class="flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-primary-content">
 			<Icon icon="mdi:account-star" class="text-3xl" />
 		</div>
 		<div>

@@ -195,22 +195,17 @@
 		<main class="flex flex-col gap-4">
 
 			<!-- ── HERO BANNER ── -->
-			<div class="relative overflow-hidden rounded-3xl bg-neutral shadow-xl">
-				<!-- Decorative blobs -->
-				<div class="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-[#FF6A1A] opacity-25 blur-3xl"></div>
-				<div class="pointer-events-none absolute -bottom-6 left-1/4 h-32 w-32 rounded-full bg-accent opacity-20 blur-2xl"></div>
-				<div class="pointer-events-none absolute right-1/4 top-0 h-40 w-40 rounded-full bg-[#FF3D2E] opacity-10 blur-3xl"></div>
-
+			<div class="relative overflow-hidden rounded-box border border-base-content/10 bg-neutral shadow-sm">
 				<div class="relative px-8 pb-8 pt-8">
 					<!-- Top row: avatar + name + coins -->
 					<div class="flex flex-col gap-6 sm:flex-row sm:items-center">
 
 						<!-- Avatar -->
 						<div class="relative shrink-0">
-							<div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-accent/50 bg-white/20 shadow-xl ring-4 ring-white/10 backdrop-blur-sm">
+							<div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-accent/50 bg-white/20 shadow-sm ring-4 ring-white/10">
 								<Icon icon="mdi:account-circle" class="h-full w-full text-white/60" />
 							</div>
-							<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-3 py-0.5 text-xs font-black text-base-content shadow-lg">
+							<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-3 py-0.5 text-xs font-black text-base-content shadow-sm">
 								LVL {$userProfile.level}
 							</span>
 						</div>
@@ -230,7 +225,7 @@
 								</div>
 							{:else}
 								<div class="group flex items-center gap-2">
-									<h1 class="text-4xl font-black text-white drop-shadow">{displayName}</h1>
+									<h1 class="text-4xl font-black tracking-tight text-white">{displayName}</h1>
 									<button
 										class="rounded-full p-1.5 opacity-0 transition-opacity hover:bg-white/20 group-hover:opacity-100"
 										on:click={startEditing}
@@ -252,7 +247,7 @@
 						</div>
 
 						<!-- Coins -->
-						<div class="flex shrink-0 items-center gap-3 rounded-2xl bg-black/20 px-5 py-3 backdrop-blur-sm">
+						<div class="flex shrink-0 items-center gap-3 rounded-xl bg-black/40 px-5 py-3">
 							<Icon icon="mdi:currency-usd-circle" class="text-3xl text-yellow-300" />
 							<div>
 								<div class="text-2xl font-black leading-none text-white">{walletCoins.toLocaleString()}</div>
@@ -269,7 +264,7 @@
 						</div>
 						<div class="h-3 w-full overflow-hidden rounded-full bg-black/20">
 							<div
-								class="h-full rounded-full bg-gradient-to-r from-accent to-yellow-300 shadow-sm transition-all duration-500"
+								class="h-full rounded-full bg-accent transition-all duration-500"
 								style="width: {xpInLevel}%"
 							></div>
 						</div>
@@ -306,7 +301,7 @@
 			</div>
 
 			<!-- ── TAB BAR ── -->
-			<div class="flex gap-2 rounded-2xl bg-black/15 p-1.5 backdrop-blur-sm">
+			<div class="flex gap-2 rounded-xl border border-base-content/10 bg-black/40 p-1.5">
 				{#each TABS as tab}
 					<button
 						class="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition-all duration-150
@@ -329,7 +324,7 @@
 
 					<!-- Recently Played -->
 					{#if recentGamesList.length > 0}
-						<div class="col-span-full rounded-3xl bg-base-100 p-6 shadow-lg">
+						<div class="col-span-full rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 							<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Icon icon="mdi:history" class="text-primary" /></span>
 								Recently Played
@@ -339,10 +334,10 @@
 								{#each recentGamesList.slice(0, 8) as game}
 									<a
 										href={game.href}
-										class="group relative aspect-square overflow-hidden rounded-2xl bg-base-200 shadow-sm transition-all hover:scale-105 hover:shadow-md"
+										class="group relative aspect-square overflow-hidden rounded-xl bg-base-200 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
 									>
 										<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
-										<div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
+										<div class="absolute inset-0 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"></div>
 										<div class="absolute inset-x-0 bottom-0 translate-y-full p-1.5 transition-transform group-hover:translate-y-0">
 											<span class="block truncate text-[10px] font-black text-white">{game.title}</span>
 										</div>
@@ -353,7 +348,7 @@
 					{/if}
 
 					<!-- Settings -->
-					<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+					<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/15"><Icon icon="mdi:cog" class="text-amber-600" /></span>
 							Settings
@@ -400,7 +395,7 @@
 					</div>
 
 					<!-- Favorites -->
-					<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+					<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50"><Icon icon="mdi:heart" class="text-red-400" /></span>
 							Favorite Games
@@ -414,7 +409,7 @@
 						{:else}
 							<div class="grid grid-cols-4 gap-2">
 								{#each mappedGames.filter(g => $userProfile.favoriteGames.includes(g.href.split('/').pop())).slice(0, 8) as game}
-									<a href={game.href} class="group relative aspect-square overflow-hidden rounded-xl transition-all hover:scale-105 hover:shadow-md">
+									<a href={game.href} class="group relative aspect-square overflow-hidden rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md">
 										<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 									</a>
 								{/each}
@@ -427,21 +422,20 @@
 			{:else if activeTab === 'ai-games'}
 				<div class="flex flex-col gap-4">
 					<!-- CTA -->
-					<div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-secondary p-7 text-white shadow-lg">
-						<div class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+					<div class="relative overflow-hidden rounded-box border border-base-content/10 bg-primary p-7 text-white shadow-sm">
 						<div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div>
-								<h2 class="text-2xl font-black">AI Lab</h2>
+								<h2 class="text-2xl font-black tracking-tight">AI Lab</h2>
 								<p class="mt-1 opacity-80">Turn your ideas into playable games instantly.</p>
 							</div>
-							<a href="/ai" class="btn shrink-0 rounded-2xl bg-base-100 font-black text-primary shadow-md hover:bg-white/90">
+							<a href="/ai" class="btn shrink-0 rounded-xl bg-base-100 font-black text-primary shadow-sm hover:bg-white/90">
 								<Icon icon="mdi:auto-fix" />Generate a Game
 							</a>
 						</div>
 					</div>
 
 					<!-- Games grid -->
-					<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+					<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 						<div class="mb-5 flex items-center justify-between">
 							<h3 class="flex items-center gap-2 text-lg font-black text-base-content">
 								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10"><Icon icon="mdi:robot" class="text-secondary" /></span>
@@ -459,7 +453,7 @@
 						{:else}
 							<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 								{#each $localAiGames as game}
-									<div class="group flex flex-col gap-2 rounded-2xl border-l-4 border-primary/40 bg-base-100 p-4 transition-all hover:shadow-md">
+									<div class="group flex flex-col gap-2 rounded-xl border border-base-content/10 border-l-4 border-l-primary/40 bg-base-100 p-4 transition-all hover:shadow-md">
 										<div class="flex items-start justify-between gap-2">
 											<div class="min-w-0 flex-1">
 												<div class="truncate font-black text-base-content">{game.title}</div>
@@ -503,7 +497,7 @@
 
 			<!-- SHOP -->
 			{:else if activeTab === 'shop'}
-				<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+				<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 					<!-- Sub-toggle: the Kazcoin item shop and the KazMarket both live here -->
 					<div class="mb-6 inline-flex rounded-2xl bg-base-200 p-1">
 						<button
@@ -528,7 +522,7 @@
 				</div>
 
 			{:else if activeTab === 'players'}
-				<div class="rounded-3xl bg-base-100 p-6 shadow-lg">
+				<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 					<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
 						<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10"><Icon icon="mdi:account-search" class="text-primary" /></span>
 						Find players
@@ -540,19 +534,18 @@
 			{:else if activeTab === 'leaderboard'}
 				<div class="flex flex-col gap-4">
 					<!-- Banner -->
-					<div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-yellow-400 to-orange-500 p-7 text-white shadow-lg">
-						<div class="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+					<div class="relative overflow-hidden rounded-box border border-base-content/10 bg-primary p-7 text-white shadow-sm">
 						<div class="relative flex items-center justify-between">
 							<div>
-								<h3 class="text-2xl font-black">Top Streaks</h3>
+								<h3 class="text-2xl font-black tracking-tight">Top Streaks</h3>
 								<p class="mt-1 font-semibold opacity-80">The players with the longest daily-play streaks. Play every day to climb.</p>
 							</div>
-							<Icon icon="mdi:trophy" class="text-6xl text-yellow-200 drop-shadow-lg" />
+							<Icon icon="mdi:trophy" class="text-6xl text-yellow-200" />
 						</div>
 					</div>
 
 					<!-- Table -->
-					<div class="overflow-hidden rounded-3xl bg-base-100 shadow-lg">
+					<div class="overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm">
 						{#if leaderboardLoading}
 							<div class="flex h-40 items-center justify-center">
 								<span class="loading loading-spinner loading-lg text-primary"></span>
@@ -608,7 +601,7 @@
 
 			<!-- Back home -->
 			<div>
-				<a href="/" class="btn rounded-2xl bg-black/15 font-black text-white backdrop-blur-sm hover:bg-black/25">
+				<a href="/" class="btn rounded-xl border border-base-content/10 bg-black/40 font-black text-white hover:bg-black/50">
 					<Icon icon="mdi:arrow-left" />Back to Games
 				</a>
 			</div>
@@ -616,16 +609,16 @@
 
 		<!-- Right Sidebar -->
 		<aside class="flex flex-col gap-4">
-			<div class="flex h-56 w-full items-center justify-center rounded-3xl border-2 border-dashed border-white/20 bg-white/10">
+			<div class="flex h-56 w-full items-center justify-center rounded-box border-2 border-dashed border-white/20 bg-white/10">
 				<span class="text-sm font-bold text-white/30">Ad Space</span>
 			</div>
-			<div class="rounded-3xl bg-white/10 p-4">
+			<div class="rounded-box border border-base-content/10 bg-white/10 p-4">
 				<h3 class="mb-3 text-xs font-black uppercase tracking-widest text-white/60">Recommended</h3>
 				<div class="grid grid-cols-2 gap-3">
 					{#each mappedGames.slice(0, 6) as game}
-						<a href={game.href} class="group relative aspect-square overflow-hidden rounded-2xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-md">
+						<a href={game.href} class="group relative aspect-square overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
-							<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
+							<div class="absolute inset-0 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							<div class="absolute inset-x-0 bottom-0 translate-y-full p-1.5 transition-transform group-hover:translate-y-0">
 								<span class="block truncate text-[10px] font-black text-white">{game.title}</span>
 							</div>

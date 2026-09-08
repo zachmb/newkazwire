@@ -30,19 +30,19 @@
 	/>
 </svelte:head>
 
-<div class="min-h-screen bg-gradient-to-b from-base-100 to-base-200 px-4 py-12 md:px-8 lg:px-16">
+<div class="min-h-screen bg-base-100 px-4 py-12 md:px-8 lg:px-16">
 	<!-- Header -->
 	<div class="mx-auto mb-16 max-w-7xl text-center">
 		{#if mounted}
 			<h1
 				in:fly={{ y: -20, duration: 800 }}
-				class="mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-5xl font-black text-transparent md:text-7xl"
+				class="mb-6 text-5xl font-black tracking-tight text-base-content md:text-7xl"
 			>
 				Insights & Innovation
 			</h1>
 			<p
 				in:fly={{ y: 20, duration: 800, delay: 200 }}
-				class="mx-auto max-w-2xl text-xl text-base-content/70"
+				class="mx-auto max-w-2xl text-xl text-base-content/60"
 			>
 				Deep dives into the future of gaming, the evolution of the web, and how the web is
 				redefining the entertainment landscape.
@@ -69,7 +69,7 @@
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Search articles..."
-				class="input input-bordered w-full rounded-full bg-base-100/50 backdrop-blur-sm"
+				class="input input-bordered w-full rounded-full bg-base-100"
 			/>
 			<span class="absolute right-4 top-3 italic text-base-content/30">Search</span>
 		</div>
@@ -80,17 +80,17 @@
 		{#each filteredBlogs as blog, i}
 			<a
 				href="/blog/{blog.slug}"
-				class="group card overflow-hidden border border-base-content/5 bg-base-100 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+				class="group card overflow-hidden border border-base-content/10 bg-base-100 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
 				in:fade={{ duration: 400, delay: i * 100 }}
 			>
 				<figure class="relative h-48 overflow-hidden">
 					<img
 						src={blog.image}
 						alt={blog.title}
-						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+						class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
 					/>
 					<div
-						class="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+						class="absolute inset-0 flex items-end bg-black/40 p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 					>
 						<span class="font-bold text-white">Read More →</span>
 					</div>
@@ -124,7 +124,6 @@
 
 <style>
 	.card {
-		background: rgba(var(--b1), 0.7);
-		backdrop-filter: blur(10px);
+		background: rgb(var(--b1));
 	}
 </style>

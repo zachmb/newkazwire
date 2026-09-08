@@ -59,12 +59,12 @@
 				{/each}
 			</div>
 		{:else if !query.trim()}
-			<div class="rounded-3xl bg-base-200 px-6 py-12 text-center">
+			<div class="rounded-box bg-base-200 px-6 py-12 text-center">
 				<Icon icon="mdi:account-group-outline" class="mx-auto text-5xl text-base-content/30" />
 				<p class="mt-3 font-bold text-base-content">Start typing to find players.</p>
 			</div>
 		{:else if searched && results.length === 0}
-			<div class="rounded-3xl bg-base-200 px-6 py-12 text-center">
+			<div class="rounded-box bg-base-200 px-6 py-12 text-center">
 				<Icon icon="mdi:account-off-outline" class="mx-auto text-5xl text-base-content/30" />
 				<p class="mt-3 font-bold text-base-content">No players found for “{query.trim()}”.</p>
 			</div>

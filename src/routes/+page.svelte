@@ -100,34 +100,30 @@
 	<meta property="og:description" content={config.branding.description} />
 </svelte:head>
 
-<div class="min-h-screen w-full bg-base-100 p-5 font-main">
-	<!-- HERO — restored original centered hero: logo + wordmark + tagline + two orange CTAs -->
-	<div class="hero mb-10 min-h-fit bg-base-100 font-heading">
-		<div class="hero-content flex-col lg:flex-row">
-			<div class="relative overflow-visible">
-				<img
-					src="/logo.png"
-					alt=""
-					class="w-full max-w-sm rounded-lg drop-shadow-2xl transition-all duration-300 hover:scale-105"
-				/>
-			</div>
-			<div>
-				<h1 class="text-5xl font-bold"><Cloak text={host} /></h1>
-				<p class="py-6">Enjoy free, fast, and safe gaming and browsing.</p>
-				<div class="flex flex-col gap-2 md:flex-row">
-					<a href="#games" class="w-full">
-						<button class="btn btn-primary w-full">Play Now</button>
-					</a>
-					<a href="/apps" class="w-full">
-						<button class="btn btn-primary w-full">Browse Now</button>
-					</a>
+<div class="min-h-screen w-full bg-base-100">
+	<!-- HERO — flat, left-aligned editorial: logo + wordmark + tagline + one primary CTA -->
+	<section class="kz-wide pb-10 pt-8 md:pb-14 md:pt-12">
+		<div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
+			<img
+				src="/logo.png"
+				alt=""
+				class="h-24 w-24 flex-none rounded-box object-contain sm:h-28 sm:w-28"
+			/>
+			<div class="max-w-2xl">
+				<h1 class="text-4xl font-black tracking-tight sm:text-6xl"><Cloak text={host} /></h1>
+				<p class="mt-3 text-lg leading-relaxed text-base-content/60 sm:text-xl">
+					Free, fast games and a private browser — no downloads, no waiting. Just click and play.
+				</p>
+				<div class="mt-6 flex flex-wrap gap-3">
+					<a href="#games" class="btn btn-primary">Play now</a>
+					<a href="/apps" class="btn btn-ghost border border-base-content/15">Browse apps</a>
 				</div>
 			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- RAILS — apps first, then popular/continue/favorites, community, then categories -->
-	<div class="justify-left mb-10 flex flex-col gap-4">
+	<div class="kz-wide flex flex-col gap-9 pb-16 md:gap-11">
 		<HomeRail title="Apps" viewMoreHref="/apps" items={apps} />
 
 		<span id="games"></span>

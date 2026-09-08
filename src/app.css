@@ -57,3 +57,45 @@
 		/* Firefox */
 	}
 }
+
+/*
+  ── Design register (Favente-style, Kazwire colors kept) ────────────────────
+  Flat surfaces (no gradients/glows), hairline borders over heavy shadows, one
+  consistent card radius, sharp typographic hierarchy, generous rhythm. Colors
+  come entirely from the daisyUI theme (amber-orange primary + steel-blue accent).
+*/
+@layer base {
+	body {
+		font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
+	/* Sharp, tight display type for every heading. */
+	h1, h2, h3, h4, h5, h6 {
+		@apply font-heading font-bold;
+		letter-spacing: -0.015em;
+	}
+}
+
+@layer components {
+	/* Standard content page: left-aligned, one consistent width + rhythm. */
+	.kz-page {
+		@apply mx-auto w-full max-w-6xl px-5 py-8 md:px-8 md:py-12;
+	}
+	/* Wide shell for the library / horizontal rails. */
+	.kz-wide {
+		@apply mx-auto w-full max-w-[1600px] px-4 md:px-6;
+	}
+	/* Flat card: hairline definition, subtle shadow, theme radius. */
+	.kz-card {
+		@apply rounded-box border border-base-content/10 bg-base-200 shadow-sm transition duration-150;
+	}
+	.kz-card-hover {
+		@apply hover:-translate-y-0.5 hover:shadow-md;
+	}
+	/* Small uppercase section label. */
+	.kz-eyebrow {
+		@apply text-xs font-bold uppercase tracking-widest text-base-content/50;
+	}
+}

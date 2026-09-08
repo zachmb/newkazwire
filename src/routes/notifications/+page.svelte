@@ -58,13 +58,13 @@
 	function getTypeColor(type: string) {
 		switch (type) {
 			case 'feature':
-				return 'bg-blue-100 text-blue-800';
+				return 'bg-accent/10 text-accent';
 			case 'improvement':
-				return 'bg-blue-100 text-blue-800';
+				return 'bg-accent/10 text-accent';
 			case 'fix':
-				return 'bg-orange-100 text-orange-800';
+				return 'bg-primary/10 text-primary';
 			default:
-				return 'bg-gray-100 text-gray-800';
+				return 'bg-base-200 text-base-content/60';
 		}
 	}
 </script>
@@ -81,29 +81,29 @@
 
 		<!-- Main Content -->
 		<main class="flex flex-col gap-6">
-			<div class="rounded-3xl bg-base-100 p-8 shadow-sm">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm">
 				<div class="mb-8 flex items-center justify-between">
 					<div>
-						<h1 class="text-4xl font-black text-base-content">Changelog</h1>
+						<h1 class="text-4xl font-black tracking-tight text-base-content">Changelog</h1>
 						<p class="mt-2 text-lg text-base-content/60">Latest updates, features, and improvements.</p>
 					</div>
 					<div class="hidden md:block">
-						<Icon icon="lucide:sparkles" class="h-12 w-12 text-[#5B9BFF]" />
+						<Icon icon="lucide:sparkles" class="h-12 w-12 text-accent" />
 					</div>
 				</div>
 
 				<div
-					class="relative space-y-8 pl-8 before:absolute before:left-[11px] before:top-2 before:h-full before:w-[2px] before:bg-gray-200"
+					class="relative space-y-8 pl-8 before:absolute before:left-[11px] before:top-2 before:h-full before:w-[2px] before:bg-base-content/10"
 				>
 					{#each updates as update}
 						<div class="relative">
 							<!-- Dot -->
 							<div
-								class="absolute -left-[29px] top-1.5 h-6 w-6 rounded-full border-4 border-white bg-base-200 shadow-sm"
+								class="absolute -left-[29px] top-1.5 h-6 w-6 rounded-full border-4 border-base-100 bg-base-300 shadow-sm"
 							/>
 
 							<div
-								class="flex flex-col gap-2 rounded-2xl border border-neutral/5 bg-neutral/[0.02] p-6 transition-colors hover:bg-neutral/[0.04]"
+								class="flex flex-col gap-2 rounded-xl border border-base-content/10 bg-base-200 p-6 transition-colors hover:bg-base-300"
 							>
 								<div class="flex flex-wrap items-center gap-3">
 									<span class="font-mono text-sm font-bold text-base-content/50">{update.date}</span>
@@ -133,12 +133,12 @@
 		<!-- Right Column -->
 		<aside class="flex flex-col gap-6">
 			<div class="flex flex-col gap-4">
-				<h3 class="px-2 text-lg font-black text-white drop-shadow-sm">Recommended</h3>
+				<h3 class="px-2 text-lg font-black tracking-tight text-base-content">Recommended</h3>
 				<div class="grid grid-cols-2 gap-3">
 					{#each mappedGames.slice(0, 6) as game}
 						<a
 							href={game.href}
-							class="group relative aspect-square w-full overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:scale-105 hover:shadow-lg"
+							class="group relative aspect-square w-full overflow-hidden rounded-xl border border-base-content/10 bg-base-100 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<div

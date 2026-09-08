@@ -40,7 +40,7 @@
 
 	<!-- Favorite -->
 	<button
-		class="absolute right-2 top-2 z-20 grid h-8 w-8 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-all hover:bg-black/60 {isFavorite
+		class="absolute right-2 top-2 z-20 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white transition-all hover:bg-black/70 {isFavorite
 			? 'opacity-100'
 			: 'opacity-0 group-hover:opacity-100'}"
 		on:click={toggleFavorite}
@@ -52,14 +52,14 @@
 
 	<!-- Play affordance on hover -->
 	<div class="pointer-events-none absolute inset-0 grid place-items-center transition-colors duration-200 group-hover:bg-black/20">
-		<div class="grid h-12 w-12 translate-y-1 place-items-center rounded-full bg-primary text-white opacity-0 shadow-lg ring-2 ring-white/30 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+		<div class="grid h-12 w-12 translate-y-1 place-items-center rounded-full bg-primary text-white opacity-0 shadow-sm ring-2 ring-white/30 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
 			<Icon icon="mdi:play" class="text-2xl" />
 		</div>
 	</div>
 
 	{#if showTitle}
 		<!-- Always-visible, high-contrast title bar -->
-		<div class="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 to-transparent px-2.5 pb-2 pt-7">
+		<div class="absolute inset-x-0 bottom-0 z-10 bg-black/60 px-2.5 pb-2 pt-2">
 			<span class="block truncate text-[13px] font-semibold leading-tight text-white">{title}</span>
 		</div>
 	{/if}

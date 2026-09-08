@@ -22,7 +22,7 @@
 
 {#if $isSearchOpen}
 	<div
-		class="fixed inset-0 z-[9999] flex flex-col bg-black/80 p-4 backdrop-blur-md sm:p-8"
+		class="fixed inset-0 z-[9999] flex flex-col bg-black/80 p-4 sm:p-8"
 		transition:fade={{ duration: 200 }}
 	>
 		<!-- Close Button -->
@@ -44,7 +44,7 @@
 					type="text"
 					bind:value={$searchQuery}
 					placeholder="Search for games..."
-					class="w-full rounded-full bg-base-100 py-6 pl-20 pr-8 text-2xl font-bold text-base-content shadow-2xl placeholder:text-base-content/30 focus:outline-none focus:ring-4 focus:ring-primary/50"
+					class="w-full rounded-full border border-base-content/10 bg-base-100 py-6 pl-20 pr-8 text-2xl font-bold text-base-content shadow-md placeholder:text-base-content/30 focus:outline-none focus:ring-4 focus:ring-primary/50"
 					autofocus
 				/>
 			</div>
@@ -59,7 +59,7 @@
 					{#each mappedGames as game}
 						<a
 							href={game.href}
-							class="group relative aspect-square w-full overflow-hidden rounded-3xl bg-base-100 shadow-lg transition-transform hover:scale-105"
+							class="group relative aspect-square w-full overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
 							on:click={() => ($isSearchOpen = false)}
 						>
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />

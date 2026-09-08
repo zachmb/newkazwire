@@ -143,7 +143,7 @@
 		</div>
 	{:else if notFound || !profile}
 		<!-- Graceful 404 / nothing-public state -->
-		<div class="rounded-3xl bg-base-200 px-6 py-16 text-center">
+		<div class="rounded-box border border-base-content/10 bg-base-200 px-6 py-16 text-center">
 			<Icon icon="mdi:account-off-outline" class="mx-auto text-6xl text-base-content/30" />
 			<h1 class="mt-4 text-2xl font-black text-base-content">Nothing to see here yet</h1>
 			<p class="mx-auto mt-2 max-w-md text-base-content/60">
@@ -158,13 +158,13 @@
 		<!-- Header -->
 		<header class="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:text-left">
 			<div
-				class="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-primary text-4xl font-black text-primary-content shadow-lg"
+				class="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-primary text-4xl font-black text-primary-content shadow-sm"
 				aria-hidden="true"
 			>
 				{initial(profile.name)}
 			</div>
 			<div class="min-w-0">
-				<h1 class="truncate text-3xl font-black text-base-content">{profile.name}</h1>
+				<h1 class="truncate text-3xl font-black tracking-tight text-base-content">{profile.name}</h1>
 				<div class="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm font-semibold text-base-content/60 sm:justify-start">
 					{#if profile.location}
 						<span class="inline-flex items-center gap-1">
@@ -212,7 +212,7 @@
 					{#each games as game (game.id)}
 						<a
 							href="/ai/user-g/{game.id}"
-							class="group flex flex-col overflow-hidden rounded-2xl border border-neutral/10 transition-all hover:scale-[1.02] hover:border-primary/30 hover:shadow-xl"
+							class="group flex flex-col overflow-hidden rounded-xl border border-base-content/10 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
 						>
 							<div class="relative aspect-video w-full bg-black">
 								{#if game.coverUrl}

@@ -380,10 +380,9 @@
 		<!-- Main Content -->
 		<main class="flex flex-col gap-6">
 			<!-- Hero header -->
-			<div class="relative overflow-hidden rounded-3xl bg-base-100 p-6 shadow-xl sm:p-8">
-				<div class="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/10 blur-3xl"></div>
+			<div class="relative overflow-hidden rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 				<div class="relative z-10 flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-					<div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg">
+					<div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-content">
 						<Icon icon="mdi:robot-happy" class="text-4xl" />
 					</div>
 					<div class="flex-1">
@@ -402,7 +401,7 @@
 			</div>
 
 			<!-- Mode tabs -->
-			<div role="tablist" class="tabs tabs-boxed w-full rounded-2xl bg-base-100 p-1.5 shadow-sm">
+			<div role="tablist" class="tabs tabs-boxed w-full rounded-box border border-base-content/10 bg-base-100 p-1.5">
 				<button
 					role="tab"
 					class="tab flex-1 gap-2 rounded-xl font-bold {mode === 'create' ? 'tab-active bg-primary text-primary-content' : ''}"
@@ -427,14 +426,14 @@
 			{#if mode === 'create'}
 				<div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
 					<!-- Generation Form -->
-					<section class="flex flex-col gap-5 rounded-3xl bg-base-100 p-6 shadow-xl sm:p-8">
+					<section class="flex flex-col gap-5 rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 						<h2 class="flex items-center gap-2 text-2xl font-black">
 							<Icon icon="mdi:creation" class="text-primary" />
 							Create a new game
 						</h2>
 
 						{#if sourceGame}
-							<div class="flex flex-wrap items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+							<div class="flex flex-wrap items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
 								<div class="badge badge-primary font-bold">Remixing</div>
 								<div class="font-bold text-base-content/70">{sourceGame.title}</div>
 								<button
@@ -475,7 +474,7 @@
 							{/if}
 
 							{#if error}
-								<div class="alert alert-error rounded-2xl font-bold">
+								<div class="alert alert-error rounded-xl font-bold">
 									<Icon icon="mdi:alert-circle" />
 									<span>{error}</span>
 								</div>
@@ -483,7 +482,7 @@
 
 							<button
 								type="button"
-								class="btn btn-primary btn-lg mt-1 h-16 rounded-2xl text-xl font-black shadow-lg shadow-primary/20 transition-all active:scale-95"
+								class="btn btn-primary btn-lg mt-1 h-16 rounded-xl text-xl font-black shadow-sm transition-all hover:shadow-md"
 								on:click|preventDefault={handleGenerate}
 								disabled={isGenerating}
 							>
@@ -500,10 +499,10 @@
 					</section>
 
 					<!-- Preview / Result -->
-					<section class="flex flex-col gap-6 rounded-3xl bg-base-100 p-6 shadow-xl sm:p-8">
+					<section class="flex flex-col gap-6 rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 						{#if isGenerating}
 							<div class="flex flex-col gap-6">
-								<div class="flex items-center gap-4 rounded-2xl bg-primary/5 p-4">
+								<div class="flex items-center gap-4 rounded-xl bg-primary/5 p-4">
 									<div class="relative flex h-12 w-12 shrink-0 items-center justify-center">
 										<span class="loading loading-spinner loading-lg text-primary"></span>
 									</div>
@@ -523,10 +522,10 @@
 												<a
 													href="/ai/user-g/{g.id}"
 													target="_blank"
-													class="group relative aspect-square overflow-hidden rounded-xl bg-base-200 transition-all hover:scale-105 hover:shadow-lg"
+													class="group relative aspect-square overflow-hidden rounded-xl border border-base-content/10 bg-base-200 transition-all hover:-translate-y-0.5 hover:shadow-md"
 												>
 													<div class="absolute inset-0 flex flex-col items-center justify-center gap-1 p-2 text-center">
-														<Icon icon="mdi:robot" class="text-2xl text-primary/50 transition-transform group-hover:scale-110" />
+														<Icon icon="mdi:robot" class="text-2xl text-primary/50" />
 														<span class="line-clamp-2 text-xs font-bold">{g.title}</span>
 													</div>
 													<div class="absolute right-1 top-1 flex items-center gap-0.5 rounded-full bg-base-content/20 px-1.5 py-0.5 text-[10px] font-bold text-warning">
@@ -578,7 +577,7 @@
 								</div>
 
 								{#if publishSuccess}
-									<div class="alert alert-success rounded-2xl">
+									<div class="alert alert-success rounded-xl">
 										<Icon icon="mdi:check-circle" />
 										<div class="flex flex-col">
 											<span class="font-bold">Published to the community gallery!</span>
@@ -588,7 +587,7 @@
 										</div>
 									</div>
 								{/if}
-								<div class="aspect-video w-full overflow-hidden rounded-2xl border-4 border-base-300 bg-black shadow-inner">
+								<div class="aspect-video w-full overflow-hidden rounded-xl border border-base-content/10 bg-black">
 									<iframe
 										id="game-preview"
 										title="AI Generated Game"
@@ -608,7 +607,7 @@
 				</div>
 			{:else}
 				<!-- UPLOAD MODE -->
-				<section class="flex flex-col gap-5 rounded-3xl bg-base-100 p-6 shadow-xl sm:p-8">
+				<section class="flex flex-col gap-5 rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 					<h2 class="flex items-center gap-2 text-2xl font-black">
 						<Icon icon="mdi:upload" class="text-primary" />
 						Upload your own game
@@ -616,7 +615,7 @@
 
 					{#if uploadSuccess}
 						<div class="flex flex-col items-center gap-5 py-8 text-center">
-							<div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-success/15 text-success">
+							<div class="flex h-16 w-16 items-center justify-center rounded-xl bg-success/15 text-success">
 								<Icon icon="mdi:check-circle" class="text-4xl" />
 							</div>
 							<div>
@@ -692,7 +691,7 @@
 						{/if}
 
 						{#if uploadError}
-							<div class="alert alert-error rounded-2xl font-bold">
+							<div class="alert alert-error rounded-xl font-bold">
 								<Icon icon="mdi:alert-circle" />
 								<span>{uploadError}</span>
 							</div>
@@ -700,7 +699,7 @@
 
 						<button
 							type="button"
-							class="btn btn-primary btn-lg h-16 rounded-2xl text-xl font-black shadow-lg shadow-primary/20 transition-all active:scale-95"
+							class="btn btn-primary btn-lg h-16 rounded-xl text-xl font-black shadow-sm transition-all hover:shadow-md"
 							on:click|preventDefault={handleUpload}
 							disabled={isUploading}
 						>
@@ -717,7 +716,7 @@
 			{/if}
 
 			<!-- My AI Games -->
-			<section class="rounded-3xl bg-base-100 p-6 shadow-xl sm:p-8">
+			<section class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 				<div class="mb-5 flex items-center justify-between gap-2">
 					<h2 class="flex items-center gap-2 text-2xl font-black">
 						<Icon icon="mdi:folder-star" class="text-primary" />
@@ -735,7 +734,7 @@
 						{/each}
 					</div>
 				{:else}
-					<div class="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-base-300 py-14 text-center text-base-content/40">
+					<div class="flex flex-col items-center gap-3 rounded-xl border border-dashed border-base-content/20 py-14 text-center text-base-content/40">
 						<Icon icon="mdi:gamepad-variant-outline" class="text-6xl" />
 						<p class="max-w-[24ch] font-bold">No games yet. Build one with AI or upload your own to see it here.</p>
 					</div>
@@ -745,7 +744,7 @@
 
 		<!-- Right Column -->
 		<aside class="flex flex-col gap-6">
-			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 				<div class="mb-4 flex items-center justify-between gap-2">
 					<h3 class="text-xl font-black">Community library</h3>
 					<a href="/ai/gallery" class="text-sm font-bold text-primary hover:underline">See all</a>
@@ -771,7 +770,7 @@
 				{/if}
 			</div>
 
-			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 				<div class="flex items-start gap-3">
 					<Icon icon="mdi:earth" class="text-2xl text-info" />
 					<div>
@@ -783,7 +782,7 @@
 				</div>
 			</div>
 
-			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 				<h3 class="mb-4 text-xl font-black">How it works</h3>
 				<ul class="space-y-4">
 					<li class="flex items-start gap-3">

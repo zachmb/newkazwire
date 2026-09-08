@@ -182,11 +182,11 @@
 	<div class="relative flex-1 bg-base-100">
 		{#if !browsing}
 			<div class="flex h-full flex-col items-center justify-center gap-6 p-6 text-center">
-				<div class="grid h-20 w-20 place-items-center rounded-3xl bg-primary/15 text-primary">
+				<div class="grid h-20 w-20 place-items-center rounded-box bg-primary/15 text-primary">
 					<Icon icon="mdi:shield-lock" class="text-5xl" />
 				</div>
 				<div>
-					<h1 class="text-3xl font-black text-base-content"><Cloak text="Private Browser" /></h1>
+					<h1 class="text-3xl font-black tracking-tight text-base-content"><Cloak text="Private Browser" /></h1>
 					<p class="mx-auto mt-2 max-w-md text-base-content/70">
 						Browse any site right here — search above or jump to a favorite. Traffic routes through {$page.url.hostname}'s own server.
 					</p>

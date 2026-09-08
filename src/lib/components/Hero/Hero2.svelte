@@ -8,26 +8,26 @@
 		<img
 			src="/logo.png"
 			alt="{$page.url.hostname} Logo"
-			class="w-full max-w-sm rounded-lg drop-shadow-2xl"
+			class="w-full max-w-sm rounded-box border border-base-content/10 shadow-sm"
 		/>
-		<div class="flex skew-x-3 flex-col gap-6 text-base-content">
+		<div class="flex flex-col gap-6 text-base-content">
 			<a href="/games">
 				<h1
-					class="text-5xl font-black uppercase transition-all hover:-skew-y-2 hover:skew-x-6 hover:scale-105 hover:text-secondary sm:text-8xl"
+					class="text-5xl font-black uppercase tracking-tight transition-all hover:scale-[1.02] hover:text-secondary sm:text-8xl"
 				>
 					Games
 				</h1>
 			</a>
 			<a href="/apps">
 				<h1
-					class="text-5xl font-black uppercase transition-all hover:skew-x-6 hover:skew-y-2 hover:scale-105 hover:text-success sm:text-8xl"
+					class="text-5xl font-black uppercase tracking-tight transition-all hover:scale-[1.02] hover:text-accent sm:text-8xl"
 				>
 					Apps
 				</h1>
 			</a>
 			<a href="/search">
 				<h1
-					class="text-5xl font-black uppercase transition-all hover:-skew-y-3 hover:skew-x-6 hover:scale-105 hover:text-primary sm:text-8xl"
+					class="text-5xl font-black uppercase tracking-tight transition-all hover:scale-[1.02] hover:text-primary sm:text-8xl"
 				>
 					Browse
 				</h1>

@@ -316,7 +316,7 @@
 <!-- Compose FAB: posting still works; a new post lands as a slide in this feed -->
 <button
 	onclick={() => (composing = true)}
-	class="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-black text-primary-content shadow-xl transition-transform active:scale-95 pb-[env(safe-area-inset-bottom)]"
+	class="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-black text-primary-content shadow-md transition-all hover:shadow-md hover:-translate-y-0.5 pb-[env(safe-area-inset-bottom)]"
 	aria-label="Create a post"
 >
 	<Icon icon="lucide:pencil" class="h-4 w-4" />
@@ -326,13 +326,13 @@
 <!-- Compose overlay -->
 {#if composing}
 	<div
-		class="fixed inset-0 z-[1000] flex items-start justify-center bg-black/60 p-4 pt-24 backdrop-blur-sm"
+		class="fixed inset-0 z-[1000] flex items-start justify-center bg-black/60 p-4 pt-24"
 		role="button"
 		tabindex="0"
 		onclick={(e) => { if (e.target === e.currentTarget) composing = false; }}
 		onkeydown={(e) => { if (e.key === 'Escape') composing = false; }}
 	>
-		<div class="w-full max-w-xl overflow-hidden rounded-3xl bg-base-100 shadow-2xl">
+		<div class="w-full max-w-xl overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-md">
 			<div class="flex items-center justify-between border-b border-base-300 px-4 py-3">
 				<h2 class="flex items-center gap-2 text-sm font-black text-base-content">
 					<Icon icon="lucide:pencil" class="h-4 w-4 text-primary" />
@@ -354,7 +354,7 @@
 <!-- Loading pill while AI gallery + posts resolve -->
 {#if loadingExtras}
 	<div
-		class="pointer-events-none fixed left-1/2 top-4 z-20 -translate-x-1/2 rounded-full bg-black/60 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur"
+		class="pointer-events-none fixed left-1/2 top-4 z-20 -translate-x-1/2 rounded-full bg-black/60 px-4 py-1.5 text-xs font-semibold text-white"
 	>
 		Loading feed…
 	</div>
@@ -364,7 +364,7 @@
 <div class="fixed right-6 top-1/2 z-20 hidden -translate-y-1/2 flex-col gap-3 md:flex">
 	<button
 		onclick={() => go(-1)}
-		class="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/25 disabled:opacity-30"
+		class="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/25 disabled:opacity-30"
 		disabled={current === 0}
 		aria-label="Previous"
 	>
@@ -372,7 +372,7 @@
 	</button>
 	<button
 		onclick={() => go(1)}
-		class="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white backdrop-blur transition hover:bg-white/25 disabled:opacity-30"
+		class="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/25 disabled:opacity-30"
 		disabled={current === items.length - 1}
 		aria-label="Next"
 	>
@@ -382,7 +382,7 @@
 
 <!-- Progress counter -->
 <div
-	class="fixed bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white backdrop-blur pb-[env(safe-area-inset-bottom)]"
+	class="fixed bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white pb-[env(safe-area-inset-bottom)]"
 >
 	{current + 1} / {items.length}
 </div>

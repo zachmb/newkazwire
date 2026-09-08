@@ -29,23 +29,24 @@
 			<div class="no-scrollbar flex flex-row justify-start gap-x-4 overflow-x-auto scroll-smooth pb-5">
 				{#each items as item (item.href)}
 					<a
-						class="block h-40 w-[18rem] flex-none text-left transition-all duration-150 hover:scale-95 hover:cursor-pointer hover:shadow-lg hover:shadow-accent"
+						class="block h-40 w-[18rem] flex-none text-left transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer hover:shadow-md"
 						href={item.href}
 						title={item.title}
 					>
-						<div class="relative h-full w-full overflow-hidden rounded-box bg-black">
+						<div class="relative h-full w-full overflow-hidden rounded-box border border-base-content/10 bg-black">
 							<img
-								class="absolute h-full w-full bg-white object-cover opacity-50"
+								class="absolute h-full w-full bg-white object-cover"
 								loading="lazy"
 								src={item.image}
 								alt={item.title}
 							/>
+							<div class="absolute inset-0 bg-black/40"></div>
 							<div class="absolute inset-0 flex flex-col justify-end gap-0.5 p-3">
-								<h3 class="text-lg font-bold leading-tight text-white drop-shadow">
+								<h3 class="text-lg font-bold leading-tight tracking-tight text-white">
 									{#if cloak}<Cloak text={item.title} />{:else}{item.title}{/if}
 								</h3>
 								{#if item.subtitle}
-									<p class="line-clamp-1 text-sm text-white/80 drop-shadow">{item.subtitle}</p>
+									<p class="line-clamp-1 text-sm text-white/80">{item.subtitle}</p>
 								{/if}
 							</div>
 						</div>

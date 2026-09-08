@@ -7,15 +7,15 @@
 </svelte:head>
 
 <div class="min-h-screen bg-base-200 p-4 text-base-content md:p-12">
-	<div class="mx-auto max-w-4xl overflow-hidden rounded-[3rem] bg-base-100 shadow-2xl">
+	<div class="mx-auto max-w-4xl overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm">
 		<!-- Header -->
 		<div class="bg-neutral p-8 text-center text-white md:p-16">
 			<div
-				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-base-100 p-2 shadow-xl ring-4 ring-[#5B9BFF]/30 transition-transform hover:scale-105"
+				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-xl bg-base-100 p-2 shadow-sm ring-1 ring-white/10 transition-transform hover:-translate-y-0.5"
 			>
-				<img src="/logo.png" alt="" class="h-full w-full rounded-2xl object-cover" />
+				<img src="/logo.png" alt="" class="h-full w-full rounded-xl object-cover" />
 			</div>
-			<h1 class="text-5xl font-black tracking-tight text-[#5B9BFF] md:text-6xl">DMCA Policy</h1>
+			<h1 class="text-5xl font-black tracking-tight text-accent md:text-6xl">DMCA Policy</h1>
 			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
 				Respecting intellectual property rights.
 			</p>

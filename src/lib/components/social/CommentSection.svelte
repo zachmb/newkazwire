@@ -244,7 +244,7 @@
 	$: totalCount = comments.reduce((n, c) => n + 1 + (c.replies?.length ?? 0), 0);
 </script>
 
-<section class="rounded-3xl bg-base-100 p-6 shadow-xl sm:p-8">
+<section class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 	<div class="mb-5 flex items-center gap-2">
 		<Icon icon="mdi:comment-multiple-outline" class="text-2xl text-primary" />
 		<h3 class="text-2xl font-black text-base-content">

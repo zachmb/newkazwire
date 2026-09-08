@@ -58,15 +58,13 @@
 >
 	{#if item.kind === 'post'}
 		<!-- POST slide: a community post surfaced inside the vertical game feed -->
-		<div class="absolute inset-0 bg-gradient-to-br from-primary/25 via-neutral to-secondary/25"></div>
-		<div
-			class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
-		></div>
+		<div class="absolute inset-0 bg-primary/15"></div>
+		<div class="pointer-events-none absolute inset-0 bg-black/50"></div>
 
 		<!-- Top chip -->
 		<div class="absolute left-4 top-4 z-10 flex items-center gap-2 pt-[env(safe-area-inset-top)]">
 			<span
-				class="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm"
+				class="flex items-center gap-1 rounded-full bg-black/50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white"
 			>
 				<Icon icon="lucide:message-square-text" class="h-3.5 w-3.5" />
 				Post
@@ -75,7 +73,7 @@
 
 		<!-- Centered post text -->
 		<div class="absolute inset-0 flex items-center justify-center px-6">
-			<p class="max-w-xl text-center text-2xl font-black leading-snug text-white drop-shadow-lg sm:text-3xl">
+			<p class="max-w-xl text-center text-2xl font-black leading-snug tracking-tight text-white sm:text-3xl">
 				{item.postText || item.title}
 			</p>
 		</div>
@@ -94,7 +92,7 @@
 			{#if item.href && item.gameTitle}
 				<a
 					href={item.href}
-					class="flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-black uppercase tracking-wide text-primary-content shadow-xl transition-transform active:scale-95"
+					class="flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-primary py-4 text-base font-black uppercase tracking-wide text-primary-content shadow-sm transition-transform active:scale-95"
 				>
 					<Icon icon="lucide:play" class="h-5 w-5" />
 					Play {item.gameTitle}
@@ -106,7 +104,7 @@
 					href={item.link}
 					target="_blank"
 					rel="noopener nofollow"
-					class="flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-white/15 py-3.5 text-sm font-bold text-white ring-1 ring-white/25 backdrop-blur-sm transition-transform active:scale-95"
+					class="flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-white/15 py-3.5 text-sm font-bold text-white ring-1 ring-white/25 transition-transform active:scale-95"
 				>
 					<Icon icon="lucide:external-link" class="h-4 w-4" />
 					{linkLabel(item.link)}
@@ -132,7 +130,7 @@
 	<!-- Fallback / loading backdrop -->
 	{#if !imgLoaded || imgFailed}
 		<div
-			class="absolute inset-0 grid place-items-center bg-gradient-to-br from-primary/30 via-neutral to-secondary/30"
+			class="absolute inset-0 grid place-items-center bg-primary/15"
 		>
 			<Icon icon="lucide:gamepad-2" class="h-16 w-16 text-base-content/30" />
 		</div>
@@ -140,10 +138,10 @@
 
 	<!-- Scrims: darken top (for chip) and bottom (for text) so content stays legible -->
 	<div
-		class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/60 to-transparent"
+		class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-black/40"
 	></div>
 	<div
-		class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/90 via-black/50 to-transparent"
+		class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-black/55"
 	></div>
 
 	<!-- Top chip -->
@@ -157,7 +155,7 @@
 			</span>
 		{:else}
 			<span
-				class="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm"
+				class="flex items-center gap-1 rounded-full bg-black/50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white"
 			>
 				{item.chip}
 			</span>
@@ -169,7 +167,7 @@
 		class="absolute bottom-32 right-4 z-10 flex flex-col items-center gap-5 text-white sm:bottom-28"
 	>
 		<div class="flex flex-col items-center gap-1">
-			<Icon icon="lucide:star" class="h-8 w-8 drop-shadow-md" />
+			<Icon icon="lucide:star" class="h-8 w-8" />
 			<span class="text-xs font-bold">{item.rating.toFixed(1)}</span>
 		</div>
 		<a
@@ -210,7 +208,7 @@
 		{/if}
 
 		<!-- Title -->
-		<h2 class="text-3xl font-black leading-tight drop-shadow-lg">{item.title}</h2>
+		<h2 class="text-3xl font-black leading-tight tracking-tight">{item.title}</h2>
 
 		<!-- Rating stars -->
 		<div class="flex items-center gap-1" aria-label="Rated {item.rating.toFixed(1)} out of 5">
@@ -225,7 +223,7 @@
 		<!-- Primary PLAY button -->
 		<a
 			href={item.href}
-			class="mt-3 flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-lg font-black uppercase tracking-wide text-primary-content shadow-xl transition-transform active:scale-95"
+			class="mt-3 flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-primary py-4 text-lg font-black uppercase tracking-wide text-primary-content shadow-sm transition-transform active:scale-95"
 		>
 			<Icon icon="lucide:play" class="h-6 w-6" />
 			Play

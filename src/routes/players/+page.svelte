@@ -103,7 +103,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-	<h1 class="mb-1 flex items-center gap-2 text-2xl font-black text-base-content">
+	<h1 class="mb-1 flex items-center gap-2 text-2xl font-black tracking-tight text-base-content">
 		<Icon icon="mdi:account-search" class="text-2xl text-primary" />
 		Find players
 	</h1>
@@ -144,14 +144,14 @@
 			</div>
 		{:else if !query.trim()}
 			<!-- Empty (nothing typed yet) -->
-			<div class="rounded-3xl bg-base-200 px-6 py-14 text-center">
+			<div class="rounded-box border border-base-content/10 bg-base-200 px-6 py-14 text-center">
 				<Icon icon="mdi:account-group-outline" class="mx-auto text-5xl text-base-content/30" />
 				<p class="mt-3 font-bold text-base-content">Start typing to find players.</p>
 				<p class="mt-1 text-sm text-base-content/50">Search by creator name.</p>
 			</div>
 		{:else if searched && results.length === 0}
 			<!-- No results -->
-			<div class="rounded-3xl bg-base-200 px-6 py-14 text-center">
+			<div class="rounded-box border border-base-content/10 bg-base-200 px-6 py-14 text-center">
 				<Icon icon="mdi:account-off-outline" class="mx-auto text-5xl text-base-content/30" />
 				<p class="mt-3 font-bold text-base-content">No players found for “{query.trim()}”.</p>
 				<p class="mt-1 text-sm text-base-content/50">Try a different name.</p>

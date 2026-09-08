@@ -278,11 +278,6 @@
 <div
 	class="font-sans relative min-h-screen overflow-hidden bg-base-200 p-4 text-base-content"
 >
-	<!-- Animated Background Pattern -->
-	<div
-		class="animated-pattern pointer-events-none absolute inset-0 z-0 opacity-[0.15] mix-blend-overlay"
-	/>
-
 	<div
 		class="relative z-10 mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]"
 	>
@@ -392,7 +387,7 @@
 			<!-- Exit Fullscreen Button -->
 			{#if expanded && !isFakeFullscreen}
 				<button
-					class="btn btn-circle btn-error fixed left-4 top-4 z-[501] shadow-lg"
+					class="btn btn-circle btn-error fixed left-4 top-4 z-[501] shadow-md"
 					on:click={shrinkiFrame}
 					aria-label="Exit Fullscreen"
 				>
@@ -403,7 +398,7 @@
 			<!-- Exit Fake Fullscreen Button -->
 			{#if isFakeFullscreen}
 				<button
-					class="btn btn-circle btn-error fixed right-4 top-4 z-[10000] shadow-lg"
+					class="btn btn-circle btn-error fixed right-4 top-4 z-[10000] shadow-md"
 					on:click={toggleFakeFullscreen}
 					aria-label="Exit Fullscreen"
 				>
@@ -414,14 +409,14 @@
 			<!-- Share Modal -->
 			{#if showShareModal}
 				<div
-					class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+					class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4"
 					on:click={closeShareModal}
 					on:keydown={(e) => e.key === 'Escape' && closeShareModal()}
 					role="button"
 					tabindex="0"
 				>
 					<div
-						class="w-full max-w-6xl rounded-3xl bg-base-100 p-8 text-center shadow-2xl"
+						class="w-full max-w-6xl rounded-box border border-base-content/10 bg-base-100 p-8 text-center shadow-md"
 						on:click|stopPropagation
 						on:keydown|stopPropagation
 						role="dialog"
@@ -452,7 +447,7 @@
 			{/if}
 
 			<!-- Description / Extra Info -->
-			<div class="rounded-3xl bg-base-100 p-6 shadow-sm">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 				<div class="mb-2 flex items-center justify-between gap-3">
 					<h2 class="text-xl font-black">About {data.game.title}</h2>
 					<a
@@ -487,11 +482,11 @@
 			<a
 				href="https://joinkaz.com"
 				target="_blank"
-				class="group flex h-64 w-full flex-col items-center justify-center gap-4 rounded-3xl bg-primary text-center transition-all hover:scale-[1.02] hover:shadow-xl"
+				class="group flex h-64 w-full flex-col items-center justify-center gap-4 rounded-box bg-primary text-center transition-all hover:-translate-y-0.5 hover:shadow-md"
 			>
 				<Icon
 					icon="ic:baseline-discord"
-					class="text-7xl text-white transition-transform group-hover:scale-110"
+					class="text-7xl text-white"
 				/>
 				<div class="flex flex-col gap-1 px-4">
 					<span class="text-lg font-bold text-white/90">Join our discord at</span>
@@ -515,20 +510,3 @@
 		</aside>
 	</div>
 </div>
-
-<style>
-	@keyframes move-pattern {
-		0% {
-			background-position: 0 0;
-		}
-		100% {
-			background-position: 100px 100px;
-		}
-	}
-
-	.animated-pattern {
-		background-image: url('/bg-pattern.png');
-		background-size: 800px;
-		animation: move-pattern 60s linear infinite;
-	}
-</style>

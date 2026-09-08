@@ -215,13 +215,13 @@
 		<main class="flex min-w-0 flex-col gap-6">
 			{#if isLoading}
 				<div
-					class="flex h-96 flex-col items-center justify-center gap-4 rounded-3xl bg-base-100 opacity-50 shadow-xl"
+					class="flex h-96 flex-col items-center justify-center gap-4 rounded-box border border-base-content/10 bg-base-100 opacity-50 shadow-sm"
 				>
 					<Icon icon="line-md:loading-alt-loop" class="text-6xl" />
 					<p class="font-bold">Loading game...</p>
 				</div>
 			{:else if error}
-				<div class="alert alert-error rounded-3xl shadow-xl">
+				<div class="alert alert-error rounded-box shadow-sm">
 					<Icon icon="mdi:alert-circle" class="text-2xl" />
 					<div class="flex flex-col">
 						<span class="font-bold">Error loading game</span>
@@ -282,14 +282,14 @@
 					<!-- Share Modal -->
 					{#if showShareModal}
 						<div
-							class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+							class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4"
 							on:click={() => (showShareModal = false)}
 							on:keydown={(e) => e.key === 'Escape' && (showShareModal = false)}
 							role="button"
 							tabindex="0"
 						>
 							<div
-								class="w-full max-w-6xl rounded-3xl bg-base-100 p-8 text-center shadow-2xl"
+								class="w-full max-w-6xl rounded-box border border-base-content/10 bg-base-100 p-8 text-center shadow-md"
 								on:click|stopPropagation
 								on:keydown|stopPropagation
 								role="dialog"
@@ -325,7 +325,7 @@
 					<!-- Game Info & Review -->
 					<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 						<!-- Info -->
-						<div class="flex flex-col gap-4 rounded-3xl bg-base-100 p-8 shadow-xl">
+						<div class="flex flex-col gap-4 rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm">
 							<div class="flex items-center justify-between">
 								<h1 class="text-3xl font-black">{game.title}</h1>
 								<div class="flex items-center gap-1 text-xl font-bold text-primary">
@@ -380,14 +380,14 @@
 						</div>
 
 						<!-- Leave a Review -->
-						<div class="flex flex-col gap-4 rounded-3xl bg-base-100 p-8 shadow-xl">
+						<div class="flex flex-col gap-4 rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm">
 							<h3 class="text-2xl font-black">Rate this Game</h3>
 							<p class="text-sm opacity-60">Tap a star and submit your rating.</p>
 
 							<div class="flex gap-2 text-3xl">
 								{#each [1, 2, 3, 4, 5] as star}
 									<button
-										class="transition-transform hover:scale-125 {rating >= star
+										class="transition-transform hover:scale-[1.1] {rating >= star
 											? 'text-primary'
 											: 'text-base-content/10'}"
 										on:click={() => (rating = star)}
@@ -423,7 +423,7 @@
 		{#if toast}
 			<div class="pointer-events-none fixed inset-x-0 bottom-6 z-[2000] flex justify-center px-4">
 				<div
-					class="pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-xl {toastKind ===
+					class="pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-md {toastKind ===
 					'success'
 						? 'bg-primary'
 						: 'bg-error'}"
@@ -437,7 +437,7 @@
 
 		<!-- Right Column -->
 		<aside class="flex flex-col gap-6">
-			<div class="rounded-3xl bg-base-100 p-6 shadow-xl">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 				<h3 class="mb-4 text-xl font-black">Pro Tip</h3>
 				<p class="text-sm leading-relaxed opacity-70">
 					AI games are experimental. If it doesn't work, try remixing it with a better description!

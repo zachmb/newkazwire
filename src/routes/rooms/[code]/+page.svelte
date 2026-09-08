@@ -196,7 +196,7 @@
 		<!-- MAIN -->
 		<main class="flex min-h-[70vh] flex-col gap-4">
 			<!-- Header -->
-			<div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-base-100 p-4 ring-1 ring-base-300">
+			<div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-content/10 bg-base-100 p-4">
 				<div class="flex items-center gap-3">
 					<a href="/rooms" class="grid h-9 w-9 place-items-center rounded-full bg-base-200 text-base-content hover:bg-base-300" aria-label="Leave"><Icon icon="mdi:arrow-left" /></a>
 					<div>
@@ -220,7 +220,7 @@
 
 			<!-- Leader controls -->
 			{#if me.isLeader && room.mode !== 'bomb'}
-				<div class="flex flex-wrap items-center gap-2 rounded-2xl bg-base-100 p-3 ring-1 ring-base-300">
+				<div class="flex flex-wrap items-center gap-2 rounded-box border border-base-content/10 bg-base-100 p-3">
 					<span class="px-1 text-xs font-bold uppercase tracking-wider text-base-content/50">You're the leader</span>
 					<button class="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-110" on:click={() => (showPicker = !showPicker)}>
 						<Icon icon="mdi:gamepad-variant" /> Pick a game
@@ -238,7 +238,7 @@
 
 			<!-- Game picker -->
 			{#if showPicker}
-				<div class="flex flex-col gap-2 rounded-2xl bg-base-100 p-3 ring-1 ring-base-300">
+				<div class="flex flex-col gap-2 rounded-box border border-base-content/10 bg-base-100 p-3">
 					<input class="input input-bordered w-full" placeholder="Search games…" bind:value={pickerQuery} />
 					<div class="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
 						{#each pickerResults as g (g.id)}
@@ -252,14 +252,14 @@
 			{/if}
 
 			<!-- STAGE -->
-			<div class="flex flex-1 flex-col overflow-hidden rounded-2xl bg-base-100 ring-1 ring-base-300">
+			<div class="flex flex-1 flex-col overflow-hidden rounded-box border border-base-content/10 bg-base-100">
 				{#if room.mode === 'bomb' && bomb}
 					<!-- BombParty -->
 					<div class="flex flex-1 flex-col items-center justify-center gap-6 p-6">
 						<div class="flex flex-wrap justify-center gap-3">
 							{#each bomb.players as p (p.id)}
 								<div
-									class="flex flex-col items-center gap-1 rounded-2xl px-4 py-3 ring-2 transition-all duration-200 {p.id === bomb.currentPlayerId ? 'scale-110 shadow-lg' : ''} {p.lives <= 0 ? 'opacity-40 grayscale' : ''}"
+									class="flex flex-col items-center gap-1 rounded-box px-4 py-3 ring-2 transition-all duration-200 {p.id === bomb.currentPlayerId ? 'scale-110 shadow-md' : ''} {p.lives <= 0 ? 'opacity-40 grayscale' : ''}"
 									style="background:{p.id === bomb.currentPlayerId ? pbg(p.id) : 'var(--fallback-b2,#f2f2f2)'};box-shadow:{p.id === bomb.currentPlayerId ? `0 0 0 3px ${pring(p.id)}` : 'none'}"
 								>
 									<span class="grid h-8 w-8 place-items-center rounded-full text-sm font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
@@ -343,7 +343,7 @@
 
 		<!-- SIDEBAR: players + chat -->
 		<aside class="flex max-h-[86vh] flex-col gap-4">
-			<div class="rounded-2xl bg-base-100 p-4 ring-1 ring-base-300">
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-4">
 				<h2 class="mb-2 flex items-center gap-2 text-sm font-black uppercase tracking-wider text-base-content/60">
 					<Icon icon="mdi:account-multiple" /> Players ({room.players.length})
 				</h2>
@@ -359,7 +359,7 @@
 				</div>
 			</div>
 
-			<div class="flex min-h-0 flex-1 flex-col rounded-2xl bg-base-100 ring-1 ring-base-300">
+			<div class="flex min-h-0 flex-1 flex-col rounded-box border border-base-content/10 bg-base-100">
 				<h2 class="flex items-center gap-2 border-b border-base-300 px-4 py-3 text-sm font-black uppercase tracking-wider text-base-content/60">
 					<Icon icon="mdi:chat" /> Chat
 				</h2>
@@ -382,8 +382,8 @@
 
 	<!-- Winner overlay -->
 	{#if winner}
-		<div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" on:click={() => (winner = null)} on:keydown role="button" tabindex="0">
-			<div class="flex flex-col items-center gap-3 rounded-3xl bg-base-100 p-8 text-center shadow-2xl">
+		<div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4" on:click={() => (winner = null)} on:keydown role="button" tabindex="0">
+			<div class="flex flex-col items-center gap-3 rounded-box border border-base-content/10 bg-base-100 p-8 text-center shadow-md">
 				<Icon icon="mdi:trophy" class="text-6xl text-warning" />
 				<h3 class="text-2xl font-black text-base-content">{winner.name} wins!</h3>
 				<p class="text-sm text-base-content/60">BombParty champion 🎉</p>

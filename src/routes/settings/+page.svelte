@@ -170,7 +170,7 @@
 </svelte:head>
 
 <div class="flex flex-row flex-wrap justify-center gap-8">
-	<div class="card w-96 bg-base-300 shadow-xl">
+	<div class="card w-96 border border-base-content/10 bg-base-200 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title justify-center">Theme</h2>
 
@@ -183,7 +183,7 @@
 		</div>
 	</div>
 
-	<div class="card w-96 bg-base-300 shadow-xl">
+	<div class="card w-96 border border-base-content/10 bg-base-200 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title justify-center">About Blank</h2>
 
@@ -193,7 +193,7 @@
 		</div>
 	</div>
 
-	<div class="card w-96 bg-base-300 shadow-xl">
+	<div class="card w-96 border border-base-content/10 bg-base-200 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title justify-center">Panic Key</h2>
 
@@ -216,7 +216,7 @@
 		</div>
 	</div>
 
-	<div class="card w-96 bg-base-300 shadow-xl">
+	<div class="card w-96 border border-base-content/10 bg-base-200 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title justify-center">Tab Cloaker</h2>
 

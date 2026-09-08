@@ -1,11 +1,12 @@
 <script lang="ts">
-	// S&P-500-style area chart: gradient fill under a trend-colored line, faint gridlines.
-	// Pure SVG, no deps. `values` is a price series (oldest → newest).
+	// S&P-500-style area chart: flat semi-transparent fill under a trend-colored line,
+	// faint gridlines. Pure SVG, no deps. `values` is a price series (oldest → newest).
+	// Line/fill hue is a data-semantic up/down indicator (green up, red down), not a
+	// brand color — kept so the trend direction stays legible.
 	export let values: number[] = [];
 	export let height = 220;
 	export let showGrid = true;
 
-	const gid = 'sc' + Math.random().toString(36).slice(2, 9);
 	const W = 1000; // viewBox width; the SVG scales to its container width
 
 	$: pts = (values || []).filter((v) => typeof v === 'number' && isFinite(v));
@@ -23,19 +24,13 @@
 </script>
 
 <svg viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" class="w-full" style="height:{height}px" role="img" aria-label="price chart">
-	<defs>
-		<linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-			<stop offset="0%" stop-color={color} stop-opacity="0.30" />
-			<stop offset="100%" stop-color={color} stop-opacity="0" />
-		</linearGradient>
-	</defs>
 	{#if showGrid}
 		{#each [0.25, 0.5, 0.75] as g}
 			<line x1="0" x2={W} y1={height * g} y2={height * g} stroke="currentColor" class="text-base-300" stroke-width="1" stroke-dasharray="3 7" vector-effect="non-scaling-stroke" />
 		{/each}
 	{/if}
 	{#if pts.length >= 2}
-		<polygon points={area} fill={`url(#${gid})`} />
+		<polygon points={area} fill={color} fill-opacity="0.15" />
 		<polyline points={line} fill="none" stroke={color} stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />
 	{:else}
 		<line x1="0" x2={W} y1={height / 2} y2={height / 2} stroke="currentColor" class="text-base-300" stroke-width="2" stroke-dasharray="4 6" vector-effect="non-scaling-stroke" />
