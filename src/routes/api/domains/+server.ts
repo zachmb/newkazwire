@@ -6,13 +6,21 @@ import {
 	addDomain,
 	countDomains,
 	isServable,
+	listLinks,
+	listLiveDomains,
 	normalizeDomain,
 	rateLimit
 } from '$lib/server/domains';
 
-/** GET /api/domains            -> { count }
- *  GET /api/domains?check=foo  -> { domain, live }  (is it registered/served + points at us) */
+/** GET /api/domains             -> { count }
+ *  GET /api/domains?check=foo   -> { domain, live }  (registered/served + points at us)
+ *  GET /api/domains?list=all    -> { domains: [...] }  (all live bare domains)
+ *  GET /api/domains?list=links  -> { links: [...] }    (full https URLs; Discord-bot pool) */
 export const GET: RequestHandler = async ({ url }) => {
+	const list = url.searchParams.get('list');
+	if (list === 'all') return json({ domains: listLiveDomains() });
+	if (list === 'links') return json({ links: listLinks() });
+
 	const check = url.searchParams.get('check');
 	if (check) {
 		const { domain, error } = normalizeDomain(check);

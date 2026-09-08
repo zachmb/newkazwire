@@ -116,7 +116,38 @@ export function isOwnedDomain(domain: string): boolean {
 /** Is this hostname allowed to be served / get a cert? (used by the Caddy ask gate) */
 export function isServable(domain: string): boolean {
 	if (isOwnedDomain(domain)) return true;
-	return load().has(domain);
+	const reg = load();
+	if (reg.has(domain)) return true;
+	// Allow subdomains of any registered community domain too (e.g. www.theirdomain.com),
+	// so a cert is issued for the www record we tell users to add.
+	const parts = domain.split('.');
+	for (let i = 1; i < parts.length - 1; i++) {
+		if (reg.has(parts.slice(i).join('.'))) return true;
+	}
+	return false;
+}
+
+// Subdomains we advertise as usable links. For our OWN domains we control the DNS
+// (these all resolve); for community domains we only promise apex + www (what users
+// are told to add). Deliberately excludes fingerprint-y names.
+const OWNED_LINK_SUBS = ['', 'www', 'play', 'games', 'go', 'unblocked', 'hub', 'new'];
+const COMMUNITY_LINK_SUBS = ['', 'www'];
+
+/** All live bare domains (our own + community-registered), deduped + sorted. */
+export function listLiveDomains(): string[] {
+	const set = new Set<string>(BASE_DOMAINS);
+	for (const d of load().keys()) set.add(d);
+	return [...set].sort();
+}
+
+/** Full https:// URLs across all live domains — the pool the Discord bot hands out. */
+export function listLinks(): string[] {
+	const urls: string[] = [];
+	for (const d of listLiveDomains()) {
+		const subs = BASE_DOMAINS.has(d) ? OWNED_LINK_SUBS : COMMUNITY_LINK_SUBS;
+		for (const s of subs) urls.push(`https://${s ? s + '.' : ''}${d}`);
+	}
+	return urls;
 }
 
 export function listDomains(): MirrorDomain[] {

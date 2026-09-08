@@ -29,7 +29,11 @@ https:// {
 
 	encode zstd gzip
 
-	# Ultraviolet bare-server + websocket upgrades
+	# Proxy transport: Wisp WebSocket (primary) + legacy bare-server (fallback).
+	# Caddy's reverse_proxy handles WebSocket upgrades and long-lived streams natively.
+	handle /w/* {
+		reverse_proxy 127.0.0.1:8080
+	}
 	handle /bare/* {
 		reverse_proxy 127.0.0.1:8080
 	}
