@@ -16,7 +16,8 @@
 				{ label: 'Apps', href: '/apps' },
 				{ label: 'Proxy', href: '/proxy' },
 				{ label: 'Create with AI', href: '/ai' },
-				{ label: 'Community', href: '/ai/gallery' }
+				{ label: 'Community', href: '/ai/gallery' },
+				{ label: 'Add your domain', href: '/portal' }
 			]
 		},
 		{

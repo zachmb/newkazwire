@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 .vercel
 
 .env*.local
+
+# local dev registry for the /portal add-your-domain feature
+.data

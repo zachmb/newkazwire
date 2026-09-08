@@ -1,0 +1,47 @@
+# Kazwire edge — Caddy with on-demand TLS.
+#
+# This REPLACES nginx as the public edge (ports 80/443) so that ANY domain a kid
+# points at this box is served automatically, with a Let's Encrypt cert issued on
+# the fly. It reverse-proxies to the same backends nginx used:
+#   - SvelteKit app (adapter-node) on 127.0.0.1:3000
+#   - Ultraviolet bare-server on   127.0.0.1:8080  (path /bare/*)
+#
+# Install: see deploy/provision-caddy.sh. Place this at /etc/caddy/Caddyfile.
+
+{
+	# Only issue certs for domains our app approves. Caddy calls this during the TLS
+	# handshake for any unknown SNI; a 200 lets it obtain a cert, anything else denies.
+	# This is what stops the on-demand endpoint from being abused into unlimited certs.
+	on_demand_tls {
+		ask http://127.0.0.1:3000/api/domains/verify
+		interval 2m
+		burst 8
+	}
+	email admin@kazwire.com
+}
+
+# Catch-all HTTPS site: matches kazwire.com, every mirror, and every user-added
+# domain. `on_demand` makes Caddy fetch a cert the first time each hostname is hit.
+https:// {
+	tls {
+		on_demand
+	}
+
+	encode zstd gzip
+
+	# Ultraviolet bare-server + websocket upgrades
+	handle /bare/* {
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	# Long-cache SvelteKit immutable assets
+	@immutable path /_app/immutable/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# Everything else -> SvelteKit app
+	reverse_proxy 127.0.0.1:3000
+
+	request_body {
+		max_size 25MB
+	}
+}
