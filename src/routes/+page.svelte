@@ -5,8 +5,18 @@
 	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
 	import HomeRail from '$lib/components/HomeRail.svelte';
 	import Cloak from '$lib/components/Cloak.svelte';
+	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+
+	// The four things you can do, surfaced as quick-access cards in the hero so the
+	// landing makes them obvious (game generator, private browser, apps, multiplayer).
+	const quickActions = [
+		{ label: 'Create with AI', sub: 'Make a game from a prompt', href: '/ai', icon: 'mdi:sparkles' },
+		{ label: 'Private browser', sub: 'Open any site', href: '/study', icon: 'mdi:shield-lock' },
+		{ label: 'Apps', sub: 'Tools & extras', href: '/apps', icon: 'ri:apps-2-fill' },
+		{ label: 'Game rooms', sub: 'Join or create a room', href: '/rooms', icon: 'mdi:account-group' }
+	];
 
 	export let data: any;
 
@@ -101,8 +111,9 @@
 </svelte:head>
 
 <div class="min-h-screen w-full bg-base-100">
-	<!-- HERO — flat, left-aligned editorial: logo + wordmark + tagline + one primary CTA -->
-	<section class="kz-wide pb-10 pt-8 md:pb-14 md:pt-12">
+	<!-- HERO — flat editorial: wordmark + tagline, then the 4 things you can do, then
+	     a clear cue to scroll into the games library below. -->
+	<section class="kz-wide pb-8 pt-8 md:pt-12">
 		<div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
 			<img
 				src="/logo.png"
@@ -114,19 +125,39 @@
 				<p class="mt-3 text-lg leading-relaxed text-base-content/60 sm:text-xl">
 					Enjoy free, fast, and safe gaming and browsing.
 				</p>
-				<div class="mt-6 flex flex-wrap gap-3">
-					<a href="#games" class="btn btn-primary">Play now</a>
-					<a href="/apps" class="btn btn-ghost border border-base-content/15">Browse apps</a>
-				</div>
 			</div>
+		</div>
+
+		<!-- Quick access to the four core destinations -->
+		<div class="mt-7 grid grid-cols-2 gap-3 sm:mt-8 lg:grid-cols-4">
+			{#each quickActions as q}
+				<a href={q.href} class="kz-card kz-card-hover flex items-center gap-3 p-4">
+					<span class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-primary/10 text-primary">
+						<Icon icon={q.icon} class="text-xl" />
+					</span>
+					<span class="min-w-0">
+						<span class="block text-sm font-black leading-tight text-base-content">{q.label}</span>
+						<span class="block truncate text-xs text-base-content/60">{q.sub}</span>
+					</span>
+				</a>
+			{/each}
+		</div>
+
+		<!-- Scroll cue into the library — a real, tappable pill so it reads actionable. -->
+		<div class="mt-7 flex justify-center sm:mt-8">
+			<a
+				href="#games"
+				class="inline-flex items-center gap-2 rounded-full border border-base-content/10 bg-base-200 px-5 py-2.5 text-sm font-bold text-base-content transition hover:border-primary hover:text-primary"
+			>
+				<Icon icon="mdi:gamepad-variant" class="text-lg text-primary" />
+				Browse {games.length}+ games
+				<Icon icon="mdi:chevron-down" class="animate-bounce text-lg" />
+			</a>
 		</div>
 	</section>
 
-	<!-- RAILS — apps first, then popular/continue/favorites, community, then categories -->
-	<div class="kz-wide flex flex-col gap-9 pb-16 md:gap-11">
-		<HomeRail title="Apps" viewMoreHref="/apps" items={apps} />
-
-		<span id="games"></span>
+	<!-- RAILS — games lead (popular/continue/favorites), then apps, community, categories -->
+	<div class="kz-wide flex flex-col gap-9 scroll-mt-24 pb-16 md:gap-11" id="games">
 		<HomeRail title="Popular" viewMoreHref="/g" items={popular} />
 
 		{#if recent.length}
@@ -136,6 +167,7 @@
 			<HomeRail title="Your favorites" items={favorites} />
 		{/if}
 
+		<HomeRail title="Apps" viewMoreHref="/apps" items={apps} />
 		<HomeRail title="Community creations" viewMoreHref="/ai/gallery" items={community} />
 
 		{#each rails as r}

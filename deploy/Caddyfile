@@ -35,6 +35,10 @@ https:// {
 	handle /bare/* {
 		reverse_proxy 127.0.0.1:8080
 	}
+	# Party/rooms websocket (BombParty-style multiplayer) — kazwire-party on :8091.
+	handle /party/* {
+		reverse_proxy 127.0.0.1:8091
+	}
 
 	# Long-cache SvelteKit immutable assets
 	@immutable path /_app/immutable/*
