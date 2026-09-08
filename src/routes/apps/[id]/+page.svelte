@@ -68,9 +68,9 @@
 		if (!browser) {
 			return url;
 		}
-		// Check if __uv$config is defined before using it
+		// Check if the browser engine config is defined before using it
 		if (typeof __uv$config === 'undefined') {
-			console.warn('Ultraviolet config not loaded yet, returning raw URL');
+			console.warn('browser engine config not loaded yet, returning raw URL');
 			return url;
 		}
 
@@ -275,7 +275,7 @@
 						</div>
 					{/if}
 
-					<!-- Proxied app -->
+					<!-- App loaded in the private browser -->
 					{#if data.app.embedURL != null}
 						<iframe
 							class="h-full w-full bg-base-100 opacity-0"

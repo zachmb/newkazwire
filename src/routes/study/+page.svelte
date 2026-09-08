@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { config } from '$lib/config';
 	import Icon from '@iconify/svelte';
 	import Cloak from '$lib/components/Cloak.svelte';
 
@@ -9,7 +8,6 @@
 	let iframe: HTMLIFrameElement;
 	let loading = false;
 	let browsing = false;
-	let swReady = false;
 	let error = '';
 
 	function toUrl(input: string): string {
@@ -23,13 +21,13 @@
 
 	function loadScript(src: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			if (document.querySelector(`script[data-uv="${src}"]`)) return resolve();
-			const s = document.createElement('script');
-			s.src = src;
-			s.dataset.uv = src;
-			s.onload = () => resolve();
-			s.onerror = () => reject(new Error('failed to load ' + src));
-			document.head.appendChild(s);
+			if (document.querySelector(`script[data-kz="${src}"]`)) return resolve();
+			const el = document.createElement('script');
+			el.src = src;
+			el.dataset.kz = src;
+			el.onload = () => resolve();
+			el.onerror = () => reject(new Error('failed to load ' + src));
+			document.head.appendChild(el);
 		});
 	}
 
@@ -40,18 +38,41 @@
 		for (let i = 0; i < 50 && !(window as any).__uv$config; i++) {
 			await new Promise((r) => setTimeout(r, 100));
 		}
-		if (!(window as any).__uv$config) throw new Error('proxy config failed to load');
+		if (!(window as any).__uv$config) throw new Error('service config failed to load');
 	}
 
-	async function ensureSW() {
-		if (swReady) return true;
-		try {
-			if (!('serviceWorker' in navigator)) throw new Error('service workers are not supported in this browser');
+	// The wisp websocket endpoint (cloaked). Must match static/uv/uv.config.js and
+	// the edge config. Uses wss:// on https, ws:// on http.
+	function wispUrl(): string {
+		const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+		return `${proto}://${location.host}/w/`;
+	}
+
+	// One-time setup: pick the Wisp transport via bare-mux BEFORE the UV service
+	// worker is registered, then register the SW under the cloaked scope.
+	let started: Promise<void> | null = null;
+	function ensureReady(): Promise<void> {
+		if (started) return started;
+		const run = (async () => {
+			if (!('serviceWorker' in navigator)) {
+				throw new Error('service workers are not supported in this browser');
+			}
 			await loadUVConfig();
 			const cfg = (window as any).__uv$config;
+
+			// bare-mux + epoxy(Wisp) transport — set the transport first so the SW
+			// has a live connection the instant it takes control. The specifier is
+			// held in a variable + @vite-ignore so it stays a RUNTIME URL (served
+			// from static/baremux/), not something the bundler/TS tries to resolve.
+			const baremuxUrl = '/baremux/index.mjs';
+			const baremux: any = await import(/* @vite-ignore */ baremuxUrl);
+			const conn = new baremux.BareMuxConnection('/baremux/worker.js');
+			await conn.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl() }]);
+
+			// Register the UV 3.x service worker under the cloaked scope (/edu/).
 			const reg = await navigator.serviceWorker.register('/uv.js', { scope: cfg.prefix });
-			// Wait for the worker to ACTIVATE. We can't use navigator.serviceWorker.ready
-			// because this page (/proxy) is outside the SW scope (/service/), so ready never resolves.
+			// Wait for ACTIVATION. We can't use navigator.serviceWorker.ready because
+			// this page is outside the SW scope, so `ready` never resolves here.
 			if (!reg.active) {
 				await new Promise<void>((resolve) => {
 					const sw = reg.installing || reg.waiting;
@@ -61,12 +82,13 @@
 					done();
 				});
 			}
-			swReady = true;
-			return true;
-		} catch (e: any) {
-			error = 'Could not start the proxy service worker: ' + (e?.message || e);
-			return false;
-		}
+		})();
+		started = run.catch((e: any) => {
+			started = null; // allow a retry
+			error = 'Could not start the private browser: ' + (e?.message || e);
+			throw e;
+		});
+		return started;
 	}
 
 	async function go(e?: Event) {
@@ -74,7 +96,11 @@
 		error = '';
 		const url = toUrl(query);
 		if (!url) return;
-		if (!(await ensureSW())) return;
+		try {
+			await ensureReady();
+		} catch {
+			return;
+		}
 		const cfg = (window as any).__uv$config;
 		loading = true;
 		browsing = true;
@@ -97,7 +123,9 @@
 
 	onMount(() => {
 		window.scrollTo(0, 0);
-		ensureSW();
+		ensureReady().catch(() => {
+			/* surfaced via `error` */
+		});
 	});
 
 	const quickLinks = [

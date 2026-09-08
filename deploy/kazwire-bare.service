@@ -1,5 +1,5 @@
 [Unit]
-Description=Kazwire Ultraviolet bare-server
+Description=Kazwire proxy transport server (Wisp + legacy bare fallback)
 After=network.target
 
 [Service]
@@ -8,7 +8,10 @@ WorkingDirectory=/opt/kazwire
 Environment=NODE_ENV=production
 Environment=BARE_HOST=127.0.0.1
 Environment=BARE_PORT=8080
-ExecStart=/usr/bin/node server/bare-server.cjs
+Environment=WISP_PATH=/w/
+# Combined server: Wisp on /w/ (the transport UV 3.x actually uses) + the legacy
+# @tomphttp bare relay on /bare/ as a dormant fallback, in one process on :8080.
+ExecStart=/usr/bin/node server/proxy-server.cjs
 Restart=always
 RestartSec=3
 User=kazwire

@@ -21,7 +21,7 @@ export const load: PageLoad = async ({ params, data }) => {
 			description: app.description || 'No description available',
 			developer: '',
 			image: app.image, // Map thumbnail_url to image for compatibility
-			embedURL: app.url || app.href, // real site to proxy (falls back to href)
+			embedURL: app.url || app.href, // real site to load in the private browser (falls back to href)
 			views: 1000,
 			loves: 5          // Map likes to loves for compatibility with local state if needed
 		}

@@ -14,7 +14,7 @@
 			links: [
 				{ label: 'Games', href: '/' },
 				{ label: 'Apps', href: '/apps' },
-				{ label: 'Proxy', href: '/proxy' },
+				{ label: 'Study', href: '/study' },
 				{ label: 'Create with AI', href: '/ai' },
 				{ label: 'Community', href: '/ai/gallery' },
 				{ label: 'Add your domain', href: '/portal' }

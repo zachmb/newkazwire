@@ -4,8 +4,8 @@ export interface AppEntry {
     description: string;
     image: string; // bucket filename (app/img/…) OR a full http(s)/absolute URL
     href: string;
-    url?: string; // the real site to proxy through Ultraviolet (embedURL)
-    internal?: boolean; // links straight to an internal route (href) instead of the proxy player
+    url?: string; // the real site to load through the private browser (embedURL)
+    internal?: boolean; // links straight to an internal route (href) instead of the browser player
 }
 
 export const apps: AppEntry[] = [
@@ -46,7 +46,7 @@ export const apps: AppEntry[] = [
         title: "Private Browser",
         description: "Browse any site privately.",
         image: "/logo.png",
-        href: "/proxy",
+        href: "/study",
         internal: true
     }
 ];

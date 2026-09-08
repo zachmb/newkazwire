@@ -127,17 +127,17 @@
 			<span class="hidden sm:inline"><Cloak text="Create" /></span>
 		</a>
 
-		<!-- Proxy CTA (always visible, prominent) -->
+		<!-- Private-browser CTA (always visible, prominent) -->
 		<a
-			href="/proxy"
+			href="/study"
 			class="flex flex-none items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110 sm:px-4"
 			title="Open the private browser"
 		>
 			<Icon icon="mdi:shield-lock" class="text-lg" />
-			<span class="hidden sm:inline"><Cloak text="Proxy" /></span>
+			<span class="hidden sm:inline"><Cloak text="Study" /></span>
 		</a>
 
-		<!-- Discord CTA (always visible), to the right of Proxy -->
+		<!-- Discord CTA (always visible), to the right of the Study CTA -->
 		{#if config.social.discord}
 			<a
 				href={config.social.discord}
