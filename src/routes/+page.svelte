@@ -112,7 +112,7 @@
 			<div class="max-w-2xl">
 				<h1 class="text-4xl font-black tracking-tight sm:text-6xl"><Cloak text={host} /></h1>
 				<p class="mt-3 text-lg leading-relaxed text-base-content/60 sm:text-xl">
-					Free, fast games and a private browser — no downloads, no waiting. Just click and play.
+					Enjoy free, fast, and safe gaming and browsing.
 				</p>
 				<div class="mt-6 flex flex-wrap gap-3">
 					<a href="#games" class="btn btn-primary">Play now</a>

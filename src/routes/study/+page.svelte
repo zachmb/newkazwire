@@ -10,6 +10,15 @@
 	let browsing = false;
 	let error = '';
 
+	// Bump on any change to the proxy asset set (uv.*/baremux/epoxy) so returning
+	// browsers can't run a STALE cached service worker against the new config. The
+	// pre-Wisp UV2 SW read `__uv$config.bare` (removed in the Wisp migration), so a
+	// cached UV2 /uv.js did `new URL(undefined)` → "Could not start the private
+	// browser". Versioned URLs + updateViaCache:'none' + unregistering old workers
+	// force a clean, matched set. (Assets are served without Cache-Control.)
+	const UV_VERSION = '2026-09-08a';
+	const v = (path: string) => `${path}${path.includes('?') ? '&' : '?'}v=${UV_VERSION}`;
+
 	function toUrl(input: string): string {
 		const s = input.trim();
 		if (!s) return '';
@@ -33,8 +42,8 @@
 
 	async function loadUVConfig() {
 		if ((window as any).__uv$config) return;
-		await loadScript('/uv/uv.bundle.js');
-		await loadScript('/uv/uv.config.js');
+		await loadScript(v('/uv/uv.bundle.js'));
+		await loadScript(v('/uv/uv.config.js'));
 		for (let i = 0; i < 50 && !(window as any).__uv$config; i++) {
 			await new Promise((r) => setTimeout(r, 100));
 		}
@@ -48,6 +57,24 @@
 		return `${proto}://${location.host}/w/`;
 	}
 
+	// Drop any proxy service worker registered before this asset version — including
+	// the pre-cloak `/service/`-scoped UV2 worker and any unversioned `/uv.js` a
+	// browser cached. Without this, a returning user runs stale UV2 code against the
+	// new config and hits `new URL(undefined)`.
+	async function cleanupStaleSW(): Promise<void> {
+		try {
+			const regs = await navigator.serviceWorker.getRegistrations();
+			await Promise.all(
+				regs.map((r) => {
+					const url = r.active?.scriptURL || r.waiting?.scriptURL || r.installing?.scriptURL || '';
+					return url.includes(`v=${UV_VERSION}`) ? Promise.resolve(true) : r.unregister().catch(() => false);
+				})
+			);
+		} catch {
+			/* best-effort */
+		}
+	}
+
 	// One-time setup: pick the Wisp transport via bare-mux BEFORE the UV service
 	// worker is registered, then register the SW under the cloaked scope.
 	let started: Promise<void> | null = null;
@@ -57,6 +84,7 @@
 			if (!('serviceWorker' in navigator)) {
 				throw new Error('service workers are not supported in this browser');
 			}
+			await cleanupStaleSW();
 			await loadUVConfig();
 			const cfg = (window as any).__uv$config;
 
@@ -64,13 +92,19 @@
 			// has a live connection the instant it takes control. The specifier is
 			// held in a variable + @vite-ignore so it stays a RUNTIME URL (served
 			// from static/baremux/), not something the bundler/TS tries to resolve.
-			const baremuxUrl = '/baremux/index.mjs';
+			const baremuxUrl = v('/baremux/index.mjs');
 			const baremux: any = await import(/* @vite-ignore */ baremuxUrl);
-			const conn = new baremux.BareMuxConnection('/baremux/worker.js');
-			await conn.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl() }]);
+			const conn = new baremux.BareMuxConnection(v('/baremux/worker.js'));
+			await conn.setTransport(v('/epoxy/index.mjs'), [{ wisp: wispUrl() }]);
 
 			// Register the UV 3.x service worker under the cloaked scope (/edu/).
-			const reg = await navigator.serviceWorker.register('/uv.js', { scope: cfg.prefix });
+			// updateViaCache:'none' makes the browser fetch the SW script AND its
+			// importScripts (uv.sw.js/uv.bundle.js) bypassing the HTTP cache, so a
+			// stale UV2 worker can never load against the new config.
+			const reg = await navigator.serviceWorker.register(v('/uv.js'), {
+				scope: cfg.prefix,
+				updateViaCache: 'none'
+			});
 			// Wait for ACTIVATION. We can't use navigator.serviceWorker.ready because
 			// this page is outside the SW scope, so `ready` never resolves here.
 			if (!reg.active) {
