@@ -1,0 +1,9 @@
+[Unit]
+Description=Kazwire uptime watchdog (health probe + self-heal)
+After=network.target caddy.service kazwire.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/kazwire/deploy/healthcheck.sh
+# needs root to restart services
+User=root
