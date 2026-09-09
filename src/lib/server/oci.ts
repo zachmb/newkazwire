@@ -175,7 +175,19 @@ export function checkStorageLimits(newGameSizeBytes: number, registry: UserGame[
     }
 }
 
+// In-process write lock: registry/market updates are read-modify-write on one JSON
+// object, so two concurrent requests could clobber each other (lost game / market
+// double-spend). Serializing them in this single-node process closes the race.
+const _locks = new Map<string, Promise<unknown>>();
+export function withLock<T>(key: string, fn: () => Promise<T>): Promise<T> {
+    const prev = _locks.get(key) || Promise.resolve();
+    const run = prev.then(fn, fn);
+    _locks.set(key, run.then(() => undefined, () => undefined));
+    return run;
+}
+
 export async function addToRegistry(game: UserGame) {
+    return withLock('registry', async () => {
     const registry = await getRegistry();
     registry.push(game);
     await uploadToOCI(OCI_REGISTRY_PATH, JSON.stringify(registry), 'application/json');
@@ -190,6 +202,7 @@ export async function addToRegistry(game: UserGame) {
     }
 
     throw new Error(`Registry write did not publish game ${game.id} after retries.`);
+    });
 }
 
 /**
@@ -239,9 +252,13 @@ export async function saveTelemetry(sessionId: string, payload: any) {
         };
     }
 
-    // 2. Append new events
+    // 2. Append new events — capped so a hostile client can't grow a session file
+    // without bound (max 100 events per call, 1000 stored per session).
     if (payload.events && Array.isArray(payload.events)) {
-        sessionData.events.push(...payload.events);
+        sessionData.events.push(...payload.events.slice(0, 100));
+        if (sessionData.events.length > 1000) {
+            sessionData.events = sessionData.events.slice(-1000);
+        }
     }
 
     // 3. Update metadata
@@ -1068,6 +1085,18 @@ export async function tradeMarket(
     const { assetId, action } = args;
     const amount = Number(args.amount);
     if (!assetId || !Number.isFinite(amount) || amount <= 0) return { ok: false, error: 'Invalid trade.' };
+    // Serialize trades: concurrent read-modify-writes on the shared market/wallet
+    // JSON could double-spend shares/coins. One at a time in this process.
+    return withLock('market', () => tradeMarketUnlocked(uid, args, action, amount));
+}
+
+async function tradeMarketUnlocked(
+    uid: string,
+    args: { assetId: string; kind?: 'game' | 'ai' | 'post'; title?: string; action: 'buy' | 'sell'; amount: number },
+    action: 'buy' | 'sell',
+    amount: number
+): Promise<TradeResult> {
+    const { assetId } = args;
 
     const m = await getMarket();
     const now = new Date().toISOString();

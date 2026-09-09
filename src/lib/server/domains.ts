@@ -154,7 +154,9 @@ export function listLinks(): string[] {
 // so a user adding a link can't inject a dead (or malicious) domain into the pool
 // the bot serves to everyone. Owned domains skip the check (always live). Cached.
 const dnsCache = new Map<string, { ok: boolean; ts: number }>();
-const DNS_TTL_MS = 10 * 60 * 1000;
+// Short TTL: a community domain that re-points its DNS away from Kazwire falls out
+// of the hand-out pool within ~2 minutes (lookups are cheap and cached).
+const DNS_TTL_MS = 2 * 60 * 1000;
 async function resolvesToKazwire(domain: string): Promise<boolean> {
 	const cached = dnsCache.get(domain);
 	if (cached && Date.now() - cached.ts < DNS_TTL_MS) return cached.ok;
@@ -233,7 +235,9 @@ const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const MAX_PER_WINDOW = 10; // 10 new domains / IP / hour
 
 export function rateLimit(ip: string, now = Date.now()): { ok: boolean; retryAfterSec?: number } {
-	if (!ip) return { ok: true };
+	// No resolvable IP (misconfigured proxy hop) -> share one bucket instead of
+	// bypassing the limit, so an attacker can't strip headers for unlimited adds.
+	if (!ip) ip = '__unknown__';
 	const arr = (HITS.get(ip) || []).filter((t) => now - t < WINDOW_MS);
 	if (arr.length >= MAX_PER_WINDOW) {
 		const retryAfterSec = Math.ceil((WINDOW_MS - (now - arr[0])) / 1000);

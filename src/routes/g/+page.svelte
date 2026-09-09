@@ -16,9 +16,9 @@
 
 	function search() {
 		if (searchQuery === '') {
-			window.location.href = '/games';
+			window.location.href = '/g';
 		} else {
-			window.location.href = '/games?search=' + searchQuery;
+			window.location.href = '/g?search=' + searchQuery;
 		}
 	}
 </script>
@@ -41,9 +41,9 @@
 			bind:value={tagQuery}
 			on:change={() => {
 				if (tagQuery === 'all') {
-					window.location.href = '/games';
+					window.location.href = '/g';
 				} else {
-					window.location.href = '/games?tag=' + tagQuery;
+					window.location.href = '/g?tag=' + tagQuery;
 				}
 			}}
 		>
@@ -78,7 +78,7 @@
 			id={'gamePage-' + game.id}
 			developer={game.developer}
 			image={game.thumbnail_url || getCDNImageUrl(game.image, 'game')}
-			link={'/games/' + (game.slug || game.id)}
+			link={'/g/' + (game.slug || game.id)}
 		/>
 	{/each}
 </grid>
