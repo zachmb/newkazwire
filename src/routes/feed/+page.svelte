@@ -28,10 +28,13 @@
 		creatorLocation?: string;
 		rating: number;
 		chip: string;
+		postId?: string;
 		postText?: string;
 		gameTitle?: string;
 		link?: string;
 		likes?: number;
+		replyCount?: number;
+		createdAt?: number | string;
 	};
 
 	type PublicUserGame = {
@@ -54,6 +57,7 @@
 		link?: string;
 		createdAt: number | string;
 		likes: number;
+		replies?: unknown[];
 	};
 
 	// Deterministic pseudo-rating for library games (no rating field in data).
@@ -99,10 +103,13 @@
 			creatorName: p.author || 'Anonymous',
 			rating: 0,
 			chip: 'Post',
+			postId: p.id,
 			postText: p.text,
 			gameTitle: p.gameTitle,
 			link: p.link,
-			likes: p.likes
+			likes: p.likes,
+			replyCount: Array.isArray(p.replies) ? p.replies.length : 0,
+			createdAt: p.createdAt
 		};
 	}
 
@@ -313,14 +320,15 @@
 	{/each}
 </div>
 
-<!-- Compose FAB: posting still works; a new post lands as a slide in this feed -->
+<!-- Compose FAB: posting still works; a new post lands as a slide in this feed.
+     Labeled + reachable on mobile and desktop; clearly the primary action. -->
 <button
 	onclick={() => (composing = true)}
-	class="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-black text-primary-content shadow-md transition-all hover:shadow-md hover:-translate-y-0.5 pb-[env(safe-area-inset-bottom)]"
+	class="fixed bottom-16 right-4 z-40 flex items-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-black text-primary-content shadow-md transition-transform hover:-translate-y-0.5 active:scale-95 mb-[env(safe-area-inset-bottom)] sm:bottom-6"
 	aria-label="Create a post"
 >
 	<Icon icon="lucide:pencil" class="h-4 w-4" />
-	Post
+	New post
 </button>
 
 <!-- Compose overlay -->

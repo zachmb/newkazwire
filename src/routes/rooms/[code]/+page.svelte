@@ -188,6 +188,12 @@
 
 	$: myTurn = bomb && bomb.currentPlayerId === me.id;
 	$: currentPlayerName = bomb ? bomb.players.find((p: any) => p.id === bomb.currentPlayerId)?.name : '';
+
+	// BombParty needs 2+ players. Gate the button on it, and clear the stale
+	// "need 2 players" warning the moment a second player shows up.
+	$: playerCount = room?.players?.length || 0;
+	$: canStartBomb = playerCount >= 2;
+	$: if (canStartBomb && errorMsg === 'Need at least 2 players to start.') errorMsg = '';
 </script>
 
 
@@ -225,9 +231,17 @@
 					<button class="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-110" on:click={() => (showPicker = !showPicker)}>
 						<Icon icon="mdi:gamepad-variant" /> Pick a game
 					</button>
-					<button class="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm font-bold text-white hover:brightness-110" on:click={() => send({ t: 'startBomb' })}>
+					<button
+						class="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+						disabled={!canStartBomb}
+						title={canStartBomb ? 'Start BombParty' : 'Need at least 2 players'}
+						on:click={() => send({ t: 'startBomb' })}
+					>
 						<Icon icon="mdi:bomb" /> Start BombParty
 					</button>
+					{#if !canStartBomb}
+						<span class="px-1 text-xs font-semibold text-base-content/50">Grab one more player to start</span>
+					{/if}
 					{#if room.currentGame}
 						<button class="flex items-center gap-1.5 rounded-full bg-base-200 px-4 py-2 text-sm font-bold text-base-content hover:bg-base-300" on:click={() => send({ t: 'backToLobby' })}>
 							<Icon icon="mdi:home" /> Lobby

@@ -184,19 +184,21 @@
 		</p>
 		<div class="flex gap-3">
 			<div
-				class="mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-base-300 text-base-content/50"
+				class="mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/15 text-primary"
 				aria-hidden="true"
 			>
 				<Icon icon="lucide:user" class="h-5 w-5" />
 			</div>
 
 			<div class="min-w-0 flex-1">
+				<!-- svelte-ignore a11y_autofocus -->
 				<textarea
 					bind:value={text}
 					maxlength={MAX + 200}
-					rows="2"
+					rows="4"
+					autofocus
 					placeholder="What's happening?"
-					class="w-full resize-none border-0 bg-transparent p-0 text-[15px] leading-relaxed text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-0"
+					class="w-full resize-none rounded-xl border border-base-300 bg-base-200 p-3 text-base leading-relaxed text-base-content placeholder:text-base-content/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
 					onkeydown={(e) => {
 						if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submit();
 					}}
@@ -267,7 +269,7 @@
 				{/if}
 
 				<!-- Action bar -->
-				<div class="mt-3 flex items-center justify-between">
+				<div class="mt-3 flex items-center justify-between gap-2">
 					<button
 						type="button"
 						onclick={loadGames}
@@ -292,7 +294,7 @@
 							type="button"
 							onclick={submit}
 							disabled={!canPost}
-							class="btn btn-primary btn-sm rounded-full px-5"
+							class="btn btn-primary btn-sm rounded-full px-6 text-primary-content"
 						>
 							{#if posting}
 								<span class="loading loading-spinner loading-xs"></span>
@@ -301,6 +303,9 @@
 						</button>
 					</div>
 				</div>
+				<p class="mt-2 text-right text-[11px] text-base-content/40">
+					Press ⌘/Ctrl + Enter to post
+				</p>
 			</div>
 		</div>
 	{/if}

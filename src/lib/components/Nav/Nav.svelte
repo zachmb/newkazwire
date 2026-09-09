@@ -57,7 +57,7 @@
 	YouTube Playables (mobbin.com/screens/51422fe7-611e-4ab3-a865-fa61050ff5ce).
 -->
 <header class="sticky top-0 z-50 border-b border-base-300 bg-base-200">
-	<nav class="mx-auto flex h-16 max-w-[1800px] items-center gap-3 px-3 sm:px-5">
+	<nav class="mx-auto flex h-16 max-w-[1800px] items-center gap-1.5 px-3 sm:gap-3 sm:px-5">
 		<!--
 			BRAND TILE — explicitly self-lit so it survives OS/UA dark mode.
 			Bug fix: the wordmark previously inherited theme colors; a UA honoring
@@ -143,7 +143,7 @@
 				href={config.social.discord}
 				target="_blank"
 				rel="noopener"
-				class="grid h-10 w-10 flex-none place-items-center rounded-full bg-[#5865F2]/10 text-[#5865F2] transition hover:bg-[#5865F2] hover:text-white"
+				class="hidden h-10 w-10 flex-none place-items-center rounded-full bg-[#5865F2]/10 text-[#5865F2] transition hover:bg-[#5865F2] hover:text-white lg:grid"
 				aria-label="Join our Discord"
 				title="Join our Discord community"
 			>
@@ -154,7 +154,7 @@
 		<!-- Theme toggle (light/dark) -->
 		<button
 			on:click={toggleTheme}
-			class="grid h-10 w-10 flex-none place-items-center rounded-full text-base-content/80 transition hover:bg-primary/10 hover:text-primary"
+			class="hidden h-10 w-10 flex-none place-items-center rounded-full text-base-content/80 transition hover:bg-primary/10 hover:text-primary sm:grid"
 			aria-label="Toggle dark mode"
 			title="Toggle dark mode"
 		>
