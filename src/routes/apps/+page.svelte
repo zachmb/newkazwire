@@ -51,7 +51,7 @@
 	{#each data.apps as app}
 		<DefaultBox
 			name={app.title}
-			developer={'Unknown'}
+			developer={app.description || ''}
 			id={'appPage-' + app.id}
 			image={app.image.startsWith('http') || app.image.startsWith('/') ? app.image : getCDNImageUrl(app.image, 'app')}
 			link={app.internal ? app.href : '/apps/' + app.id}

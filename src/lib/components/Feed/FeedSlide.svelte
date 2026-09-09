@@ -166,7 +166,9 @@
 		-->
 		<div class="absolute inset-0 bg-base-200"></div>
 
-		<div class="relative z-10 flex h-full w-full items-center justify-center overflow-y-auto px-4 py-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+		<!-- Top-aligned (not centered): a lone short post otherwise floats in an empty
+		     viewport and reads as broken rather than "top of the feed". -->
+		<div class="relative z-10 flex h-full w-full items-start justify-center overflow-y-auto px-4 pb-16 pt-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 			<div class="flex w-full max-w-xl flex-col rounded-box border border-base-content/10 bg-base-100 p-5 shadow-sm sm:p-6">
 				<!-- Header: chip + author + time -->
 				<div class="flex items-center gap-3">

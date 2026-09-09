@@ -81,7 +81,7 @@
 
 		<!-- Search -->
 		{#if config.features.searchBar}
-			<form on:submit={submitSearch} class="mx-auto flex w-full min-w-0 max-w-xl items-center">
+			<form on:submit={submitSearch} class="mx-auto flex w-full min-w-[9rem] max-w-xl items-center">
 				<label class="flex w-full items-center gap-2 rounded-btn bg-base-100 px-4 py-2 ring-1 ring-base-300 transition focus-within:ring-2 focus-within:ring-primary">
 					<Icon icon="mdi:magnify" class="text-xl text-base-content/60" />
 					<input
@@ -93,7 +93,7 @@
 						class="w-full bg-transparent text-sm font-medium text-base-content placeholder:text-base-content/50 focus:outline-none"
 						aria-label="Search games"
 					/>
-					<span class="hidden min-w-fit gap-1 sm:flex">
+					<span class="hidden min-w-fit gap-1 xl:flex">
 						<kbd class="kbd kbd-sm">ctrl</kbd><kbd class="kbd kbd-sm">k</kbd>
 					</span>
 				</label>
@@ -107,12 +107,14 @@
 			{#each links as l}
 				<a
 					href={l.href}
+					title={l.label}
 					class="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-bold transition {isActive(l.href, $page.url.pathname)
 						? 'bg-primary/15 text-primary'
 						: 'text-base-content/80 hover:bg-primary/10 hover:text-primary'}"
 				>
 					<Icon icon={l.icon} class="text-lg" />
-					<Cloak text={l.label} />
+					<!-- Labels only at xl+ — at lg the row is tight and starves the search box. -->
+					<span class="hidden xl:inline"><Cloak text={l.label} /></span>
 				</a>
 			{/each}
 		</div>
