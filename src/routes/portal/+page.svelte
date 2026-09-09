@@ -158,7 +158,7 @@
 			/>
 			<button
 				type="submit"
-				disabled={submitting || !domain.trim()}
+				disabled={submitting || !/^\S+\.\S{2,}$/.test(domain.trim().replace(/^[a-z]+:\/\//i, '').replace(/[/?#].*$/, ''))}
 				class="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-black text-white transition hover:brightness-110 disabled:opacity-50"
 			>
 				{#if submitting}

@@ -23,6 +23,7 @@
 // be passed through untouched. A build that dropped this split and XOR'd the whole
 // string garbled the query on every URL that carried one — exactly the
 // "SyntaxError / Failed to load accounts.google.com/...?<garbage>" the sign-in flow hit.
+if (!self.__uv$config) {
 const xorEncode = (str) => {
 	if (!str) return str;
 	let result = '';
@@ -53,3 +54,5 @@ self.__uv$config = {
 	config: '/uv/uv.config.js',
 	sw: '/uv/uv.sw.js'
 };
+
+}
