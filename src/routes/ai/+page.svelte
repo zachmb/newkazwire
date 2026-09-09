@@ -62,12 +62,35 @@
 			iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;height:600px;border:0;';
 			iframe.srcdoc = code;
 			document.body.appendChild(iframe);
+			// Reject a blank/near-uniform frame (empty or all-black canvas) so the game
+			// falls back to generated cover art instead of shipping a black tile.
+			const isBlank = (c: HTMLCanvasElement): boolean => {
+				try {
+					const s = document.createElement('canvas');
+					s.width = 32;
+					s.height = 18;
+					const ctx = s.getContext('2d');
+					if (!ctx) return false;
+					ctx.drawImage(c, 0, 0, 32, 18);
+					const d = ctx.getImageData(0, 0, 32, 18).data;
+					let min = 255, max = 0, sumA = 0;
+					for (let i = 0; i < d.length; i += 4) {
+						const lum = (d[i] + d[i + 1] + d[i + 2]) / 3;
+						if (lum < min) min = lum;
+						if (lum > max) max = lum;
+						sumA += d[i + 3];
+					}
+					return max - min < 12 || sumA === 0; // uniform color or fully transparent
+				} catch {
+					return false;
+				}
+			};
 			const grab = () => {
 				try {
 					const doc = iframe.contentWindow?.document;
 					const canvases = doc ? Array.from(doc.querySelectorAll('canvas')) : [];
 					const c = canvases.sort((a, b) => (b.width * b.height) - (a.width * a.height))[0];
-					if (c && c.width > 0 && c.height > 0) {
+					if (c && c.width > 0 && c.height > 0 && !isBlank(c)) {
 						finish(c.toDataURL('image/png'));
 						return;
 					}
@@ -112,8 +135,8 @@
 	}
 
 	async function handleGenerate() {
-		if (!prompt || !title) {
-			error = 'Please provide a title and a prompt.';
+		if (!prompt) {
+			error = 'Please describe the game you want to make.';
 			return;
 		}
 		// NAME-GATE: a player must name themselves before generating.
@@ -201,6 +224,14 @@
 					.trim();
 			} else if (gameCode.startsWith('```')) {
 				gameCode = gameCode.replace(/^```/, '').replace(/```$/, '').trim();
+			}
+
+			// AI-generated title: if the player didn't name it, adopt the name the AI
+			// gave the game in its own <title> (its start screen). Never leave it blank.
+			if (!title.trim()) {
+				const m = gameCode.match(/<title>\s*([^<]{1,60}?)\s*<\/title>/i);
+				const aiTitle = m && m[1].trim();
+				title = aiTitle && !/^(document|untitled|game|snake)$/i.test(aiTitle) ? aiTitle : 'Untitled Game';
 			}
 
 			const blob = new Blob([gameCode], { type: 'text/html' });
@@ -446,10 +477,10 @@
 
 						<div class="flex w-full flex-col gap-4">
 							<label class="form-control w-full">
-								<span class="label-text mb-1 font-bold">Game title</span>
+								<span class="label-text mb-1 font-bold">Game title <span class="font-normal opacity-50">— optional, AI names it for you</span></span>
 								<input
 									type="text"
-									placeholder="e.g. Neon Breakout, Zombie Survival..."
+									placeholder="Leave blank and the AI will name it"
 									class="input input-bordered input-lg w-full rounded-2xl"
 									bind:value={title}
 									disabled={isGenerating}

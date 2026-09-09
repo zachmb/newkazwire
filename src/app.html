@@ -25,10 +25,18 @@
 	<link rel="dns-prefetch" href="https://objectstorage.us-chicago-1.oraclecloud.com" />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<!-- Google AdSense loader (ca-pub-7648886706850999 — matches static/ads.txt). Without
+	     this the adsbygoogle ad units across the site never fill. -->
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7648886706850999" crossorigin="anonymous"></script>
+	<!-- Google Tag Manager (container GTM-KVGNDGZ7 — carries GA4). Loaded here so
+	     analytics fires on every route (the GTM component was never mounted anywhere). -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KVGNDGZ7');</script>
 	%sveltekit.head%
 </head>
 
 <body class="bg-base-100 text-base-content font-sans">
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVGNDGZ7" height="0" width="0" style="display:none;visibility:hidden" title="gtm"></iframe></noscript>
 	<div style="display: contents">%sveltekit.body%</div>
 </body>
 

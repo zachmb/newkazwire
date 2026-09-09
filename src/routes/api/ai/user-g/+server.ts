@@ -14,9 +14,19 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         const { title, description, code, sourceGameId, creatorName, cover, creatorUid, source } =
             await request.json();
 
-        if (!title || !code) {
-            return json({ error: 'Title and code are required' }, { status: 400 });
+        if (!code) {
+            return json({ error: 'Code is required' }, { status: 400 });
         }
+
+        // Every game gets a title: the player's, else the name the AI gave it in its
+        // own <title>, else a generic fallback. Never blank in the gallery.
+        let safeTitle = (typeof title === 'string' ? title : '').trim();
+        if (!safeTitle) {
+            const m = String(code).match(/<title>\s*([^<]{1,60}?)\s*<\/title>/i);
+            const aiTitle = m && m[1].trim();
+            safeTitle = aiTitle && !/^(document|untitled|game)$/i.test(aiTitle) ? aiTitle : 'Untitled Game';
+        }
+        safeTitle = safeTitle.slice(0, 80);
 
         // Real visitor IP (behind nginx, getClientAddress() is 127.0.0.1 — read XFF).
         const ip = getRealIp(request, getClientAddress);
@@ -60,7 +70,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         const cleanCreator = cleanName(creatorName);
         const newGame: UserGame = {
             id,
-            title,
+            title: safeTitle,
             description: description || '',
             codeUrl,
             creatorIp: ip,

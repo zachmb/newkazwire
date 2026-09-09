@@ -9,17 +9,24 @@
 	let userGames: any[] = [];
 	let isLoading = true;
 	let error = '';
+	let sort: 'new' | 'top' = 'new';
 
 	$: mappedGames = games.map((g) => ({
 		...g,
 		image: getCDNImageUrl(g.image)
 	}));
 
+	// Cover for a game: the captured canvas snapshot if it has one, else generated
+	// on-brand art so every game shows a real cover (never a blank tile).
+	const coverFor = (g: any) =>
+		g.coverUrl || `/api/ai/cover/${g.id}?t=${encodeURIComponent(g.title || 'AI Game')}`;
+
 	async function fetchGallery() {
+		isLoading = true;
+		error = '';
 		try {
-			// This fetching will happen on the client-side for now,
-			// calling an API that reads registry.json from OCI.
-			const res = await fetch('/api/ai/gallery');
+			// Reads registry.json from OCI; sort is ranked server-side.
+			const res = await fetch('/api/ai/gallery?sort=' + sort);
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Failed to fetch gallery');
 			userGames = data.games || [];
@@ -28,6 +35,12 @@
 		} finally {
 			isLoading = false;
 		}
+	}
+
+	function setSort(s: 'new' | 'top') {
+		if (s === sort) return;
+		sort = s;
+		fetchGallery();
 	}
 
 	onMount(() => {
@@ -62,10 +75,27 @@
 						<p class="opacity-70">Play and review games created by the community.</p>
 					</div>
 				</div>
-				<a href="/ai" class="btn btn-primary rounded-2xl font-black text-white">
-					<Icon icon="mdi:creation" />
-					Create Your Own
-				</a>
+				<div class="flex items-center gap-3">
+					<!-- Sort / recommendation toggle -->
+					<div class="inline-flex rounded-full border border-base-content/10 bg-base-200 p-1">
+						<button
+							on:click={() => setSort('top')}
+							class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition {sort === 'top' ? 'bg-primary text-white shadow-sm' : 'text-base-content/70 hover:text-primary'}"
+						>
+							<Icon icon="mdi:fire" /> Top
+						</button>
+						<button
+							on:click={() => setSort('new')}
+							class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition {sort === 'new' ? 'bg-primary text-white shadow-sm' : 'text-base-content/70 hover:text-primary'}"
+						>
+							<Icon icon="mdi:clock-outline" /> Newest
+						</button>
+					</div>
+					<a href="/ai" class="btn btn-primary rounded-full font-black text-white">
+						<Icon icon="mdi:creation" />
+						Create
+					</a>
+				</div>
 			</div>
 
 			<div class="min-h-[400px] rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
@@ -93,21 +123,12 @@
 								class="group flex flex-col overflow-hidden rounded-box border border-base-content/10 bg-base-200 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
 							>
 								<div class="relative aspect-video w-full bg-black">
-									{#if game.coverUrl}
-										<img
-											src={game.coverUrl}
-											alt={game.title}
-											loading="lazy"
-											class="absolute inset-0 h-full w-full object-cover"
-										/>
-									{:else}
-										<div class="absolute inset-0 flex items-center justify-center bg-primary/10">
-											<Icon
-												icon="mdi:robot"
-												class="text-6xl text-primary/40"
-											/>
-										</div>
-									{/if}
+									<img
+										src={coverFor(game)}
+										alt={game.title}
+										loading="lazy"
+										class="absolute inset-0 h-full w-full object-cover"
+									/>
 									{#if game.sourceGameId}
 										<div class="badge badge-accent absolute right-2 top-2 font-bold shadow-md">
 											REMIX
