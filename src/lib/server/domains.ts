@@ -140,10 +140,49 @@ export function listLiveDomains(): string[] {
 	return [...set].sort();
 }
 
-/** Full https:// URLs across all live domains — the pool the Discord bot hands out. */
+/** Full https:// URLs across all live domains (owned + all community, unverified). */
 export function listLinks(): string[] {
 	const urls: string[] = [];
 	for (const d of listLiveDomains()) {
+		const subs = BASE_DOMAINS.has(d) ? OWNED_LINK_SUBS : COMMUNITY_LINK_SUBS;
+		for (const s of subs) urls.push(`https://${s ? s + '.' : ''}${d}`);
+	}
+	return urls;
+}
+
+// DNS-verify a community domain actually points at Kazwire before we hand it out —
+// so a user adding a link can't inject a dead (or malicious) domain into the pool
+// the bot serves to everyone. Owned domains skip the check (always live). Cached.
+const dnsCache = new Map<string, { ok: boolean; ts: number }>();
+const DNS_TTL_MS = 10 * 60 * 1000;
+async function resolvesToKazwire(domain: string): Promise<boolean> {
+	const cached = dnsCache.get(domain);
+	if (cached && Date.now() - cached.ts < DNS_TTL_MS) return cached.ok;
+	let ok = false;
+	try {
+		const { resolve4 } = await import('node:dns/promises');
+		const ips = await resolve4(domain).catch(() => [] as string[]);
+		ok = ips.includes(KAZWIRE_SERVER_IP);
+	} catch {
+		ok = false;
+	}
+	dnsCache.set(domain, { ok, ts: Date.now() });
+	return ok;
+}
+
+/** The SAFE hand-out pool: owned domains (always) + community domains that actually
+ *  resolve to Kazwire. Use this for anything shown to end users (the Discord bot). */
+export async function listVerifiedLinks(): Promise<string[]> {
+	const community = [...load().keys()].filter((d) => !isOwnedDomain(d));
+	const liveCommunity: string[] = [];
+	await Promise.all(
+		community.map(async (d) => {
+			if (await resolvesToKazwire(d)) liveCommunity.push(d);
+		})
+	);
+	const domains = [...new Set([...BASE_DOMAINS, ...liveCommunity])].sort();
+	const urls: string[] = [];
+	for (const d of domains) {
 		const subs = BASE_DOMAINS.has(d) ? OWNED_LINK_SUBS : COMMUNITY_LINK_SUBS;
 		for (const s of subs) urls.push(`https://${s ? s + '.' : ''}${d}`);
 	}

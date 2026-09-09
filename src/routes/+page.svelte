@@ -15,7 +15,8 @@
 		{ label: 'Create with AI', sub: 'Make a game from a prompt', href: '/ai', icon: 'mdi:sparkles' },
 		{ label: 'Private browser', sub: 'Open any site', href: '/study', icon: 'mdi:shield-lock' },
 		{ label: 'Apps', sub: 'Tools & extras', href: '/apps', icon: 'ri:apps-2-fill' },
-		{ label: 'Game rooms', sub: 'Join or create a room', href: '/rooms', icon: 'mdi:account-group' }
+		{ label: 'Game rooms', sub: 'Join or create a room', href: '/rooms', icon: 'mdi:account-group' },
+		{ label: 'Add a link', sub: 'Add your own mirror', href: '/portal', icon: 'mdi:link-plus' }
 	];
 
 	export let data: any;
@@ -129,7 +130,7 @@
 		</div>
 
 		<!-- Quick access to the four core destinations -->
-		<div class="mt-7 grid grid-cols-2 gap-3 sm:mt-8 lg:grid-cols-4">
+		<div class="mt-7 grid grid-cols-2 gap-3 sm:mt-8 sm:grid-cols-3 lg:grid-cols-5">
 			{#each quickActions as q}
 				<a href={q.href} class="kz-card kz-card-hover flex items-center gap-3 p-4">
 					<span class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-primary/10 text-primary">

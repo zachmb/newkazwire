@@ -6,7 +6,7 @@ import {
 	addDomain,
 	countDomains,
 	isServable,
-	listLinks,
+	listVerifiedLinks,
 	listLiveDomains,
 	normalizeDomain,
 	rateLimit
@@ -19,7 +19,7 @@ import {
 export const GET: RequestHandler = async ({ url }) => {
 	const list = url.searchParams.get('list');
 	if (list === 'all') return json({ domains: listLiveDomains() });
-	if (list === 'links') return json({ links: listLinks() });
+	if (list === 'links') return json({ links: await listVerifiedLinks() });
 
 	const check = url.searchParams.get('check');
 	if (check) {
