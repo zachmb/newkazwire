@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { uploadToOCI, addToRegistry, getRegistry, checkStorageLimits, upsertProfile } from '$lib/server/oci';
 import type { UserGame } from '$lib/server/oci';
 import { getRealIp, geolocate } from '$lib/server/ip';
+import { stripMarkdown } from '$lib/server/deepseek';
 
 function cleanName(raw: unknown): string {
     const s = (typeof raw === 'string' ? raw : '').replace(/[<>]/g, '').trim().slice(0, 32);
@@ -11,9 +12,17 @@ function cleanName(raw: unknown): string {
 
 export const POST: RequestHandler = async ({ request, getClientAddress, url }) => {
     try {
-        const { title, description, code, sourceGameId, creatorName, cover, creatorUid, source } =
+        const { title, description, code: rawCode, sourceGameId, creatorName, cover, creatorUid, source } =
             await request.json();
 
+        if (!rawCode) {
+            return json({ error: 'Code is required' }, { status: 400 });
+        }
+
+        // The streamed generation path assembles code client-side, so stray ```
+        // markdown fences from the model can reach publish — they break the game
+        // (black screen). Strip them server-side no matter which path sent this.
+        const code = stripMarkdown(String(rawCode));
         if (!code) {
             return json({ error: 'Code is required' }, { status: 400 });
         }

@@ -5,7 +5,7 @@ const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const systemPrompt = `You are a senior HTML5 game developer with a great sense of game feel. You output single-file HTML5 games that run perfectly in an iframe AND are genuinely fun, polished, and replayable — not bare-minimum demos.
 
 HARD FORMAT RULES (no exceptions — breaking these produces a black screen):
-- Output ONLY raw HTML starting with <!DOCTYPE html>. No markdown, no code fences, no explanation.
+- Output ONLY raw HTML. The VERY FIRST characters of your output must be <!DOCTYPE html> and the very last must be </html>. ABSOLUTELY NO markdown code fences: never emit \`\`\` or \`\`\`html anywhere — a fence anywhere in the output breaks the game file and the player sees a black screen. No explanation before or after the HTML.
 - NO COMPRESSION: Do not minify. Every HTML tag MUST have a space between its name and its attributes (e.g. <canvas id="c"> is CORRECT, <canvasid="c"> is BROKEN).
 - SIBLING TAGS: The <script> tag MUST be a sibling of the <canvas> tag, NEVER nested inside it. Browsers treat content inside <canvas> as fallback and will NOT execute the script if it's a child.
 - All CSS must include: * { margin:0; padding:0; box-sizing:border-box; } and html,body { width:100%; height:100%; overflow:hidden; }
@@ -102,13 +102,28 @@ function buildMessages(prompt: string, remixContext?: string, remixCode?: string
     ];
 }
 
-function stripMarkdown(code: string): string {
-    if (code.startsWith('```html')) {
-        return code.replace(/^```html/, '').replace(/```$/, '').trim();
-    } else if (code.startsWith('```')) {
-        return code.replace(/^```/, '').replace(/```$/, '').trim();
+/**
+ * Strip markdown code fences the model sometimes wraps output in despite the
+ * prompt — a stray ``` in the served HTML breaks the game. Handles fences with
+ * leading whitespace/prose, a language tag, and a trailing fence; as a last
+ * resort trims anything before <!DOCTYPE and after </html>.
+ */
+export function stripMarkdown(code: string): string {
+    const out = (code || '').trim();
+    // If the full document markers exist, clamp to them — this removes fences,
+    // language tags, and any prose the model wrapped around the game in one cut.
+    const lower = out.toLowerCase();
+    const start = lower.indexOf('<!doctype html');
+    const end = lower.lastIndexOf('</html>');
+    if (start >= 0 && end > start) {
+        return out.slice(start, end + '</html>'.length);
     }
-    return code;
+    // No full document: still peel leading/trailing fences + stray fence lines.
+    return out
+        .replace(/^```[a-zA-Z]*\s*\n?/, '')
+        .replace(/\n?```\s*$/, '')
+        .replace(/^```[a-zA-Z]*\s*$/gm, '')
+        .trim();
 }
 
 /**
