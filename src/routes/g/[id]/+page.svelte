@@ -68,11 +68,15 @@
 			return url;
 		}
 
-		navigator.serviceWorker.getRegistrations().then((registrations) => {
-			if (registrations.length === 0) {
-				registerServiceWorker();
-			}
-		});
+		// Guard: navigator.serviceWorker is undefined in insecure contexts / some
+		// private-browsing modes — calling it there throws and crashes the player.
+		if (navigator.serviceWorker) {
+			navigator.serviceWorker.getRegistrations().then((registrations) => {
+				if (registrations.length === 0) {
+					registerServiceWorker();
+				}
+			}).catch(() => {});
+		}
 		return __uv$config.prefix + __uv$config.encodeUrl(search(url));
 	}
 
@@ -82,6 +86,7 @@
 			setTimeout(registerServiceWorker, 1000);
 			return;
 		}
+		if (!navigator.serviceWorker) return; // unsupported context — nothing to register
 		navigator.serviceWorker.register('/uv.js', { scope: __uv$config.prefix }).then((reg) => {
 			if (reg.installing) {
 				const sw = reg.installing || reg.waiting;
@@ -91,7 +96,7 @@
 					}
 				};
 			}
-		});
+		}).catch(() => {});
 	}
 
 	let canShare: boolean = false;

@@ -74,13 +74,16 @@
 			return url;
 		}
 
-		// check if the service worker is installed
-		navigator.serviceWorker.getRegistrations().then((registrations) => {
-			if (registrations.length === 0) {
-				// Service worker is not installed so register it
-				registerServiceWorker();
-			}
-		});
+		// check if the service worker is installed (guard: no SW in insecure
+		// contexts / some private-browsing modes — calling it there throws)
+		if (navigator.serviceWorker) {
+			navigator.serviceWorker.getRegistrations().then((registrations) => {
+				if (registrations.length === 0) {
+					// Service worker is not installed so register it
+					registerServiceWorker();
+				}
+			}).catch(() => {});
+		}
 
 		return __uv$config.prefix + __uv$config.encodeUrl(search(url));
 	}
@@ -93,6 +96,7 @@
 			setTimeout(registerServiceWorker, 1000);
 			return;
 		}
+		if (!navigator.serviceWorker) return; // unsupported context — nothing to register
 		navigator.serviceWorker.register('/uv.js', { scope: __uv$config.prefix }).then((reg) => {
 			if (reg.installing) {
 				const sw = reg.installing || reg.waiting;
@@ -103,16 +107,24 @@
 					}
 				};
 			}
-		});
+		}).catch(() => {});
 	}
 
 	let canShare: boolean = false;
 	onMount(() => {
 		registerServiceWorker();
 
-		// Check if the browser supports the share API
-		if (navigator.canShare({ url: window.location.href })) {
-			canShare = true;
+		// Check if the browser supports the share API. navigator.canShare is
+		// undefined on many desktop browsers (Firefox, older Chrome) — calling it
+		// unguarded threw here in onMount and crashed the whole /apps player to the
+		// SvelteKit error page. Guard + try-catch so an unsupported browser just
+		// hides the share button instead of erroring.
+		try {
+			if (typeof navigator.canShare === 'function' && navigator.canShare({ url: window.location.href })) {
+				canShare = true;
+			}
+		} catch {
+			/* share API unsupported — non-critical */
 		}
 
 		// Fire event when its finished rendering
