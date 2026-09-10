@@ -54,7 +54,7 @@
 				<span class="text-2xl font-black tracking-tight"><Cloak text={host} /></span>
 			</a>
 			<p class="max-w-xs text-sm leading-relaxed text-base-content/60">
-				The ultimate destination for browser games and interactive entertainment. Jump in and play — no downloads.
+				A comprehensive gaming platform offering a variety of exciting games for players of all ages. Jump in and play — free, no downloads.
 			</p>
 			<div class="mt-1 flex gap-3">
 				{#each socials as s}
