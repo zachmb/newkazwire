@@ -40,9 +40,56 @@
 			userProfile.addCoins(1);
 		}, 60000);
 
+		// AD-OVERLAY ESCAPE HATCH. Google's auto-ads rewarded/vignette prompt
+		// ("Unlock more content — watch a short ad") sometimes renders with no
+		// close control and re-fires every ~10 min, trapping the player. Any
+		// full-viewport fixed overlay containing a Google ad iframe gets our own
+		// working ✕ that removes it and restores scrolling. (Root fix lives in the
+		// AdSense dashboard: Auto ads → disable the Rewarded format.)
+		const AD_SRC = /googlesyndication|googleads|doubleclick|adtrafficquality/;
+		const ensureEscape = () => {
+			const cands = new Set<HTMLElement>();
+			for (const el of Array.from(document.body.children)) {
+				if (el instanceof HTMLElement) cands.add(el);
+			}
+			document.querySelectorAll('ins.adsbygoogle').forEach((el) => {
+				if (el instanceof HTMLElement) cands.add(el);
+			});
+			for (const el of cands) {
+				if (el.dataset.kzAdEscape) continue;
+				const cs = getComputedStyle(el);
+				if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') continue;
+				const r = el.getBoundingClientRect();
+				const coversViewport = r.width >= innerWidth * 0.85 && r.height >= innerHeight * 0.85;
+				if (!coversViewport) continue;
+				const hasAdFrame = Array.from(el.querySelectorAll('iframe')).some((f) =>
+					AD_SRC.test(f.src || '')
+				);
+				if (!hasAdFrame) continue;
+
+				el.dataset.kzAdEscape = '1';
+				const btn = document.createElement('button');
+				btn.textContent = '✕';
+				btn.setAttribute('aria-label', 'Close ad');
+				btn.style.cssText =
+					'position:fixed;top:14px;right:14px;z-index:2147483647;width:40px;height:40px;' +
+					'border-radius:9999px;border:none;background:rgba(0,0,0,.75);color:#fff;' +
+					'font-size:18px;font-weight:700;cursor:pointer;line-height:1;';
+				btn.addEventListener('click', () => {
+					el.remove();
+					// The overlay locks page scroll — undo whatever it pinned.
+					document.documentElement.style.overflow = '';
+					document.body.style.overflow = '';
+					document.body.style.position = '';
+				});
+				el.appendChild(btn);
+			}
+		};
+		const adEscapeInterval = setInterval(ensureEscape, 2000);
 
 		return () => {
 			clearInterval(coinInterval);
+			clearInterval(adEscapeInterval);
 		};
 	});
 
