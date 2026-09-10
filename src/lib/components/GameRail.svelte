@@ -1,8 +1,18 @@
 <script lang="ts">
 	import BrandNavTile from './BrandNavTile.svelte';
 	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
+	import { registerBrandTile } from '$lib/stores/brandTile';
+	import { onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 
 	export let games: { title: string; image: string; href: string }[] = [];
+
+	// While this rail is on screen the Nav drops its own wordmark (the brand tile
+	// below is the site title) and the tile hangs flush from the nav bar.
+	if (browser) {
+		const unregister = registerBrandTile();
+		onDestroy(unregister);
+	}
 
 	// Sort games to show recently played first
 	let sortedGames: typeof games = [];
@@ -45,12 +55,18 @@
 	});
 </script>
 
+<!-- -mt-4 cancels the page's top padding so the brand tile sits flush against the
+     nav's bottom border and reads as one merged unit with the (now wordmark-less)
+     nav — square top corners, card-round bottom corners. NOTE: no `sticky` here —
+     the game pages wrap content in overflow-hidden, so sticky can never pin (the
+     wrapper isn't the scroller) and its top offset just shoved the rail down,
+     breaking the flush merge. -->
 <div
-	class="no-scrollbar sticky top-4 flex h-[calc(100vh-2rem)] w-full flex-col gap-3 overflow-y-auto"
+	class="no-scrollbar -mt-4 flex h-[calc(100vh-1rem)] w-full flex-col gap-3 overflow-y-auto"
 >
-	<!-- Brand Tile -->
+	<!-- Brand Tile (merged into the nav above it) -->
 	<div
-		class="h-[140px] w-full flex-shrink-0 overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+		class="h-[148px] w-full flex-shrink-0 overflow-hidden rounded-bl-[var(--rounded-box,1rem)] rounded-br-[var(--rounded-box,1rem)] border border-t-0 border-base-content/10 bg-base-100 shadow-sm transition-all duration-200 hover:shadow-md"
 	>
 		<BrandNavTile />
 	</div>

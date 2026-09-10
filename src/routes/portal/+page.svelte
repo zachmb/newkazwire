@@ -1,18 +1,44 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { page } from '$app/stores';
-	import Cloak from '$lib/components/Cloak.svelte';
 	import { onMount } from 'svelte';
 
-	const SERVER_IP = '51.81.210.201';
+	// The server address is NEVER written as a literal string anywhere in this file
+	// (so filter-vendor crawlers can't scrape it out of the static HTML or JS bundle).
+	// XOR-masked octets, decoded at runtime client-side only: the minifier flattens
+	// plain hex octets back into the recognizable decimal sequence, so the shipped
+	// bundle must contain neither the dotted string NOR the octets themselves.
+	const MASKED = [153, 251, 120, 99]; // octet ^ 170
+	const decodeIp = () => MASKED.map((n) => n ^ 170).join('.');
+	let serverIp = '…'; // subtle placeholder until assembled on mount
+	let mounted = false;
+
 	$: host = $page.url.hostname;
 
 	let domain = '';
 	let submitting = false;
 	let result: { ok: boolean; status: string; message: string; domain?: string } | null = null;
 
+	// Copy-to-clipboard state (users retype this into their registrar).
+	let copied = false;
+	let copyTimer: ReturnType<typeof setTimeout>;
+	async function copyIp() {
+		if (!mounted) return;
+		try {
+			await navigator.clipboard.writeText(serverIp);
+			copied = true;
+			clearTimeout(copyTimer);
+			copyTimer = setTimeout(() => (copied = false), 1500);
+		} catch {
+			/* clipboard unavailable — user can still read/select the value */
+		}
+	}
+
 	let count = 0;
 	onMount(async () => {
+		// Assemble the address at runtime so it only ever exists in a live DOM.
+		serverIp = decodeIp();
+		mounted = true;
 		try {
 			const r = await fetch('/api/domains');
 			if (r.ok) count = (await r.json()).count ?? 0;
@@ -68,12 +94,12 @@
 		{
 			icon: 'mdi:cart-outline',
 			title: 'Get a domain',
-			body: 'Grab any cheap domain (Namecheap, Porkbun, Cloudflare — often under $10/yr). Pick something that sounds harmless.'
+			body: 'Grab any cheap domain (Namecheap, Porkbun, Cloudflare — often under $10/yr).'
 		},
 		{
 			icon: 'mdi:dns-outline',
 			title: 'Point it at us',
-			body: `In your registrar's DNS settings, add an A record for “@” (and “www”) pointing to ${SERVER_IP}.`
+			body: 'In your registrar’s DNS settings, add an A record for “@” (and “www”) using the address in the table below.'
 		},
 		{
 			icon: 'mdi:rocket-launch-outline',
@@ -96,8 +122,8 @@
 		</div>
 		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">Add your own link</h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/80">
-			Blocked at school? Put the whole site on <em>your</em> domain. Point it at us and it goes live in about a
-			minute — with HTTPS, totally free.
+			Put the whole site on <em>your</em> domain. Point it at us and it goes live in about a
+			minute — HTTPS included, free.
 		</p>
 		{#if count > 0}
 			<div class="mx-auto mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
@@ -136,8 +162,44 @@
 					</tr>
 				</thead>
 				<tbody class="font-mono font-semibold text-base-content">
-					<tr><td class="py-1 pr-6">A</td><td class="py-1 pr-6">@</td><td class="py-1">{SERVER_IP}</td></tr>
-					<tr><td class="py-1 pr-6">A</td><td class="py-1 pr-6">www</td><td class="py-1">{SERVER_IP}</td></tr>
+					<tr>
+						<td class="py-1 pr-6">A</td>
+						<td class="py-1 pr-6">@</td>
+						<td class="py-1">
+							<span class="inline-flex items-center gap-2">
+								{#if mounted}<span>{serverIp}</span>{:else}<span class="text-base-content/40">…</span>{/if}
+								<button
+									type="button"
+									on:click={copyIp}
+									disabled={!mounted}
+									aria-label="Copy address"
+									title="Copy address"
+									class="grid h-7 w-7 place-items-center rounded-lg text-base-content/50 transition hover:bg-base-200 hover:text-base-content disabled:opacity-40"
+								>
+									<Icon icon={copied ? 'mdi:check' : 'mdi:content-copy'} class="text-base {copied ? 'text-success' : ''}" />
+								</button>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="py-1 pr-6">A</td>
+						<td class="py-1 pr-6">www</td>
+						<td class="py-1">
+							<span class="inline-flex items-center gap-2">
+								{#if mounted}<span>{serverIp}</span>{:else}<span class="text-base-content/40">…</span>{/if}
+								<button
+									type="button"
+									on:click={copyIp}
+									disabled={!mounted}
+									aria-label="Copy address"
+									title="Copy address"
+									class="grid h-7 w-7 place-items-center rounded-lg text-base-content/50 transition hover:bg-base-200 hover:text-base-content disabled:opacity-40"
+								>
+									<Icon icon={copied ? 'mdi:check' : 'mdi:content-copy'} class="text-base {copied ? 'text-success' : ''}" />
+								</button>
+							</span>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
@@ -150,7 +212,7 @@
 			<input
 				id="domain-input"
 				bind:value={domain}
-				placeholder="myschoolgames.com"
+				placeholder="myfavgames.com"
 				autocomplete="off"
 				autocapitalize="off"
 				spellcheck="false"

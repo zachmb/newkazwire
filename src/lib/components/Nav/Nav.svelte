@@ -5,6 +5,7 @@
 	import { isSearchOpen, searchQuery } from '$lib/stores/search';
 	import { onMount } from 'svelte';
 	import Cloak from '$lib/components/Cloak.svelte';
+	import { brandTileMerged } from '$lib/stores/brandTile';
 
 	// The brand wordmark + tab title are always just the domain we're served from.
 	$: host = $page.url.hostname;
@@ -65,19 +66,32 @@
 			light background chip + explicit dark ink on the tile so it is always
 			readable regardless of the surrounding theme or OS setting.
 		-->
-		<a
-			href="/"
-			class="flex flex-none items-center gap-2 rounded-btn px-2 py-1.5 text-base-content sm:pr-3"
-			aria-label="Home"
-		>
-			<img src="/logo.png" alt="" class="h-8 w-8 rounded-lg object-contain" />
-			<!-- Wordmark is ALWAYS the current domain (works on every mirror), cloaked
-			     so the brand string isn't machine-readable/copyable. Uses base-content ink
-			     so it stays legible in BOTH the light and dark theme. -->
-			<span class="hidden text-xl font-black leading-none tracking-tight sm:block">
-				<Cloak text={host} />
-			</span>
-		</a>
+		{#if !$brandTileMerged}
+			<a
+				href="/"
+				class="flex flex-none items-center gap-2 rounded-btn px-2 py-1.5 text-base-content sm:pr-3"
+				aria-label="Home"
+			>
+				<img src="/logo.png" alt="" class="h-8 w-8 rounded-lg object-contain" />
+				<!-- Wordmark is ALWAYS the current domain (works on every mirror), cloaked
+				     so the brand string isn't machine-readable/copyable. Uses base-content ink
+				     so it stays legible in BOTH the light and dark theme. -->
+				<span class="hidden text-xl font-black leading-none tracking-tight sm:block">
+					<Cloak text={host} />
+				</span>
+			</a>
+		{:else}
+			<!-- A page's left-rail brand tile is the site title right now (it hangs from
+			     this bar) — repeating the wordmark here would duplicate it. Keep just the
+			     logo as the home click target. -->
+			<a
+				href="/"
+				class="grid h-10 w-10 flex-none place-items-center rounded-btn text-base-content"
+				aria-label="Home"
+			>
+				<img src="/logo.png" alt="" class="h-8 w-8 rounded-lg object-contain" />
+			</a>
+		{/if}
 
 		<!-- Search -->
 		{#if config.features.searchBar}

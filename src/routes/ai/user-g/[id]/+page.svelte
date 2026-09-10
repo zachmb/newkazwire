@@ -337,10 +337,21 @@
 							<div class="mt-4 flex flex-wrap gap-8">
 								<div class="flex flex-col gap-1">
 									<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created by</div>
-									<div class="flex items-center gap-1.5 font-bold">
-										<Icon icon="mdi:account-circle" class="text-primary" />
-										{game.creatorName || 'Anonymous'}{#if game.creatorLocation}<span class="opacity-50">· {game.creatorLocation}</span>{/if}
-									</div>
+									{#if game.creatorUid}
+										<!-- Attribution links to the creator's public profile -->
+										<a
+											href="/u/{game.creatorUid}"
+											class="flex items-center gap-1.5 font-bold underline-offset-2 transition-colors hover:text-primary hover:underline"
+										>
+											<Icon icon="mdi:account-circle" class="text-primary" />
+											{game.creatorName || 'Anonymous'}{#if game.creatorLocation}<span class="opacity-50">· {game.creatorLocation}</span>{/if}
+										</a>
+									{:else}
+										<div class="flex items-center gap-1.5 font-bold">
+											<Icon icon="mdi:account-circle" class="text-primary" />
+											{game.creatorName || 'Anonymous'}{#if game.creatorLocation}<span class="opacity-50">· {game.creatorLocation}</span>{/if}
+										</div>
+									{/if}
 								</div>
 								<div class="flex flex-col gap-1">
 									<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created on</div>

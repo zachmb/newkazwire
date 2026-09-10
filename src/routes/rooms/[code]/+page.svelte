@@ -1,5 +1,5 @@
 <script lang="ts">
-	// A party room — realtime via the Kazwire party WebSocket server.
+	// A room — realtime via the Kazwire party WebSocket server.
 	// Mobbin ref: Discord voice/stage channel (member list + chat + shared stage) and
 	// jklm.fun BombParty (center prompt + bomb timer + player ring).
 	import { onMount, onDestroy, tick } from 'svelte';

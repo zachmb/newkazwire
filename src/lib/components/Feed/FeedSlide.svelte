@@ -319,16 +319,13 @@
 	{/if}
 
 	<!-- Scrims: darken top (for chip) and bottom (for text) so content stays legible.
-	     Two stacked flat layers on the bottom (no gradient) — a wide medium wash plus
-	     a shorter, deeper band under the text stack for reliable contrast. -->
+	     These MUST fade smoothly — flat bands were tried here and their hard edges
+	     painted visible horizontal lines across every game cover. -->
 	<div
-		class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-black/40"
+		class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent"
 	></div>
 	<div
-		class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-black/45"
-	></div>
-	<div
-		class="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-black/60"
+		class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/75 via-black/40 to-transparent"
 	></div>
 
 	<!-- Top chip -->

@@ -1,90 +1,212 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { config } from '$lib/config';
+
+	const updated = 'September 10, 2026';
+
+	const toc = [
+		{ id: 'short-version', n: 1, title: 'The short version' },
+		{ id: 'what-we-collect', n: 2, title: 'What we collect' },
+		{ id: 'what-we-dont', n: 3, title: "What we don't collect" },
+		{ id: 'how-we-use', n: 4, title: 'How we use it' },
+		{ id: 'public-content', n: 5, title: 'What other people can see' },
+		{ id: 'storage', n: 6, title: 'Cookies and local storage' },
+		{ id: 'third-party', n: 7, title: 'Third-party games and apps' },
+		{ id: 'minors', n: 8, title: 'Kids and personal information' },
+		{ id: 'retention', n: 9, title: 'Retention and removal' },
+		{ id: 'changes', n: 10, title: 'Changes to this policy' }
+	];
 </script>
 
 <svelte:head>
-	<meta property="og:title" content="{$page.url.hostname} - Privacy Policy" />
-	<meta name="description" content="Play and browse for free now on {$page.url.hostname}!" />
-	<meta
-		property="og:description"
-		content="Play and browse for free now on {$page.url.hostname}!"
-	/>
+	<meta name="description" content="Privacy policy for {$page.url.hostname}." />
 </svelte:head>
 
-<div class="min-h-screen bg-base-200 p-4 text-base-content md:p-12">
-	<div class="mx-auto max-w-4xl overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm">
+<div class="kz-page">
+	<div class="mx-auto max-w-3xl">
 		<!-- Header -->
-		<div class="bg-neutral p-8 text-center text-white md:p-16">
-			<div
-				class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-xl bg-base-100 p-2 shadow-sm ring-1 ring-white/10 transition-transform hover:-translate-y-0.5"
+		<p class="kz-eyebrow">Legal</p>
+		<h1 class="mt-2 text-4xl font-black tracking-tight text-base-content sm:text-5xl">
+			Privacy Policy
+		</h1>
+		<p class="mt-3 text-base-content/60">Last updated: {updated}</p>
+
+		<div class="mt-5 flex flex-wrap gap-2">
+			<a
+				href="/legal/terms-of-service"
+				class="rounded-full border border-base-content/10 px-4 py-1.5 text-sm font-bold text-base-content/60 transition hover:bg-base-200 hover:text-base-content"
+				>Terms</a
 			>
-				<img src="/logo.png" alt="" class="h-full w-full rounded-xl object-cover" />
-			</div>
-			<h1 class="text-5xl font-black tracking-tight text-accent md:text-6xl">Privacy Policy</h1>
-			<p class="mx-auto mt-6 max-w-xl text-xl font-bold text-white/60">
-				Your trust is our most valuable asset.
-			</p>
+			<span
+				class="rounded-full border border-base-content/10 bg-base-200 px-4 py-1.5 text-sm font-bold text-base-content"
+				>Privacy</span
+			>
+			<a
+				href="/legal/dmca"
+				class="rounded-full border border-base-content/10 px-4 py-1.5 text-sm font-bold text-base-content/60 transition hover:bg-base-200 hover:text-base-content"
+				>DMCA</a
+			>
 		</div>
 
-		<!-- Content -->
-		<div class="px-8 py-12 md:px-20 md:py-20">
-			<article
-				class="prose prose-lg prose-neutral max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-base-content prose-p:font-medium prose-p:leading-relaxed prose-p:text-base-content/70 prose-li:font-medium prose-li:text-base-content/70"
-			>
-				<p>
-					At {$page.url.hostname}, accessible from https://{$page.url.hostname}, one of our main
-					priorities is the privacy of our visitors. This Privacy Policy document contains types of
-					information that is collected and recorded by {$page.url.hostname} and how we use it.
-				</p>
+		<!-- Table of contents -->
+		<nav class="kz-card mt-8 p-6">
+			<p class="kz-eyebrow mb-3">On this page</p>
+			<ol class="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+				{#each toc as item}
+					<li>
+						<a
+							href="#{item.id}"
+							class="text-sm font-semibold text-base-content/60 transition hover:text-primary"
+						>
+							<span class="text-base-content/40">{item.n}.</span>
+							{item.title}
+						</a>
+					</li>
+				{/each}
+			</ol>
+		</nav>
 
-				<h2>Contact Information</h2>
-				<p>
-					If you have additional questions or require more information about our Privacy Policy, do
-					not hesitate to contact us.
+		<!-- Sections -->
+		<div class="mt-12 space-y-12 leading-relaxed text-base-content/60">
+			<section id="short-version" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">1.</span> The short version
+				</h2>
+				<p class="mt-3">
+					{$page.url.hostname} has no accounts and never asks who you are. Your browser gets a
+					random identifier, we keep coarse usage stats tied to that identifier, and anything you
+					choose to post is public. That's most of it — the rest of this page is the detail.
 				</p>
+			</section>
 
-				<h2>Scope</h2>
-				<p>
-					This Privacy Policy applies only to our online activities and is valid for visitors to our
-					website with regards to the information that they shared and/or collect in {$page.url.hostname}. This policy is not applicable to any information collected offline or
-					via channels other than this website.
-				</p>
-
-				<h2>Consent</h2>
-				<p>
-					By using our website, you hereby consent to our Privacy Policy and agree to its terms.
-				</p>
-
-				<h2>Information we collect</h2>
-				<p>
-					The personal information that you are asked to provide, and the reasons why you are asked
-					to provide it, will be made clear to you at the point we ask you to provide your personal
-					information.
-				</p>
-
-				<h2>How we use your information</h2>
-				<p>We use the information we collect in various ways, including to:</p>
-				<ul>
-					<li>Provide, operate, and maintain our website</li>
-					<li>Improve, personalize, and expand our website</li>
-					<li>Understand and analyze how you use our website</li>
-					<li>Develop new products, services, features, and functionality</li>
-					<li>Communicate with you for customer service and updates</li>
-					<li>Send you emails and prevent fraud</li>
+			<section id="what-we-collect" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">2.</span> What we collect
+				</h2>
+				<ul class="mt-3 list-disc space-y-2 pl-5">
+					<li>
+						<strong class="font-bold text-base-content">A random session identifier.</strong>
+						Generated in your browser and stored in localStorage. It identifies your browser, not
+						you.
+					</li>
+					<li>
+						<strong class="font-bold text-base-content">A display name, if you set one.</strong>
+						Optional and self-chosen — pick anything (please don't use your real name).
+					</li>
+					<li>
+						<strong class="font-bold text-base-content">Content you post.</strong> Posts, comments,
+						community notes, AI game prompts, uploaded games, and shop listings, stored on our
+						infrastructure.
+					</li>
+					<li>
+						<strong class="font-bold text-base-content">Coarse usage events.</strong> Things like
+						page views and games played, tied to the anonymous session identifier — enough to see
+						what's popular, not to profile a person.
+					</li>
+					<li>
+						<strong class="font-bold text-base-content">IP addresses, server-side only.</strong>
+						Used for rate limiting and abuse prevention. They are never displayed publicly and
+						aren't attached to your public activity.
+					</li>
 				</ul>
+			</section>
 
-				<h2>Children's Information</h2>
-				<p>
-					Another part of our priority is adding protection for children while using the internet.
-					We encourage parents and guardians to observe, participate in, and/or monitor and guide
-					their online activity.
+			<section id="what-we-dont" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">3.</span> What we don't collect
+				</h2>
+				<p class="mt-3">
+					No email address, no real name, no phone number, no password, no payment details. There
+					is no registration form anywhere on the site, and nothing on the site requires personal
+					information to use.
 				</p>
-				<p>
-					{$page.url.hostname} does not knowingly collect any Personal Identifiable Information from
-					children under the age of 13.
+			</section>
+
+			<section id="how-we-use" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">4.</span> How we use it
+				</h2>
+				<ul class="mt-3 list-disc space-y-2 pl-5">
+					<li>Running the site: showing your posts, keeping your coin balance, saving settings.</li>
+					<li>Rate limiting and abuse prevention (this is what IP addresses are for).</li>
+					<li>Understanding usage in aggregate — which games and features people actually use.</li>
+				</ul>
+				<p class="mt-3">We don't sell this data or use it for ad targeting.</p>
+			</section>
+
+			<section id="public-content" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">5.</span> What other people can see
+				</h2>
+				<p class="mt-3">
+					Everything you publish — posts, comments, community notes, AI-created games, uploaded
+					games, shop listings, and your display name — is publicly visible to anyone on the site.
+					Don't put personal information in any of it. Content goes through automated profanity
+					moderation, and we may remove content at our discretion.
 				</p>
-			</article>
+			</section>
+
+			<section id="storage" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">6.</span> Cookies and local storage
+				</h2>
+				<p class="mt-3">
+					The site keeps its data in your browser's localStorage: your session identifier, your
+					settings, and similar site state. There's no third-party advertising or tracking cookie
+					layer. Clearing your browser data removes all of it — along with the identity your
+					posts and balance are tied to.
+				</p>
+			</section>
+
+			<section id="third-party" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">7.</span> Third-party games and apps
+				</h2>
+				<p class="mt-3">
+					Many games and apps in the library are embedded from or link to third parties, and
+					AI-created games are generated by a third-party AI model from user prompts. When you
+					interact with third-party content, that third party's own practices apply — we don't
+					control what embedded content does.
+				</p>
+			</section>
+
+			<section id="minors" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">8.</span> Kids and personal information
+				</h2>
+				<p class="mt-3">
+					The site is designed to be usable without providing any personal information, and we
+					don't knowingly collect personal information from anyone, including children. If you're
+					a minor, use a made-up display name and never post your real name, school, location, or
+					anything else identifying — that rule is in our
+					<a href="/legal/terms-of-service" class="font-semibold text-primary hover:underline"
+						>terms</a
+					>
+					for everyone.
+				</p>
+			</section>
+
+			<section id="retention" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">9.</span> Retention and removal
+				</h2>
+				<p class="mt-3">
+					Public content stays up until it's removed — by moderation or at our discretion. Usage
+					events are kept in coarse, aggregate-oriented form. If something on the site exposes your
+					personal information and you want it taken down, reach us through the
+					<a href="/contact" class="font-semibold text-primary hover:underline">contact page</a>
+					and we'll look at it.
+				</p>
+			</section>
+
+			<section id="changes" class="scroll-mt-24">
+				<h2 class="text-xl font-black tracking-tight text-base-content">
+					<span class="text-base-content/40">10.</span> Changes to this policy
+				</h2>
+				<p class="mt-3">
+					If this policy changes, the "Last updated" date at the top changes with it. Continuing to
+					use the site after an update means you accept the new version.
+				</p>
+			</section>
 		</div>
 	</div>
 </div>

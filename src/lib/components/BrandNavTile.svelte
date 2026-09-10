@@ -6,8 +6,10 @@
 	}
 </script>
 
+<!-- Corners inherit from the wrapper tile so every edge (including the Account /
+     Search buttons below) clips to exactly the card's own roundness. -->
 <div
-	class="group relative flex h-full w-full flex-col overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm"
+	class="group relative flex h-full w-full flex-col overflow-hidden rounded-[inherit] bg-base-100"
 >
 	<!-- Top Section: Brand (Compact).
 	     Explicitly self-lit (white bg + dark ink) so the wordmark stays readable in the
@@ -28,7 +30,7 @@
 		<!-- Account Button -->
 		<a
 			href="/account"
-			class="group/btn relative flex flex-1 items-center justify-center rounded-bl-3xl bg-primary transition hover:brightness-110"
+			class="group/btn relative flex flex-1 items-center justify-center bg-primary transition hover:brightness-110"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +50,7 @@
 
 		<!-- Search Button -->
 		<button
-			class="group/btn relative flex flex-1 items-center justify-center rounded-br-3xl border-l border-white/20 bg-primary transition hover:brightness-110"
+			class="group/btn relative flex flex-1 items-center justify-center border-l border-white/20 bg-primary transition hover:brightness-110"
 			on:click={openSearch}
 		>
 			<svg
