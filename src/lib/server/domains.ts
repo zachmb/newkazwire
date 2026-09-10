@@ -14,7 +14,7 @@
  * gitignored .data/ in the repo.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const KAZWIRE_SERVER_IP = '51.81.210.201';
@@ -68,7 +68,11 @@ function load(): Map<string, MirrorDomain> {
 function persist(map: Map<string, MirrorDomain>) {
 	try {
 		if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-		writeFileSync(FILE, JSON.stringify([...map.values()], null, 2));
+		// Atomic write: a crash mid-write must never leave a truncated registry
+		// (a corrupt file would silently drop every community mirror on restart).
+		const tmp = FILE + '.tmp';
+		writeFileSync(tmp, JSON.stringify([...map.values()], null, 2));
+		renameSync(tmp, FILE);
 	} catch (err) {
 		console.error('[domains] failed to write registry:', err);
 		throw err;
@@ -162,12 +166,17 @@ async function resolvesToKazwire(domain: string): Promise<boolean> {
 	if (cached && Date.now() - cached.ts < DNS_TTL_MS) return cached.ok;
 	let ok = false;
 	try {
-		const { resolve4 } = await import('node:dns/promises');
-		const ips = await resolve4(domain).catch(() => [] as string[]);
+		// Bounded resolver: the default can hang for many seconds per lookup, and
+		// listVerifiedLinks fans out over every community domain.
+		const { Resolver } = await import('node:dns/promises');
+		const resolver = new Resolver({ timeout: 3000, tries: 1 });
+		const ips = await resolver.resolve4(domain).catch(() => [] as string[]);
 		ok = ips.includes(KAZWIRE_SERVER_IP);
 	} catch {
 		ok = false;
 	}
+	// Cap the cache so a flood of unique lookups can't grow it without bound.
+	if (dnsCache.size > 10_000) dnsCache.clear();
 	dnsCache.set(domain, { ok, ts: Date.now() });
 	return ok;
 }

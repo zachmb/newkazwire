@@ -63,6 +63,9 @@ function getByteLength(content: string | Blob): number {
     return content.size;
 }
 
+/** Timeout on every OCI round-trip so a stalled bucket can't hang requests. */
+const OCI_FETCH_TIMEOUT_MS = 20_000;
+
 async function verifyObjectReadable(
     url: string,
     expectedMinBytes: number,
@@ -76,7 +79,8 @@ async function verifyObjectReadable(
                 cache: 'no-store',
                 headers: {
                     'Cache-Control': 'no-cache'
-                }
+                },
+                signal: AbortSignal.timeout(OCI_FETCH_TIMEOUT_MS)
             });
 
             if (response.ok) {
@@ -106,7 +110,8 @@ export async function uploadToOCI(path: string, content: string | Blob, contentT
         body: content,
         headers: {
             'Content-Type': contentType
-        }
+        },
+        signal: AbortSignal.timeout(OCI_FETCH_TIMEOUT_MS)
     });
 
     if (!response.ok) {
@@ -130,7 +135,8 @@ export async function readJsonFromOCI<T>(path: string): Promise<T | null> {
             cache: 'no-store',
             headers: {
                 'Cache-Control': 'no-cache'
-            }
+            },
+            signal: AbortSignal.timeout(OCI_FETCH_TIMEOUT_MS)
         });
         if (response.status === 404) return null;
         if (!response.ok) throw new Error(`Status ${response.status}`);
@@ -182,7 +188,12 @@ const _locks = new Map<string, Promise<unknown>>();
 export function withLock<T>(key: string, fn: () => Promise<T>): Promise<T> {
     const prev = _locks.get(key) || Promise.resolve();
     const run = prev.then(fn, fn);
-    _locks.set(key, run.then(() => undefined, () => undefined));
+    const gate = run.then(() => undefined, () => undefined);
+    _locks.set(key, gate);
+    // Drop the key once the chain drains so the map can't grow without bound.
+    gate.then(() => {
+        if (_locks.get(key) === gate) _locks.delete(key);
+    });
     return run;
 }
 
@@ -223,9 +234,11 @@ export async function isIPRateLimited(ip: string): Promise<boolean> {
 }
 
 export async function logIPGeneration(ip: string) {
+    return withLock('ip-log', async () => {
     const logs = await readJsonFromOCI<Record<string, IPLog>>(OCI_IP_LOG_PATH) || {};
     logs[ip] = { lastGeneratedAt: new Date().toISOString() };
     await uploadToOCI(OCI_IP_LOG_PATH, JSON.stringify(logs), 'application/json');
+    });
 }
 
 /**
@@ -233,6 +246,7 @@ export async function logIPGeneration(ip: string) {
  * Each session is stored in its own file per day, aggregating events as they arrive.
  */
 export async function saveTelemetry(sessionId: string, payload: any) {
+    return withLock(`telemetry:${sessionId}`, async () => {
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const path = `telemetry/${date}/sessions/${sessionId}.json`;
 
@@ -269,6 +283,7 @@ export async function saveTelemetry(sessionId: string, payload: any) {
 
     // 4. Save consolidated session back to OCI
     await uploadToOCI(path, JSON.stringify(sessionData), 'application/json');
+    });
 }
 
 /* ------------------------------------------------------------------ *
@@ -349,6 +364,8 @@ export async function getStreak(uid: string): Promise<StreakRecord | null> {
  * Returns the updated record.
  */
 export async function recordStreakPing(uid: string, name: string): Promise<StreakRecord> {
+    // Per-player lock: two pings racing would double-count gamesPlayed/coins.
+    return withLock(`streak:${uid}`, async () => {
     const today = utcDateString();
     const now = new Date().toISOString();
     const displayName = sanitizeName(name);
@@ -402,10 +419,12 @@ export async function recordStreakPing(uid: string, name: string): Promise<Strea
     }
 
     return record;
+    });
 }
 
 /** Read-modify-write the compact leaderboard aggregate for a single visitor. */
 async function updateLeaderboardEntry(record: StreakRecord): Promise<void> {
+    return withLock('leaderboard', async () => {
     const board =
         (await readJsonFromOCI<Record<string, LeaderboardRow>>(OCI_LEADERBOARD_PATH)) || {};
     board[record.uid] = {
@@ -416,6 +435,7 @@ async function updateLeaderboardEntry(record: StreakRecord): Promise<void> {
         updatedAt: record.updatedAt
     };
     await uploadToOCI(OCI_LEADERBOARD_PATH, JSON.stringify(board), 'application/json');
+    });
 }
 
 /**
@@ -450,12 +470,14 @@ export async function updateGameInRegistry(
     id: string,
     patch: Partial<UserGame>
 ): Promise<UserGame | null> {
+    return withLock('registry', async () => {
     const registry = await getRegistry();
     const idx = registry.findIndex((g) => g.id === id);
     if (idx < 0) return null;
     registry[idx] = { ...registry[idx], ...patch };
     await uploadToOCI(OCI_REGISTRY_PATH, JSON.stringify(registry), 'application/json');
     return registry[idx];
+    });
 }
 
 /* ------------------------------------------------------------------ *
@@ -551,6 +573,7 @@ export async function getPosts(limit = 100): Promise<Post[]> {
 }
 
 export async function addPost(p: Omit<Post, 'id' | 'createdAt' | 'likes'>): Promise<Post> {
+    return withLock('posts', async () => {
     const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
     const post: Post = { ...p, id: newId(), createdAt: new Date().toISOString(), likes: 0 };
     posts.push(post);
@@ -560,15 +583,18 @@ export async function addPost(p: Omit<Post, 'id' | 'createdAt' | 'likes'>): Prom
         .slice(0, MAX_POSTS_KEPT);
     await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(trimmed), 'application/json');
     return post;
+    });
 }
 
 export async function likePost(id: string, delta = 1): Promise<number | null> {
+    return withLock('posts', async () => {
     const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
     const post = posts.find((p) => p.id === id);
     if (!post) return null;
     post.likes = Math.max(0, (post.likes || 0) + delta);
     await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(posts), 'application/json');
     return post.likes;
+    });
 }
 
 /** Add a reply to a post. Returns the reply, or null if the post is gone. */
@@ -576,6 +602,7 @@ export async function addPostReply(
     postId: string,
     r: Omit<Reply, 'id' | 'createdAt' | 'likes'>
 ): Promise<Reply | null> {
+    return withLock('posts', async () => {
     const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
     const post = posts.find((p) => p.id === postId);
     if (!post) return null;
@@ -584,6 +611,7 @@ export async function addPostReply(
     post.replies.push(reply);
     await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(posts), 'application/json');
     return reply;
+    });
 }
 
 /** Repost an existing post: bumps the original's repostCount and creates a new feed
@@ -592,6 +620,7 @@ export async function repostPost(
     postId: string,
     by: { uid: string; author: string; location?: string }
 ): Promise<Post | null> {
+    return withLock('posts', async () => {
     const posts = (await readJsonFromOCI<Post[]>(OCI_POSTS_PATH)) || [];
     const original = posts.find((p) => p.id === postId);
     if (!original) return null;
@@ -626,6 +655,7 @@ export async function repostPost(
         .slice(0, MAX_POSTS_KEPT);
     await uploadToOCI(OCI_POSTS_PATH, JSON.stringify(trimmed), 'application/json');
     return repost;
+    });
 }
 
 /* ---- Per-game comments + replies ---- */
@@ -648,6 +678,7 @@ export async function addComment(
     gameId: string,
     c: Omit<Comment, 'id' | 'createdAt' | 'likes' | 'replies'>
 ): Promise<Comment> {
+    return withLock(`comments:${gameId}`, async () => {
     const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
     const comment: Comment = {
         ...c,
@@ -659,6 +690,7 @@ export async function addComment(
     comments.push(comment);
     await uploadToOCI(commentsPath(gameId), JSON.stringify(comments), 'application/json');
     return comment;
+    });
 }
 
 export async function addReply(
@@ -666,6 +698,7 @@ export async function addReply(
     commentId: string,
     r: Omit<Reply, 'id' | 'createdAt' | 'likes'>
 ): Promise<Reply | null> {
+    return withLock(`comments:${gameId}`, async () => {
     const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
     const parent = comments.find((c) => c.id === commentId);
     if (!parent) return null;
@@ -674,6 +707,7 @@ export async function addReply(
     parent.replies.push(reply);
     await uploadToOCI(commentsPath(gameId), JSON.stringify(comments), 'application/json');
     return reply;
+    });
 }
 
 export async function likeComment(
@@ -682,6 +716,7 @@ export async function likeComment(
     replyId?: string,
     delta = 1
 ): Promise<number | null> {
+    return withLock(`comments:${gameId}`, async () => {
     const comments = (await readJsonFromOCI<Comment[]>(commentsPath(gameId))) || [];
     const parent = comments.find((c) => c.id === commentId);
     if (!parent) return null;
@@ -691,6 +726,7 @@ export async function likeComment(
     target.likes = Math.max(0, (target.likes || 0) + delta);
     await uploadToOCI(commentsPath(gameId), JSON.stringify(comments), 'application/json');
     return target.likes;
+    });
 }
 
 /* ---- Community notes ---- */
@@ -713,6 +749,7 @@ export async function addNote(
     gameId: string,
     n: Omit<CommunityNote, 'id' | 'createdAt' | 'helpful' | 'notHelpful'>
 ): Promise<CommunityNote> {
+    return withLock(`notes:${gameId}`, async () => {
     const notes = (await readJsonFromOCI<CommunityNote[]>(notesPath(gameId))) || [];
     const note: CommunityNote = {
         ...n,
@@ -724,6 +761,7 @@ export async function addNote(
     notes.push(note);
     await uploadToOCI(notesPath(gameId), JSON.stringify(notes), 'application/json');
     return note;
+    });
 }
 
 export async function voteNote(
@@ -731,6 +769,7 @@ export async function voteNote(
     noteId: string,
     vote: 'helpful' | 'notHelpful'
 ): Promise<CommunityNote | null> {
+    return withLock(`notes:${gameId}`, async () => {
     const notes = (await readJsonFromOCI<CommunityNote[]>(notesPath(gameId))) || [];
     const note = notes.find((n) => n.id === noteId);
     if (!note) return null;
@@ -738,6 +777,7 @@ export async function voteNote(
     else note.notHelpful = (note.notHelpful || 0) + 1;
     await uploadToOCI(notesPath(gameId), JSON.stringify(notes), 'application/json');
     return note;
+    });
 }
 
 /* ---- Public profiles + search ---- */
@@ -763,6 +803,7 @@ export async function upsertProfile(
     bump: Partial<Pick<PublicProfile, 'gamesCreated' | 'postsCount' | 'commentsCount'>> = {}
 ): Promise<PublicProfile | null> {
     if (!uid) return null;
+    return withLock('profiles', async () => {
     const profiles =
         (await readJsonFromOCI<Record<string, PublicProfile>>(OCI_PROFILES_PATH)) || {};
     const now = new Date().toISOString();
@@ -780,6 +821,7 @@ export async function upsertProfile(
     profiles[uid] = profile;
     await uploadToOCI(OCI_PROFILES_PATH, JSON.stringify(profiles), 'application/json');
     return profile;
+    });
 }
 
 /** Search public profiles by name substring (case-insensitive). */
@@ -847,6 +889,9 @@ export async function getWallet(uid: string): Promise<Wallet> {
 /** Adjust a uid's coin balance by delta (clamped at 0). Returns the new balance. */
 export async function adjustCoins(uid: string, delta: number): Promise<number> {
     if (!uid) return 0;
+    // All wallets live in one JSON file: serialize every balance change or two
+    // concurrent adjustments clobber each other (lost or minted coins).
+    return withLock('wallets', async () => {
     const wallets = (await readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH)) || {};
     const current = wallets[uid]?.coins || 0;
     const next = Math.max(0, current + delta);
@@ -854,6 +899,7 @@ export async function adjustCoins(uid: string, delta: number): Promise<number> {
     wallets[uid] = { ...wallets[uid], coins: next, updatedAt: new Date().toISOString() };
     await uploadToOCI(OCI_WALLETS_PATH, JSON.stringify(wallets), 'application/json');
     return next;
+    });
 }
 
 export interface DailyResult { claimed: boolean; amount: number; coins: number; }
@@ -861,6 +907,9 @@ export interface DailyResult { claimed: boolean; amount: number; coins: number; 
 /** Grant a once-per-UTC-day coin bonus. Idempotent within a day (no double claim). */
 export async function claimDaily(uid: string): Promise<DailyResult> {
     if (!uid) return { claimed: false, amount: 0, coins: 0 };
+    // Same 'wallets' lock as adjustCoins: without it two racing claims both pass
+    // the lastDaily check and the bonus pays twice.
+    return withLock('wallets', async () => {
     const wallets = (await readJsonFromOCI<Record<string, Wallet>>(OCI_WALLETS_PATH)) || {};
     const today = utcDateString();
     const w = wallets[uid] || { coins: 0, updatedAt: new Date().toISOString() };
@@ -871,6 +920,7 @@ export async function claimDaily(uid: string): Promise<DailyResult> {
     wallets[uid] = w;
     await uploadToOCI(OCI_WALLETS_PATH, JSON.stringify(wallets), 'application/json');
     return { claimed: true, amount: DAILY_BONUS, coins: w.coins };
+    });
 }
 
 async function getInventory(uid: string): Promise<string[]> {
@@ -896,6 +946,7 @@ export async function getShopItems(): Promise<ShopItem[]> {
 export async function addShopItem(
     item: Omit<ShopItem, 'id' | 'createdAt' | 'active' | 'soldCount'>
 ): Promise<ShopItem> {
+    return withLock('shop', async () => {
     const items = (await readJsonFromOCI<ShopItem[]>(OCI_SHOP_PATH)) || [];
     const price = Math.max(1, Math.min(MAX_ITEM_PRICE, Math.floor(item.price || 0)));
     const newItem: ShopItem = {
@@ -909,6 +960,7 @@ export async function addShopItem(
     items.push(newItem);
     await uploadToOCI(OCI_SHOP_PATH, JSON.stringify(items), 'application/json');
     return newItem;
+    });
 }
 
 export interface BuyResult {
@@ -1169,7 +1221,9 @@ async function tradeMarketUnlocked(
  */
 export async function buyShopItem(uid: string, itemId: string): Promise<BuyResult> {
     if (!uid) return { ok: false, error: 'Missing player id.' };
-
+    // Serialize purchases: two concurrent buys racing the balance check could
+    // both pass it, or clobber the shop soldCount / inventory writes.
+    return withLock('shop', async () => {
     const items = (await readJsonFromOCI<ShopItem[]>(OCI_SHOP_PATH)) || [];
     const item = items.find((i) => i.id === itemId);
     if (!item || !item.active) return { ok: false, error: 'That item is no longer available.' };
@@ -1201,5 +1255,6 @@ export async function buyShopItem(uid: string, itemId: string): Promise<BuyResul
     }
 
     return { ok: true, balance, item };
+    });
 }
 

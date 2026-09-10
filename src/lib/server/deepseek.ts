@@ -134,7 +134,10 @@ export async function generateGameCode(
             messages,
             temperature: 0.6,
             max_tokens: 8192
-        })
+        }),
+        // A full 8k-token game takes a while, but a hung API must not pin the
+        // request open forever (report-broken holds a regen slot while this runs).
+        signal: AbortSignal.timeout(180_000)
     });
 
     if (!response.ok) {
@@ -193,7 +196,10 @@ export function generateGameCodeStream(prompt: string, remixContext?: string, re
                         temperature: 0.7,
                         max_tokens: 8192,
                         stream: true
-                    })
+                    }),
+                    // Hard ceiling on the whole stream (connect + body): a stalled
+                    // upstream otherwise leaves the SSE connection open forever.
+                    signal: AbortSignal.timeout(300_000)
                 });
 
                 if (!response.ok || !response.body) {
@@ -236,12 +242,21 @@ export function generateGameCodeStream(prompt: string, remixContext?: string, re
 
                 controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             } catch (err: any) {
-                controller.enqueue(
-                    encoder.encode(`data: [ERROR] ${encodeURIComponent(err.message)}\n\n`)
-                );
+                // The client may already be gone — enqueue on a closed controller throws.
+                try {
+                    controller.enqueue(
+                        encoder.encode(`data: [ERROR] ${encodeURIComponent(err.message)}\n\n`)
+                    );
+                } catch {
+                    /* client disconnected — nothing to report to */
+                }
             } finally {
                 clearInterval(heartbeat);
-                controller.close();
+                try {
+                    controller.close();
+                } catch {
+                    /* already closed/errored */
+                }
             }
         }
     });

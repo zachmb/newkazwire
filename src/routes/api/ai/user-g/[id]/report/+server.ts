@@ -36,7 +36,10 @@ export const POST: RequestHandler = async ({ params }) => {
         // Best-effort fetch of the current source so the model fixes the REAL game.
         let currentCode = '';
         try {
-            const res = await fetch(game.codeUrl.split('?')[0], { cache: 'no-store' });
+            const res = await fetch(game.codeUrl.split('?')[0], {
+                cache: 'no-store',
+                signal: AbortSignal.timeout(15_000)
+            });
             if (res.ok) currentCode = await res.text();
         } catch {
             /* fall back to concept-only regen */
