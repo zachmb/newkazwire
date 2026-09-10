@@ -297,9 +297,14 @@
 	<div
 		class="relative z-10 mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]"
 	>
-		<!-- Left Rail: Navigation -->
-		<aside class="hidden h-full lg:block">
-			<GameRail games={localizedGames} />
+		<!-- Left Rail: Navigation. The rail is absolutely positioned inside the
+		     stretched grid item so it runs to the bottom of the page but can
+		     never inflate the page height (104 tiles would otherwise define the
+		     row); it scrolls internally instead. -->
+		<aside class="relative hidden h-full lg:block">
+			<div class="absolute inset-0">
+				<GameRail games={localizedGames} />
+			</div>
 		</aside>
 
 		<!-- Main Content: Game Player.
@@ -502,8 +507,12 @@
 			</div>
 		</main>
 
-		<!-- Right Column: Ads & Recs -->
-		<aside class="flex flex-col gap-6">
+		<!-- Right Column: Ads & Recs. At lg+ the content is absolutely positioned
+		     (like the left rail): the recs list fills down to the page bottom and
+		     scrolls internally, without its 60 tiles inflating the page height.
+		     On mobile it stays in normal flow with a capped-height recs list. -->
+		<aside class="relative h-full">
+			<div class="flex flex-col gap-6 lg:absolute lg:inset-0">
 			<a
 				href="https://joinkaz.com"
 				target="_blank"
@@ -519,19 +528,23 @@
 				</div>
 			</a>
 
-			<!-- Recommended Games -->
-			<div class="flex flex-col gap-4">
+			<!-- Recommended Games: fills the rest of the column down to the page
+			     bottom; scrolls internally if there are more games than fit. -->
+			<div class="flex min-h-0 flex-1 flex-col gap-4">
 				<h3 class="flex items-center gap-2 px-1 text-lg font-black text-base-content">
 					<Icon icon="mdi:thumb-up" class="text-xl text-primary" /> Recommended
 				</h3>
-				<div class="grid grid-cols-2 gap-3">
-					{#each related.slice(0, 6) as game (game.href)}
-						<div class="aspect-square">
-							<GameCard title={game.title} image={game.image} href={game.href} />
-						</div>
-					{/each}
+				<div data-kz-recs class="no-scrollbar max-h-[70vh] min-h-0 flex-1 overflow-y-auto lg:max-h-none">
+					<div class="grid grid-cols-2 gap-3">
+						{#each related.slice(0, 60) as game (game.href)}
+							<div class="aspect-square">
+								<GameCard title={game.title} image={game.image} href={game.href} />
+							</div>
+						{/each}
+					</div>
 				</div>
 			</div>
+		</div>
 		</aside>
 	</div>
 </div>

@@ -32,8 +32,11 @@
 		{ title: 'Super Mario 64', image: 'super-mario-64.png', href: '/g/super-mario-64' }
 	];
 
-	$: localizedMockGames = mockGames.map((g) => ({
-		...g,
+	// Full library (not just the 8 mocks) so the side columns can fill the page.
+	import { games as allGames } from '$lib/data/games';
+	$: localizedMockGames = (allGames.length ? allGames : mockGames).map((g: any) => ({
+		title: g.title,
+		href: g.href,
 		image: getCDNImageUrl(g.image, 'game')
 	}));
 
@@ -250,8 +253,12 @@
 <div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
 	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_5fr_2fr]">
 		<!-- Left Rail: Navigation -->
-		<aside class="hidden h-full lg:block">
-			<GameRail games={localizedMockGames} />
+		<!-- Left Rail: absolutely positioned inside the stretched grid item so it
+		     runs to the page bottom without inflating the page height. -->
+		<aside class="relative hidden h-full lg:block">
+			<div class="absolute inset-0">
+				<GameRail games={localizedMockGames} />
+			</div>
 		</aside>
 
 		<!-- Main Content: App Player -->
@@ -334,8 +341,11 @@
 			</div>
 		</main>
 
-		<!-- Right Column: Ads & Recs -->
-		<aside class="flex flex-col gap-6">
+		<!-- Right Column: Ads & Recs. At lg+ the content is absolutely positioned
+		     so the recs list fills to the page bottom and scrolls internally
+		     without inflating the page height; normal flow on mobile. -->
+		<aside class="relative h-full">
+			<div class="flex flex-col gap-6 lg:absolute lg:inset-0">
 			<a
 				href="https://joinkaz.com"
 				target="_blank"
@@ -351,11 +361,13 @@
 				</div>
 			</a>
 
-			<!-- Recommended Apps/Games -->
-			<div class="flex flex-col gap-4">
-				<h3 class="px-2 text-lg font-black tracking-tight text-white">Recommended</h3>
+			<!-- Recommended Apps/Games: fills the rest of the column down to the
+			     page bottom; scrolls internally when more games than fit. -->
+			<div class="flex min-h-0 flex-1 flex-col gap-4">
+				<h3 class="px-2 text-lg font-black tracking-tight text-base-content">Recommended</h3>
+				<div data-kz-recs class="no-scrollbar max-h-[70vh] min-h-0 flex-1 overflow-y-auto lg:max-h-none">
 				<div class="grid grid-cols-2 gap-3">
-					{#each localizedMockGames.slice(0, 6) as game}
+					{#each localizedMockGames.slice(0, 60) as game}
 						<a
 							href={game.href}
 							class="group relative h-[140px] w-full overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
@@ -372,6 +384,8 @@
 						</a>
 					{/each}
 				</div>
+				</div>
+			</div>
 			</div>
 		</aside>
 	</div>

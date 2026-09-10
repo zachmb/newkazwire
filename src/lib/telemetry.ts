@@ -102,7 +102,9 @@ class TelemetryManager {
 	}
 
 	private getSelector(el: Element | null): string {
-		if (!el) return 'unknown';
+		// keydown targets can be window/document (e.g. dispatched events) — those
+		// aren't Elements and have no tagName.
+		if (!el || !(el instanceof Element)) return 'unknown';
 		if (el.id) return `#${el.id}`;
 		let path = el.tagName.toLowerCase();
 		// el.className is an SVGAnimatedString (not a string) for SVG elements

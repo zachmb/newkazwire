@@ -61,8 +61,13 @@
      the game pages wrap content in overflow-hidden, so sticky can never pin (the
      wrapper isn't the scroller) and its top offset just shoved the rail down,
      breaking the flush merge. -->
+<!-- The rail fills its (absolutely-positioned) wrapper so the game column runs
+     all the way to the bottom of the page WITHOUT contributing to the page
+     height itself — the +1rem cancels the -mt-4 flush merge offset. The list
+     scrolls internally when there are more games than fit. -->
 <div
-	class="no-scrollbar -mt-4 flex h-[calc(100vh-1rem)] w-full flex-col gap-3 overflow-y-auto"
+	data-kz-rail
+	class="no-scrollbar -mt-4 flex h-[calc(100%+1rem)] w-full flex-col gap-3 overflow-y-auto"
 >
 	<!-- Brand Tile (merged into the nav above it) -->
 	<div

@@ -18,7 +18,20 @@
 		...g,
 		image: getCDNImageUrl(g.image)
 	}));
+
+	// Global shortcuts: Ctrl/Cmd+K toggles search (the nav advertises it),
+	// Escape closes. This component is mounted on every page via the layout.
+	function onKeydown(e: KeyboardEvent) {
+		if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+			e.preventDefault();
+			$isSearchOpen = !$isSearchOpen;
+		} else if (e.key === 'Escape' && $isSearchOpen) {
+			$isSearchOpen = false;
+		}
+	}
 </script>
+
+<svelte:window on:keydown={onKeydown} />
 
 {#if $isSearchOpen}
 	<div
