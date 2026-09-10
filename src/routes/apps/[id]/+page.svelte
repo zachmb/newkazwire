@@ -14,6 +14,7 @@
 	import HeroGameCard from '$lib/components/HeroGameCard.svelte';
 	import GameRail from '$lib/components/GameRail.svelte';
 	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
+	import { openWindow } from '$lib/stores/windows';
 
 	// Mock data for recommendations and rail
 	const mockGames = [
@@ -303,7 +304,23 @@
 
 			<!-- Description / Extra Info -->
 			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
-				<h2 class="mb-2 text-xl font-black tracking-tight">About {data.app.title}</h2>
+				<div class="mb-2 flex items-center justify-between gap-3">
+					<h2 class="text-xl font-black tracking-tight">About {data.app.title}</h2>
+					{#if data.app.embedURL}
+						<button
+							class="hidden flex-none items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary hover:text-white lg:flex"
+							title="Open this app in a floating window — snap it side-by-side with games and other apps"
+							on:click={() =>
+								openWindow({
+									title: data.app.title,
+									url: encodeURL(data.app.embedURL),
+									icon: 'mdi:apps'
+								})}
+						>
+							<Icon icon="mdi:dock-window" /> Window
+						</button>
+					{/if}
+				</div>
 				<p class="leading-relaxed text-base-content/80">{data.app.description}</p>
 				{#if canShare}
 					<button

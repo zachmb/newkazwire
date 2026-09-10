@@ -22,6 +22,17 @@
 	import { userProfile } from '$lib/stores/userProfile';
 	import { games } from '$lib/data/games';
 	import { pingStreak } from '$lib/utils/streak';
+	import { openWindow } from '$lib/stores/windows';
+
+	// Open this game's raw player (no page chrome) in a floating snap window.
+	function openGameWindow() {
+		let url: string;
+		if (data.game.emulatorType === 'ruffle') url = '/g/ruffle/' + data.game.id;
+		else if (data.game.emulatorType === 'emulatorjs') url = '/g/emulator/' + data.game.id;
+		else if (data.game.embedURL) url = encodeURL(data.game.embedURL);
+		else url = CDN_BASE_URL + '/game/static/' + data.game.id + '/index.html';
+		openWindow({ title: data.game.name, url, icon: 'mdi:gamepad-variant' });
+	}
 
 	$: localizedGames = games.map((g: any) => ({
 		...g,
@@ -265,14 +276,14 @@
 
 <svelte:window bind:innerWidth={innerWidth} on:keydown={onKey} />
 <svelte:head>
-	<meta property="og:title" content="{$page.url.hostname} - {data.game.title}" />
+	<meta property="og:title" content="{$page.url.hostname} - {data.game.name}" />
 	<meta
 		name="description"
-		content="Play {data.game.title} for free now on {$page.url.hostname}!"
+		content="Play {data.game.name} for free now on {$page.url.hostname}!"
 	/>
 	<meta
 		property="og:description"
-		content="Play {data.game.title} for free now on {$page.url.hostname}!"
+		content="Play {data.game.name} for free now on {$page.url.hostname}!"
 	/>
 
 	<script src="/uv/uv.config.js"></script>
@@ -298,7 +309,7 @@
 		<main class="flex min-w-0 flex-col gap-6">
 			<HeroGameCard
 				game={{
-					name: data.game.title,
+					name: data.game.name,
 					developer: data.game.developer || 'Unknown',
 					image: getCDNImageUrl(data.game.image, 'game') || null,
 					embedURL: data.game.embedURL || '',
@@ -340,7 +351,7 @@
 							src={CDN_BASE_URL + '/game/static/' + data.game.id + '/index.html'}
 							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
-							title={data.game.title}
+							title={data.game.name}
 							on:load={() => loadedGame()}
 							allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; clipboard-read; fullscreen"
 						/>
@@ -350,7 +361,7 @@
 							src={'/g/ruffle/' + data.game.id}
 							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
-							title={data.game.title}
+							title={data.game.name}
 							on:load={() => loadedGame()}
 							allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; clipboard-read; fullscreen"
 						/>
@@ -360,7 +371,7 @@
 							src={'/g/emulator/' + data.game.id}
 							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
-							title={data.game.title}
+							title={data.game.name}
 							allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; clipboard-read; fullscreen"
 						/>
 						<!-- Proxied game -->
@@ -368,7 +379,7 @@
 						<iframe
 							class="h-full w-full bg-base-100 opacity-0"
 							id="iframe"
-							title={data.game.title}
+							title={data.game.name}
 							src={encodeURL(data.game.embedURL)}
 							on:load={() => loadedGame()}
 							allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; clipboard-read; fullscreen"
@@ -454,14 +465,23 @@
 			<!-- Description / Extra Info -->
 			<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 				<div class="mb-2 flex items-center justify-between gap-3">
-					<h2 class="text-xl font-black">About {data.game.title}</h2>
-					<a
-						href={`/market?asset=game:${data.game.id}&kind=game&title=${encodeURIComponent(data.game.title)}`}
-						class="flex flex-none items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary hover:text-white"
-						title="Invest Kazcoins in this game on KazMarket"
-					>
-						<Icon icon="mdi:chart-line" /> Invest
-					</a>
+					<h2 class="text-xl font-black">About {data.game.name}</h2>
+					<div class="flex flex-none items-center gap-2">
+						<button
+							class="hidden flex-none items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary hover:text-white lg:flex"
+							title="Open this game in a floating window — snap it side-by-side with other games and apps"
+							on:click={openGameWindow}
+						>
+							<Icon icon="mdi:dock-window" /> Window
+						</button>
+						<a
+							href={`/market?asset=game:${data.game.id}&kind=game&title=${encodeURIComponent(data.game.name)}`}
+							class="flex flex-none items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary hover:text-white"
+							title="Invest Kazcoins in this game on KazMarket"
+						>
+							<Icon icon="mdi:chart-line" /> Invest
+						</a>
+					</div>
 				</div>
 				<p class="whitespace-pre-line leading-relaxed text-base-content/80">{data.game.description}</p>
 				<div class="mt-4 flex flex-wrap gap-2">

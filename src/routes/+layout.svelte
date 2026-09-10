@@ -25,6 +25,7 @@
 
 	import { isSearchOpen } from '$lib/stores/search';
 	import SearchOverlay from '$lib/components/SearchOverlay.svelte';
+	import WindowManager from '$lib/components/Desktop/WindowManager.svelte';
 	import { userProfile } from '$lib/stores/userProfile';
 	import { telemetry } from '$lib/telemetry';
 
@@ -143,4 +144,10 @@
 
 	<!-- Global Search Overlay -->
 	<SearchOverlay />
+
+	<!-- Floating snap windows (desktop): open games/apps side-by-side. Never
+	     rendered when this page is itself inside a window iframe. -->
+	{#if !isInIframe}
+		<WindowManager />
+	{/if}
 </div>
