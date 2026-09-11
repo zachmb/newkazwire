@@ -98,6 +98,10 @@
 		{ label: 'Arcade', tags: ['Arcade'] },
 		{ label: 'Casual', tags: ['Casual'] }
 	];
+	// Keep the home page tight: only the strongest few genre rows (they're ordered
+	// by appeal above). The rest stay reachable via the All Games grid, search, and
+	// each row's "View More" -> /g?tag=.
+	const MAX_CATEGORY_ROWS = 10;
 	$: rails = CATEGORIES.map((c) => {
 		const set = new Set(c.tags);
 		const inCat = games.filter((g) => (g.tags || []).some((t) => set.has(t)));
@@ -110,7 +114,7 @@
 			count: inCat.length,
 			games: [...primary, ...secondary].slice(0, 18).map(toItem)
 		};
-	}).filter((r) => r.count >= 6);
+	}).filter((r) => r.count >= 6).slice(0, MAX_CATEGORY_ROWS);
 
 	// The full library, pinned games first then the rest — so you can scroll to the
 	// bottom of the home page and reach EVERY game, not just the capped rails above.

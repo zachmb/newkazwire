@@ -27,7 +27,11 @@
 			{/if}
 		</h2>
 		<div class="relative">
-			<div class="no-scrollbar flex flex-row justify-start gap-x-4 overflow-x-auto scroll-smooth pb-5">
+			<!-- -mx-1 px-1 + py padding gives the hover ring clearance: overflow-x-auto
+			     forces overflow-y to compute to auto (CSS spec), which would otherwise
+			     clip the 2px ring at the top/bottom and the scroll edges. The negative
+			     margin cancels the horizontal padding so cards still align with the heading. -->
+			<div class="no-scrollbar -mx-1 flex flex-row justify-start gap-x-4 overflow-x-auto scroll-smooth px-1 pb-6 pt-2">
 				{#each items as item (item.href)}
 					<a
 						class="group block h-40 w-[18rem] flex-none text-left transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer"
