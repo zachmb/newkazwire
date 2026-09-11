@@ -17,12 +17,10 @@
 	<a
 		href="/"
 		data-sveltekit-reload
+		aria-label="Home"
 		class="brand-section flex h-[60%] flex-col items-center justify-center gap-1 p-2 no-underline"
 	>
-		<img src="/logo.png" alt="" class="h-8 w-8 object-contain" />
-		<h1 class="text-lg font-black lowercase leading-none tracking-tighter sm:text-xl">
-			kaz<span class="text-primary">wire</span><span style="color:rgba(11,27,51,0.55)">.com</span>
-		</h1>
+		<img src="/logo.png" alt="" class="h-12 w-12 object-contain" />
 	</a>
 
 	<!-- Bottom Section: Nav Buttons (Compact Split) -->

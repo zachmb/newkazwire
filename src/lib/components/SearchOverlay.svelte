@@ -1,26 +1,32 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { fade, fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 	import { isSearchOpen, searchQuery } from '$lib/stores/search';
 	import { games } from '$lib/data/games';
-
 	import { getCDNImageUrl } from '$lib/utils/cdn';
+	import GameCard from '$lib/components/GameCard.svelte';
 
-	$: filteredGames = $searchQuery
-		? games.filter(
-				(g) =>
-					g.title.toLowerCase().includes($searchQuery.toLowerCase()) ||
-					g.tags.some((t) => t.toLowerCase().includes($searchQuery.toLowerCase()))
-		  )
+	const MAX_RESULTS = 60;
+
+	// Live autofill: rank title-matches above tag-matches, cap for snappiness.
+	$: q = $searchQuery.trim().toLowerCase();
+	$: matches = q
+		? (() => {
+				const title: any[] = [];
+				const tag: any[] = [];
+				for (const g of games) {
+					if (g.title.toLowerCase().includes(q)) title.push(g);
+					else if (g.tags.some((t) => t.toLowerCase().includes(q))) tag.push(g);
+				}
+				return [...title, ...tag];
+		  })()
 		: [];
+	$: shown = matches.slice(0, MAX_RESULTS).map((g) => ({ title: g.title, href: g.href, image: getCDNImageUrl(g.image, 'game') }));
 
-	$: mappedGames = filteredGames.map((g) => ({
-		...g,
-		image: getCDNImageUrl(g.image)
-	}));
-
-	// Global shortcuts: Ctrl/Cmd+K toggles search (the nav advertises it),
-	// Escape closes. This component is mounted on every page via the layout.
+	function close() {
+		$isSearchOpen = false;
+	}
 	function onKeydown(e: KeyboardEvent) {
 		if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
 			e.preventDefault();
@@ -29,66 +35,85 @@
 			$isSearchOpen = false;
 		}
 	}
+	// Enter opens the top result.
+	function onInputKey(e: KeyboardEvent) {
+		if (e.key === 'Enter' && matches.length) {
+			close();
+			goto(matches[0].href);
+		}
+	}
 </script>
 
 <svelte:window on:keydown={onKeydown} />
 
 {#if $isSearchOpen}
-	<div
-		class="fixed inset-0 z-[9999] flex flex-col bg-black/80 p-4 sm:p-8"
-		transition:fade={{ duration: 200 }}
-	>
-		<!-- Close Button -->
-		<button
-			class="btn btn-circle btn-ghost absolute right-4 top-4 text-white hover:bg-white/10"
-			on:click={() => ($isSearchOpen = false)}
-		>
-			<Icon icon="mdi:close" class="h-8 w-8" />
-		</button>
-
-		<!-- Search Bar -->
-		<div class="mx-auto mt-20 w-full max-w-3xl" transition:fly={{ y: -20, duration: 300 }}>
-			<div class="relative">
-				<Icon
-					icon="mdi:magnify"
-					class="absolute left-6 top-1/2 h-8 w-8 -translate-y-1/2 text-base-content/50"
-				/>
+	<div class="fixed inset-0 z-[9999] flex flex-col bg-black/70 backdrop-blur-sm" transition:fade={{ duration: 150 }}>
+		<!-- Search header -->
+		<div class="border-b border-white/10 bg-base-100" transition:fly={{ y: -16, duration: 200 }}>
+			<div class="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-4 sm:px-6">
+				<Icon icon="mdi:magnify" class="h-6 w-6 flex-none text-base-content/40" />
+				<!-- svelte-ignore a11y-autofocus -->
 				<input
 					type="text"
 					bind:value={$searchQuery}
-					placeholder="Search for games..."
-					class="w-full rounded-full border border-base-content/10 bg-base-100 py-6 pl-20 pr-8 text-2xl font-bold text-base-content shadow-md placeholder:text-base-content/30 focus:outline-none focus:ring-4 focus:ring-primary/50"
+					on:keydown={onInputKey}
+					placeholder="Search {games.length} games…"
 					autofocus
+					autocomplete="off"
+					spellcheck="false"
+					class="min-w-0 flex-1 bg-transparent text-xl font-bold text-base-content placeholder:font-semibold placeholder:text-base-content/30 focus:outline-none sm:text-2xl"
 				/>
+				{#if q}
+					<span class="hidden flex-none text-sm font-bold text-base-content/40 sm:inline">
+						{matches.length} result{matches.length === 1 ? '' : 's'}
+					</span>
+					<button
+						class="grid h-8 w-8 flex-none place-items-center rounded-full text-base-content/50 transition hover:bg-base-200 hover:text-base-content"
+						on:click={() => ($searchQuery = '')}
+						aria-label="Clear search"
+					>
+						<Icon icon="mdi:close" class="h-5 w-5" />
+					</button>
+				{/if}
+				<button
+					class="flex-none rounded-full border border-base-content/10 px-3 py-1.5 text-xs font-bold text-base-content/60 transition hover:bg-base-200 hover:text-base-content"
+					on:click={close}
+				>
+					Esc
+				</button>
 			</div>
 		</div>
 
 		<!-- Results -->
-		<div
-			class="mx-auto mt-12 grid w-full max-w-5xl grid-cols-2 gap-4 overflow-y-auto pb-20 md:grid-cols-4"
-		>
-			{#if searchQuery}
-				{#if mappedGames.length > 0}
-					{#each mappedGames as game}
-						<a
-							href={game.href}
-							class="group relative aspect-square w-full overflow-hidden rounded-box border border-base-content/10 bg-base-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-							on:click={() => ($isSearchOpen = false)}
-						>
-							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
-							<div
-								class="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 transition-opacity group-hover:opacity-100"
-							>
-								<span class="block truncate text-xs font-bold text-white">{game.title}</span>
+		<div class="min-h-0 flex-1 overflow-y-auto">
+			<div class="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
+				{#if !q}
+					<div class="flex flex-col items-center justify-center gap-3 py-24 text-center text-base-content/40">
+						<Icon icon="mdi:gamepad-variant" class="h-10 w-10" />
+						<p class="text-lg font-bold">Start typing to search {games.length} games</p>
+						<p class="text-sm">Search by title or category. Press Enter to open the top match.</p>
+					</div>
+				{:else if shown.length}
+					<div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
+						{#each shown as g (g.href)}
+							<div class="aspect-square" on:click={close} on:keydown role="none">
+								<GameCard title={g.title} image={g.image} href={g.href} />
 							</div>
-						</a>
-					{/each}
+						{/each}
+					</div>
+					{#if matches.length > shown.length}
+						<p class="mt-6 text-center text-sm font-semibold text-base-content/40">
+							Showing {shown.length} of {matches.length}. Keep typing to narrow it down.
+						</p>
+					{/if}
 				{:else}
-					<div class="col-span-full text-center text-xl font-bold text-white/50">
-						No games found for "{searchQuery}"
+					<div class="flex flex-col items-center justify-center gap-3 py-24 text-center text-base-content/50">
+						<Icon icon="mdi:magnify-close" class="h-10 w-10" />
+						<p class="text-lg font-bold text-base-content/70">No games match “{$searchQuery}”</p>
+						<p class="text-sm">Try a different title or category.</p>
 					</div>
 				{/if}
-			{/if}
+			</div>
 		</div>
 	</div>
 {/if}

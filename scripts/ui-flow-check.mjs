@@ -20,7 +20,9 @@ page.on('pageerror', (e) => errors.push(String(e).slice(0, 150)));
 // --- Ctrl+K search (on the home page)
 await page.goto(BASE + '/', { waitUntil: 'networkidle' });
 await page.keyboard.press('Control+KeyK');
-const input = page.locator('input[placeholder="Search for games..."]');
+// The search overlay's input (placeholder "Search N games…"); .last() picks the
+// overlay's input over the nav trigger which shares the store.
+const input = page.locator('.fixed.inset-0 input[placeholder^="Search"]').last();
 await input.waitFor({ state: 'visible', timeout: 4000 }).catch(() => fail('Ctrl+K did not open the search overlay'));
 ok('Ctrl+K opens search overlay');
 await input.fill('slope');

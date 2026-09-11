@@ -100,7 +100,7 @@
 					<Icon icon="mdi:magnify" class="text-xl text-base-content/60" />
 					<input
 						type="text"
-						placeholder="Search here"
+						placeholder="Search games…"
 						bind:value={$searchQuery}
 						on:focus={openSearch}
 						on:input={openSearch}

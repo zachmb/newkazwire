@@ -356,8 +356,8 @@
 					class="text-7xl text-white transition-transform group-hover:scale-110"
 				/>
 				<div class="flex flex-col gap-1 px-4">
-					<span class="text-lg font-bold text-white/90">Join our discord at</span>
-					<span class="text-3xl font-black text-white">joinkaz.com</span>
+					<span class="text-lg font-bold leading-snug text-white">Get more links in our Discord.</span>
+					<span class="text-base font-semibold text-white/90">Visit <span class="font-black text-white">joinkaz.com</span> to join.</span>
 				</div>
 			</a>
 
