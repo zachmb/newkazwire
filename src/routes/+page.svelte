@@ -4,6 +4,7 @@
 	import { userProfile } from '$lib/stores/userProfile';
 	import { recentlyPlayed } from '$lib/stores/recentlyPlayed';
 	import HomeRail from '$lib/components/HomeRail.svelte';
+	import GameCard from '$lib/components/GameCard.svelte';
 	import Cloak from '$lib/components/Cloak.svelte';
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
@@ -86,6 +87,26 @@
 		tag,
 		games: games.filter((g) => (g.tags || []).includes(tag)).slice(0, 18).map(toItem)
 	}));
+
+	// The full library, pinned games first then the rest — so you can scroll to the
+	// bottom of the home page and reach EVERY game, not just the capped rails above.
+	$: allGames = (() => {
+		const pinned = pinnedIds.map((id) => games.find((g) => idOf(g) === id)).filter(Boolean) as G[];
+		const rest = games.filter((g) => !pinnedIds.includes(idOf(g)));
+		return [...pinned, ...rest];
+	})();
+
+	// Lightweight client-side filter for the full grid (439+ games).
+	let allQuery = '';
+	$: filteredAll = allQuery.trim()
+		? allGames.filter((g) => {
+				const q = allQuery.toLowerCase();
+				return (
+					g.title.toLowerCase().includes(q) ||
+					(g.tags || []).some((t) => t.toLowerCase().includes(q))
+				);
+		  })
+		: allGames;
 
 	// AI community games (kept as a rail so the flagship new feature stays surfaced)
 	let community: Item[] = [];
@@ -174,5 +195,34 @@
 		{#each rails as r}
 			<HomeRail title={r.tag} viewMoreHref="/g" items={r.games} />
 		{/each}
+
+		<!-- ALL GAMES — the full library in one grid so you can scroll to the very
+		     bottom and reach every game. Filter box narrows the 400+ tiles. -->
+		<section id="all-games" class="scroll-mt-24">
+			<div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<h2 class="text-2xl font-bold capitalize">All games <span class="text-base font-semibold text-base-content/50">({allGames.length})</span></h2>
+				<label class="relative w-full sm:w-72">
+					<Icon icon="mdi:magnify" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-base-content/40" />
+					<input
+						type="text"
+						bind:value={allQuery}
+						placeholder="Filter all games…"
+						class="w-full rounded-full border border-base-content/10 bg-base-200 py-2 pl-10 pr-4 text-sm font-medium text-base-content placeholder:text-base-content/40 focus:border-primary focus:outline-none"
+					/>
+				</label>
+			</div>
+
+			{#if filteredAll.length}
+				<div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+					{#each filteredAll as g (g.href)}
+						<div class="aspect-square">
+							<GameCard title={g.title} image={g.image} href={g.href} />
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<p class="py-10 text-center text-base-content/50">No games match “{allQuery}”.</p>
+			{/if}
+		</section>
 	</div>
 </div>

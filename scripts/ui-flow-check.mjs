@@ -39,6 +39,24 @@ await input.waitFor({ state: 'visible', timeout: 4000 }).catch(() => fail('Ctrl+
 await page.keyboard.press('Escape');
 ok('Ctrl+K works on game pages');
 
+// --- Library pages must link to real game slugs, never /g/undefined.
+// (Regression guard: the /g browse page + home "All games" grid once read a
+// game.slug/game.id field that games.ts entries don't have, so every tile
+// linked to /g/undefined -> game/static/undefined/index.html ObjectNotFound.)
+for (const path of ['/g', '/']) {
+	await page.goto(BASE + path, { waitUntil: 'domcontentloaded' });
+	await page.waitForTimeout(1200);
+	const links = await page.locator('a[href^="/g/"]').evaluateAll((els) => els.map((e) => e.getAttribute('href')));
+	const broken = links.filter((h) => !h || h.includes('undefined') || h === '/g/');
+	if (!links.length) fail(`${path}: no game links found`);
+	if (broken.length) fail(`${path}: ${broken.length}/${links.length} game links are broken (e.g. ${broken[0]})`);
+	ok(`${path}: ${links.length} game links, none undefined/empty`);
+}
+
+// Back to a game page for the layout checks below.
+await page.goto(BASE + '/g/slope', { waitUntil: 'domcontentloaded' });
+await page.waitForTimeout(1500);
+
 // --- Side columns reach the page bottom on /g/[id] — measured on CONTENT,
 // not stretched grid containers (those always align and can false-green).
 const m = await page.evaluate(() => {

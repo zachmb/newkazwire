@@ -74,11 +74,11 @@
 	{/if}
 	{#each data.games as game}
 		<DefaultBox
-			name={game.name}
-			id={'gamePage-' + game.id}
-			developer={game.developer}
-			image={game.thumbnail_url || getCDNImageUrl(game.image, 'game')}
-			link={'/g/' + (game.slug || game.id)}
+			name={game.title}
+			id={'gamePage-' + game.href.split('/').pop()}
+			developer={''}
+			image={getCDNImageUrl(game.image, 'game')}
+			link={game.href}
 		/>
 	{/each}
 </grid>
