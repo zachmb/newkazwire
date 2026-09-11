@@ -72,21 +72,45 @@
 		.filter((g) => $userProfile.favoriteGames.includes(idOf(g)))
 		.map(toItem) as Item[];
 
-	// Category rails from tags (top tags by count)
-	$: tagCounts = (() => {
-		const m: Record<string, number> = {};
-		for (const g of games) for (const t of g.tags || []) m[t] = (m[t] || 0) + 1;
-		return m;
-	})();
-	$: topTags = Object.entries(tagCounts)
-		.filter(([, n]) => n >= 4)
-		.sort((a, b) => b[1] - a[1])
-		.slice(0, 12)
-		.map(([t]) => t);
-	$: rails = topTags.map((tag) => ({
-		tag,
-		games: games.filter((g) => (g.tags || []).includes(tag)).slice(0, 18).map(toItem)
-	}));
+	// Category rails — a DELIBERATELY ordered, tag-grouped set (not raw tag count,
+	// which buries the fun genres under generic buckets like "Casual"). Each entry
+	// folds related tags together; a row leads with games where the category is the
+	// PRIMARY (first) tag so rows stay distinct instead of all opening with 2048.
+	const CATEGORIES: { label: string; tags: string[] }[] = [
+		{ label: 'Action', tags: ['Action'] },
+		{ label: 'Shooter', tags: ['Shooter', 'FPS'] },
+		{ label: 'Multiplayer', tags: ['Multiplayer'] },
+		{ label: '3D', tags: ['3D'] },
+		{ label: 'Driving & Racing', tags: ['Driving', 'Car', 'Cars', 'Racing'] },
+		{ label: 'Sports', tags: ['Sports', 'Soccer'] },
+		{ label: 'Horror', tags: ['Horror'] },
+		{ label: 'Clicker & Idle', tags: ['Clicker', 'Idle', 'Incremental'] },
+		{ label: 'Puzzle & Brain', tags: ['Puzzle', 'Logic', 'Brain', 'Brain Teaser'] },
+		{ label: 'Platformer', tags: ['Platformer'] },
+		{ label: 'Strategy', tags: ['Strategy'] },
+		{ label: 'RPG', tags: ['RPG'] },
+		{ label: 'Skill', tags: ['Skill', 'Reflex', 'Reaction'] },
+		{ label: '2 Player', tags: ['2-player', 'Two Player'] },
+		{ label: 'IO Games', tags: ['IO', 'io'] },
+		{ label: 'Minecraft', tags: ['Minecraft'] },
+		{ label: 'Adventure', tags: ['Adventure'] },
+		{ label: 'Stickman', tags: ['Stickman'] },
+		{ label: 'Arcade', tags: ['Arcade'] },
+		{ label: 'Casual', tags: ['Casual'] }
+	];
+	$: rails = CATEGORIES.map((c) => {
+		const set = new Set(c.tags);
+		const inCat = games.filter((g) => (g.tags || []).some((t) => set.has(t)));
+		// primary matches (category is the game's first tag) lead the row
+		const primary = inCat.filter((g) => set.has((g.tags || [])[0]));
+		const secondary = inCat.filter((g) => !set.has((g.tags || [])[0]));
+		return {
+			label: c.label,
+			tag: c.tags[0],
+			count: inCat.length,
+			games: [...primary, ...secondary].slice(0, 18).map(toItem)
+		};
+	}).filter((r) => r.count >= 6);
 
 	// The full library, pinned games first then the rest — so you can scroll to the
 	// bottom of the home page and reach EVERY game, not just the capped rails above.
@@ -192,8 +216,8 @@
 		<HomeRail title="Apps" viewMoreHref="/apps" items={apps} />
 		<HomeRail title="Community creations" viewMoreHref="/ai/gallery" items={community} />
 
-		{#each rails as r}
-			<HomeRail title={r.tag} viewMoreHref="/g" items={r.games} />
+		{#each rails as r (r.label)}
+			<HomeRail title={r.label} viewMoreHref={`/g?tag=${encodeURIComponent(r.tag)}`} items={r.games} />
 		{/each}
 
 		<!-- ALL GAMES — the full library in one grid so you can scroll to the very

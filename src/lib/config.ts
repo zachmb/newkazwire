@@ -16,7 +16,14 @@ export const config = {
 	// Options: "hero", "main", "faq"
 	// Order: top to bottom
 	homeLayoutOrder: ['hero', 'main'],
-	pinnedGames: ['tiny-fishing', 'fruit-ninja', 'subway-surfers', 'retro-bowl', 'geometry-dash'],
+	// "Popular" row — a curated mix of timeless classics and current hits (all
+	// verified present in the library). Shown first on the home page.
+	pinnedGames: [
+		'subway-surfers', 'steal-a-brainrot', 'retro-bowl', 'geometry-dash', 'clash-royale',
+		'1v1-lol', 'plants-vs-brainrots', 'slope', 'drift-hunters', 'basketball-stars',
+		'eggy-car', 'fruit-ninja', 'moto-x3m', 'basket-random', '99-nights-in-the-forest',
+		'tiny-fishing', 'agent-smith', 'ovo', 'happy-wheels', 'cluster-rush'
+	],
 	features: {
 		searchBar: true,
 		accountCreation: true
