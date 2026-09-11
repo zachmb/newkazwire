@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Cloak from '$lib/components/Cloak.svelte';
+	import Icon from '@iconify/svelte';
 
 	// A single horizontal rail exactly as the original kazwire.com home: a bold
 	// capitalized heading with a blue "View more" accent pill, followed by a
@@ -29,18 +30,33 @@
 			<div class="no-scrollbar flex flex-row justify-start gap-x-4 overflow-x-auto scroll-smooth pb-5">
 				{#each items as item (item.href)}
 					<a
-						class="block h-40 w-[18rem] flex-none text-left transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer hover:shadow-md"
+						class="group block h-40 w-[18rem] flex-none text-left transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer"
 						href={item.href}
 						title={item.title}
 					>
-						<div class="relative h-full w-full overflow-hidden rounded-box border border-base-content/10 bg-black">
+						<!-- Same treatment as the All-Games GameCard tiles: 1px ring that turns
+						     primary (orange/clay) on hover, image zoom, and a centered play
+						     affordance that fades in. -->
+						<div
+							class="relative h-full w-full overflow-hidden rounded-box bg-black ring-1 ring-black/10 transition-all duration-200 group-hover:ring-2 group-hover:ring-primary group-hover:shadow-md"
+						>
 							<img
-								class="absolute h-full w-full bg-white object-cover"
+								class="absolute h-full w-full bg-white object-cover transition-transform duration-500 group-hover:scale-105"
 								loading="lazy"
 								src={item.image}
 								alt={item.title}
 							/>
-							<div class="absolute inset-0 bg-black/40"></div>
+							<div class="absolute inset-0 bg-black/40 transition-colors duration-200 group-hover:bg-black/25"></div>
+
+							<!-- Play affordance -->
+							<div class="pointer-events-none absolute inset-0 grid place-items-center">
+								<div
+									class="grid h-14 w-14 translate-y-1 place-items-center rounded-full bg-primary text-white opacity-0 shadow-sm ring-2 ring-white/30 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+								>
+									<Icon icon="mdi:play" class="text-3xl" />
+								</div>
+							</div>
+
 							<div class="absolute inset-0 flex flex-col justify-end gap-0.5 p-3">
 								<h3 class="text-lg font-bold leading-tight tracking-tight text-white">
 									{#if cloak}<Cloak text={item.title} />{:else}{item.title}{/if}

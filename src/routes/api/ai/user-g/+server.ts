@@ -4,10 +4,17 @@ import { uploadToOCI, addToRegistry, getRegistry, checkStorageLimits, upsertProf
 import type { UserGame } from '$lib/server/oci';
 import { getRealIp, geolocate } from '$lib/server/ip';
 import { stripMarkdown } from '$lib/server/deepseek';
+import { moderateStrict, cleanText, cleanDisplayName, containsHardTerm } from '$lib/server/moderation';
 
-function cleanName(raw: unknown): string {
-    const s = (typeof raw === 'string' ? raw : '').replace(/[<>]/g, '').trim().slice(0, 32);
-    return s || 'Anonymous';
+/** Human-visible text of a game's HTML (title + body text, minus scripts/styles)
+ *  so we can scan what a PLAYER would actually read. */
+function visibleText(html: string): string {
+    return String(html)
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&[a-z]+;/gi, ' ')
+        .slice(0, 20000);
 }
 
 export const POST: RequestHandler = async ({ request, getClientAddress, url }) => {
@@ -36,6 +43,25 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
             safeTitle = aiTitle && !/^(document|untitled|game)$/i.test(aiTitle) ? aiTitle : 'Untitled Game';
         }
         safeTitle = safeTitle.slice(0, 80);
+
+        // ── MODERATION ───────────────────────────────────────────────────────
+        // Title is public + prominent: a bad title is REJECTED (the creator picks a
+        // clean one) rather than silently falling back, so feedback is clear.
+        const titleMod = moderateStrict(safeTitle, { maxLength: 80 });
+        if (titleMod.blocked && titleMod.reason !== 'empty') {
+            return json({ error: 'That title isn\'t allowed. Please choose a school-appropriate title.' }, { status: 400 });
+        }
+        safeTitle = titleMod.text || 'Untitled Game';
+
+        // The generated game itself must not contain slurs/sexual/CSAM text a player
+        // would read (a sneaky prompt can still steer the model). Scan visible text.
+        if (containsHardTerm(visibleText(code))) {
+            return json({ error: 'This game contains content that isn\'t allowed. Try a different idea.' }, { status: 400 });
+        }
+
+        // Description: body policy (mask mild profanity, block hard terms).
+        const descMod = cleanText(description, { maxLength: 500 });
+        const safeDescription = descMod.blocked ? '' : descMod.text;
 
         // Real visitor IP (behind nginx, getClientAddress() is 127.0.0.1 — read XFF).
         const ip = getRealIp(request, getClientAddress);
@@ -76,11 +102,11 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         }
 
         // Add to registry with size tracked
-        const cleanCreator = cleanName(creatorName);
+        const cleanCreator = cleanDisplayName(creatorName);
         const newGame: UserGame = {
             id,
             title: safeTitle,
-            description: description || '',
+            description: safeDescription,
             codeUrl,
             creatorIp: ip,
             creatorName: cleanCreator,

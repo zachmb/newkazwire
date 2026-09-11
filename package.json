@@ -10,6 +10,7 @@
 		"bare": "node server/bare-server.cjs",
 		"proxy-server": "node server/proxy-server.cjs",
 		"test": "npm run test:integration && npm run test:unit",
+		"test:moderation": "tsx scripts/moderation.test.mts",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",

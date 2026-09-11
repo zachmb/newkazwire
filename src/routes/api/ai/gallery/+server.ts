@@ -1,10 +1,19 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRegistry, toPublicGame } from '$lib/server/oci';
+import { moderateStrict, containsHardTerm } from '$lib/server/moderation';
+
+/** Defense-in-depth: hide any already-published game whose title/description is
+ *  inappropriate (older games predate the publish-time moderation gate). */
+function isDisplayable(g: any): boolean {
+    if (moderateStrict(g.title, { maxLength: 80 }).blocked) return false;
+    if (containsHardTerm(g.description)) return false;
+    return true;
+}
 
 export const GET: RequestHandler = async ({ url }) => {
     try {
-        const games = await getRegistry();
+        const games = (await getRegistry()).filter(isDisplayable);
         const sort = url.searchParams.get('sort') === 'top' ? 'top' : 'new';
         const newer = (a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
