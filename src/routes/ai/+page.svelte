@@ -413,7 +413,7 @@
 			<!-- Hero header -->
 			<div class="relative overflow-hidden rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm sm:p-8">
 				<div class="relative z-10 flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-					<div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-content">
+					<div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-content">
 						<Icon icon="mdi:robot-happy" class="text-4xl" />
 					</div>
 					<div class="flex-1">
@@ -481,7 +481,7 @@
 								<input
 									type="text"
 									placeholder="Leave blank and the AI will name it"
-									class="input input-bordered input-lg w-full rounded-2xl"
+									class="input input-bordered input-lg w-full rounded-xl"
 									bind:value={title}
 									disabled={isGenerating}
 								/>
@@ -490,7 +490,7 @@
 							<label class="form-control w-full">
 								<span class="label-text mb-1 font-bold">Describe your game</span>
 								<textarea
-									class="textarea textarea-bordered h-32 w-full rounded-2xl p-4 text-base font-medium focus:textarea-primary"
+									class="textarea textarea-bordered h-32 w-full rounded-xl p-4 text-base font-medium focus:textarea-primary"
 									placeholder="e.g. A neon-style space shooter where you dodge asteroids and collect power-ups..."
 									bind:value={prompt}
 									disabled={isGenerating}
@@ -519,7 +519,7 @@
 							>
 								{#if isGenerating}
 									<Icon icon="line-md:loading-alt-loop" class="text-2xl" />
-									Generating magic...
+									Generating your game…
 								{:else}
 									<Icon icon="mdi:auto-fix" class="text-2xl" />
 									Generate game
@@ -674,7 +674,7 @@
 									<input
 										type="text"
 										placeholder="My awesome game"
-										class="input input-bordered input-lg w-full rounded-2xl"
+										class="input input-bordered input-lg w-full rounded-xl"
 										bind:value={uploadTitle}
 										disabled={isUploading}
 									/>
@@ -683,7 +683,7 @@
 								<label class="form-control w-full">
 									<span class="label-text mb-1 font-bold">Description <span class="text-base-content/40">(optional)</span></span>
 									<textarea
-										class="textarea textarea-bordered h-24 w-full rounded-2xl p-4 focus:textarea-primary"
+										class="textarea textarea-bordered h-24 w-full rounded-xl p-4 focus:textarea-primary"
 										placeholder="A short line about how it plays..."
 										bind:value={uploadDescription}
 										disabled={isUploading}
@@ -692,7 +692,7 @@
 
 								<div class="form-control w-full">
 									<span class="label-text mb-1 font-bold">Choose a .html file</span>
-									<label class="flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-dashed border-base-300 p-4 transition-colors hover:border-primary/50 hover:bg-primary/5">
+									<label class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-base-300 p-4 transition-colors hover:border-primary/50 hover:bg-primary/5">
 										<Icon icon="mdi:file-code-outline" class="text-3xl text-primary" />
 										<span class="min-w-0 flex-1">
 											<span class="block truncate font-bold">{uploadFileName || 'Click to select a .html file'}</span>
@@ -706,7 +706,7 @@
 							<label class="form-control w-full">
 								<span class="label-text mb-1 font-bold">Or paste HTML</span>
 								<textarea
-									class="textarea textarea-bordered h-full min-h-[16rem] w-full rounded-2xl p-4 font-mono text-sm focus:textarea-primary"
+									class="textarea textarea-bordered h-full min-h-[16rem] w-full rounded-xl p-4 font-mono text-sm focus:textarea-primary"
 									placeholder={'<!DOCTYPE html>\n<html>...</html>'}
 									bind:value={uploadCode}
 									disabled={isUploading}

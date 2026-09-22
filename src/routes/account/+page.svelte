@@ -107,6 +107,18 @@
 	let leaders = [];
 	let leaderboardLoading = true;
 
+	// Dark-mode toggle (real — mirrors the /settings theme switch: data-theme + kz-theme).
+	let isDark = false;
+	onMount(() => {
+		isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
+	});
+	function toggleTheme() {
+		isDark = !isDark;
+		const t = isDark ? 'dark' : 'light';
+		document.documentElement.setAttribute('data-theme', t);
+		try { localStorage.setItem('kz-theme', t); } catch { /* ignore */ }
+	}
+
 	let publishingIds = new Set();
 	let successfullyPublishedIds = new Set();
 	let publishError = '';
@@ -274,17 +286,17 @@
 				<!-- Stat strip — inside the banner, darker bottom. Every value is real. -->
 				<div class="grid grid-cols-2 border-t border-white/10 sm:grid-cols-4 lg:grid-cols-8">
 					{#each [
-						{ icon: 'mdi:fire',            value: currentStreak,      label: 'Day Streak',    color: 'text-orange-300' },
-						{ icon: 'mdi:fire-circle',     value: longestStreak,      label: 'Longest Streak',color: 'text-amber-300'  },
-						{ icon: 'mdi:gamepad-variant', value: gamesPlayed,        label: 'Games Played',  color: 'text-sky-300'    },
-						{ icon: 'mdi:heart',           value: favoritesCount,     label: 'Favorites',     color: 'text-pink-300'   },
-						{ icon: 'mdi:robot',           value: aiGamesCount,        label: 'AI Games',      color: 'text-violet-300' },
-						{ icon: 'mdi:puzzle',          value: gamesCreated,       label: 'Created',       color: 'text-emerald-300'},
-						{ icon: 'mdi:message-text',    value: postsCount,         label: 'Posts',         color: 'text-cyan-300'   },
-						{ icon: 'mdi:comment-multiple',value: commentsCount,      label: 'Comments',      color: 'text-indigo-300' }
+						{ icon: 'mdi:fire',            value: currentStreak,      label: 'Day Streak'     },
+						{ icon: 'mdi:fire-circle',     value: longestStreak,      label: 'Longest Streak' },
+						{ icon: 'mdi:gamepad-variant', value: gamesPlayed,        label: 'Games Played'   },
+						{ icon: 'mdi:heart',           value: favoritesCount,     label: 'Favorites'      },
+						{ icon: 'mdi:robot',           value: aiGamesCount,        label: 'AI Games'       },
+						{ icon: 'mdi:puzzle',          value: gamesCreated,       label: 'Created'        },
+						{ icon: 'mdi:message-text',    value: postsCount,         label: 'Posts'          },
+						{ icon: 'mdi:comment-multiple',value: commentsCount,      label: 'Comments'       }
 					] as stat}
 						<div class="flex items-center gap-3 border-t border-white/5 bg-black/15 px-5 py-4">
-							<Icon icon={stat.icon} class="shrink-0 text-2xl {stat.color}" />
+							<Icon icon={stat.icon} class="shrink-0 text-2xl text-white/55" />
 							<div>
 								<div class="text-xl font-black text-white">
 									{#if statsLoading}
@@ -301,13 +313,13 @@
 			</div>
 
 			<!-- ── TAB BAR ── -->
-			<div class="flex gap-2 rounded-xl border border-base-content/10 bg-black/40 p-1.5">
+			<div class="flex gap-1 rounded-box border border-base-content/10 bg-base-100 p-1.5 shadow-sm">
 				{#each TABS as tab}
 					<button
-						class="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition-all duration-150
+						class="flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors duration-150
 							{activeTab === tab.id
-								? 'bg-base-100 text-primary shadow-md'
-								: 'text-white/70 hover:bg-white/10 hover:text-white'}"
+								? 'bg-primary text-primary-content shadow-sm'
+								: 'text-base-content/60 hover:bg-base-200 hover:text-base-content'}"
 						on:click={() => { activeTab = tab.id; }}
 					>
 						<Icon icon={tab.icon} class="text-base shrink-0" />
@@ -350,46 +362,34 @@
 					<!-- Settings -->
 					<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
-							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/15"><Icon icon="mdi:cog" class="text-amber-600" /></span>
+							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-base-200 text-base-content/70"><Icon icon="mdi:cog" /></span>
 							Settings
 						</h2>
 						<div class="flex flex-col gap-1">
-							<label class="flex cursor-pointer items-center justify-between rounded-2xl p-3 transition-colors hover:bg-base-100">
+							<label class="flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors hover:bg-base-200">
 								<div class="flex items-center gap-3">
-									<div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-										<Icon icon="mdi:advertisements" class="text-primary" />
+									<div class="flex h-9 w-9 items-center justify-center rounded-lg bg-base-200 text-base-content/70">
+										<Icon icon="mdi:advertisements" />
 									</div>
 									<div>
 										<div class="font-bold text-base-content">Support Ads</div>
 										<div class="text-xs text-base-content/40">Help support the developer</div>
 									</div>
 								</div>
-								<input type="checkbox" class="toggle toggle-success" checked={$userProfile.showAds}
+								<input type="checkbox" class="toggle toggle-primary" checked={$userProfile.showAds}
 									on:change={() => userProfile.update((p) => ({ ...p, showAds: !p.showAds }))} />
 							</label>
-							<label class="flex cursor-pointer items-center justify-between rounded-2xl p-3 transition-colors hover:bg-base-100">
+							<label class="flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors hover:bg-base-200">
 								<div class="flex items-center gap-3">
-									<div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50">
-										<Icon icon="mdi:theme-light-dark" class="text-amber-500" />
+									<div class="flex h-9 w-9 items-center justify-center rounded-lg bg-base-200 text-base-content/70">
+										<Icon icon="mdi:theme-light-dark" />
 									</div>
 									<div>
 										<div class="font-bold text-base-content">Dark Mode</div>
 										<div class="text-xs text-base-content/40">Toggle dark theme</div>
 									</div>
 								</div>
-								<input type="checkbox" class="toggle toggle-success" checked />
-							</label>
-							<label class="flex cursor-pointer items-center justify-between rounded-2xl p-3 transition-colors hover:bg-base-100">
-								<div class="flex items-center gap-3">
-									<div class="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
-										<Icon icon="mdi:volume-high" class="text-secondary" />
-									</div>
-									<div>
-										<div class="font-bold text-base-content">Sound Effects</div>
-										<div class="text-xs text-base-content/40">Enable or disable UI sounds</div>
-									</div>
-								</div>
-								<input type="checkbox" class="toggle toggle-success" checked />
+								<input type="checkbox" class="toggle toggle-primary" checked={isDark} on:change={toggleTheme} />
 							</label>
 						</div>
 					</div>
@@ -397,12 +397,12 @@
 					<!-- Favorites -->
 					<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 						<h2 class="mb-4 flex items-center gap-2 text-lg font-black text-base-content">
-							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50"><Icon icon="mdi:heart" class="text-red-400" /></span>
+							<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary"><Icon icon="mdi:heart" /></span>
 							Favorite Games
-							<span class="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-black text-red-400">{favoritesCount}</span>
+							<span class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-black text-primary">{favoritesCount}</span>
 						</h2>
 						{#if $userProfile.favoriteGames.length === 0}
-							<div class="flex h-32 flex-col items-center justify-center gap-2 rounded-2xl bg-base-100 text-center">
+							<div class="flex h-32 flex-col items-center justify-center gap-2 rounded-lg bg-base-200 text-center">
 								<Icon icon="mdi:heart-outline" class="text-3xl text-base-content/20" />
 								<p class="text-sm font-bold text-base-content/30">No favorites yet — heart a game to save it.</p>
 							</div>
@@ -438,14 +438,14 @@
 					<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 						<div class="mb-5 flex items-center justify-between">
 							<h3 class="flex items-center gap-2 text-lg font-black text-base-content">
-								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/10"><Icon icon="mdi:robot" class="text-secondary" /></span>
+								<span class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary"><Icon icon="mdi:robot" /></span>
 								My AI Games
 							</h3>
-							<span class="rounded-full bg-secondary/10 px-3 py-1 text-xs font-black text-secondary">{$localAiGames.length} saved</span>
+							<span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">{$localAiGames.length} saved</span>
 						</div>
 
 						{#if $localAiGames.length === 0}
-							<div class="flex h-48 flex-col items-center justify-center gap-3 rounded-2xl bg-base-100 text-center">
+							<div class="flex h-48 flex-col items-center justify-center gap-3 rounded-lg bg-base-200 text-center">
 								<Icon icon="mdi:robot-outline" class="text-5xl text-base-content/15" />
 								<p class="text-sm font-bold text-base-content/30">No AI games yet.</p>
 								<a href="/ai" class="btn btn-primary btn-sm rounded-full font-black text-white">Generate one now</a>
@@ -499,7 +499,7 @@
 			{:else if activeTab === 'shop'}
 				<div class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
 					<!-- Sub-toggle: the Kazcoin item shop and the KazMarket both live here -->
-					<div class="mb-6 inline-flex rounded-2xl bg-base-200 p-1">
+					<div class="mb-6 inline-flex rounded-lg bg-base-200 p-1">
 						<button
 							class="rounded-xl px-4 py-2 text-sm font-black transition-colors {shopView === 'items' ? 'bg-primary text-white shadow' : 'text-base-content/60 hover:text-base-content'}"
 							on:click={() => { shopView = 'items'; }}
@@ -601,7 +601,7 @@
 
 			<!-- Back home -->
 			<div>
-				<a href="/" class="btn rounded-xl border border-base-content/10 bg-black/40 font-black text-white hover:bg-black/50">
+				<a href="/" class="btn rounded-btn border border-base-content/10 bg-base-100 font-bold text-base-content hover:bg-base-200">
 					<Icon icon="mdi:arrow-left" />Back to Games
 				</a>
 			</div>
@@ -609,14 +609,11 @@
 
 		<!-- Right Sidebar -->
 		<aside class="flex flex-col gap-4">
-			<div class="flex h-56 w-full items-center justify-center rounded-box border-2 border-dashed border-white/20 bg-white/10">
-				<span class="text-sm font-bold text-white/30">Ad Space</span>
-			</div>
-			<div class="rounded-box border border-base-content/10 bg-white/10 p-4">
-				<h3 class="mb-3 text-xs font-black uppercase tracking-widest text-white/60">Recommended</h3>
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-4 shadow-sm">
+				<h3 class="mb-3 text-xs font-black uppercase tracking-widest text-base-content/50">Recommended</h3>
 				<div class="grid grid-cols-2 gap-3">
 					{#each mappedGames.slice(0, 6) as game}
-						<a href={game.href} class="group relative aspect-square overflow-hidden rounded-xl bg-base-100 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+						<a href={game.href} class="group relative aspect-square overflow-hidden rounded-lg bg-base-200 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
 							<img src={game.image} alt={game.title} class="h-full w-full object-cover" />
 							<div class="absolute inset-0 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							<div class="absolute inset-x-0 bottom-0 translate-y-full p-1.5 transition-transform group-hover:translate-y-0">
