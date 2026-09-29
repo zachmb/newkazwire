@@ -8,7 +8,7 @@
 	/**
 	 * A saved AI game from the player's local library, rendered as a proper card:
 	 * cover placeholder art, title, created date, and Open + Remix actions.
-	 * The card is UI-only — Open/Remix are emitted for the page to handle so the
+	 * The card is UI-only. Open/Remix are emitted for the page to handle so the
 	 * existing generate/remix flow stays the single source of truth.
 	 */
 	export let game: LocalAiGame;

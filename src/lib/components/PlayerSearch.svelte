@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Reusable player search — used on the account "Players" tab (and /players).
+	// Reusable player search: used on the account "Players" tab (and /players).
 	// Search creators by name and open their public profile at /u/{uid}.
 	import Icon from '@iconify/svelte';
 

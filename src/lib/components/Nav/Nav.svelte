@@ -60,7 +60,7 @@
 <header class="sticky top-0 z-50 border-b border-base-300 bg-base-200">
 	<nav class="mx-auto flex h-16 max-w-[1800px] items-center gap-1.5 px-3 sm:gap-3 sm:px-5">
 		<!--
-			BRAND TILE — explicitly self-lit so it survives OS/UA dark mode.
+			BRAND TILE: explicitly self-lit so it survives OS/UA dark mode.
 			Bug fix: the wordmark previously inherited theme colors; a UA honoring
 			prefers-color-scheme:dark could render it invisible. We pin an explicit
 			light background chip + explicit dark ink on the tile so it is always
@@ -82,7 +82,7 @@
 			</a>
 		{:else}
 			<!-- A page's left-rail brand tile is the site title right now (it hangs from
-			     this bar) — repeating the wordmark here would duplicate it. Keep just the
+			     this bar). Repeating the wordmark here would duplicate it. Keep just the
 			     logo as the home click target. -->
 			<a
 				href="/"
@@ -127,13 +127,13 @@
 						: 'text-base-content/80 hover:bg-primary/10 hover:text-primary'}"
 				>
 					<Icon icon={l.icon} class="text-lg" />
-					<!-- Labels only at xl+ — at lg the row is tight and starves the search box. -->
+					<!-- Labels only at xl+. At lg the row is tight and starves the search box. -->
 					<span class="hidden xl:inline"><Cloak text={l.label} /></span>
 				</a>
 			{/each}
 		</div>
 
-		<!-- Create CTA (always visible, prominent) — make your own game with AI -->
+		<!-- Create CTA (always visible, prominent): make your own game with AI -->
 		<a
 			href="/ai"
 			class="flex flex-none items-center gap-1.5 rounded-full bg-secondary px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-110 sm:px-4"

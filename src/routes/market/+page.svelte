@@ -1,5 +1,5 @@
 <script lang="ts">
-	// /market — standalone KazMarket page. The market UI now lives in a shared
+	// /market: standalone KazMarket page. The market UI now lives in a shared
 	// component (also embedded in the account Shop tab). This page keeps the
 	// public route + deep-links (/market?asset=…) working.
 	import KazMarket from '$lib/components/KazMarket.svelte';

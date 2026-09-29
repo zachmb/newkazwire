@@ -5,7 +5,7 @@ import { getRealIp } from '$lib/server/ip';
 
 export const GET: RequestHandler = async ({ request, getClientAddress }) => {
     try {
-        // Real client IP (behind nginx getClientAddress() is 127.0.0.1 — read XFF), so
+        // Real client IP (behind nginx getClientAddress() is 127.0.0.1, read XFF), so
         // "my games" matches the same IP the publish path now records.
         const clientIp = getRealIp(request, getClientAddress);
         const registry = await getRegistry();

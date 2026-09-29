@@ -2,31 +2,31 @@ import { env } from '$env/dynamic/private';
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
-const systemPrompt = `You are a senior HTML5 game developer with a great sense of game feel. You output single-file HTML5 games that run perfectly in an iframe AND are genuinely fun, polished, and replayable — not bare-minimum demos.
+const systemPrompt = `You are a senior HTML5 game developer with a great sense of game feel. You output single-file HTML5 games that run perfectly in an iframe AND are genuinely fun, polished, and replayable, not bare-minimum demos.
 
-HARD FORMAT RULES (no exceptions — breaking these produces a black screen):
-- Output ONLY raw HTML. The VERY FIRST characters of your output must be <!DOCTYPE html> and the very last must be </html>. ABSOLUTELY NO markdown code fences: never emit \`\`\` or \`\`\`html anywhere — a fence anywhere in the output breaks the game file and the player sees a black screen. No explanation before or after the HTML.
+HARD FORMAT RULES (no exceptions, breaking these produces a black screen):
+- Output ONLY raw HTML. The VERY FIRST characters of your output must be <!DOCTYPE html> and the very last must be </html>. ABSOLUTELY NO markdown code fences: never emit \`\`\` or \`\`\`html anywhere. A fence anywhere in the output breaks the game file and the player sees a black screen. No explanation before or after the HTML.
 - NO COMPRESSION: Do not minify. Every HTML tag MUST have a space between its name and its attributes (e.g. <canvas id="c"> is CORRECT, <canvasid="c"> is BROKEN).
 - SIBLING TAGS: The <script> tag MUST be a sibling of the <canvas> tag, NEVER nested inside it. Browsers treat content inside <canvas> as fallback and will NOT execute the script if it's a child.
 - All CSS must include: * { margin:0; padding:0; box-sizing:border-box; } and html,body { width:100%; height:100%; overflow:hidden; }
 - Use a single <canvas> that fills the viewport, and handle window 'resize' so it always fits.
 - Use requestAnimationFrame with delta-time so speed is frame-rate independent.
-- All in-game UI/score/text is drawn on the canvas with ctx.fillText — never HTML <div>/<p> for game UI.
+- All in-game UI/score/text is drawn on the canvas with ctx.fillText, never HTML <div>/<p> for game UI.
 - All variables declared/initialized before use. No runtime errors, ever.
-- NEVER use external libraries, assets, images, or fonts. Vanilla JS + canvas only (procedural art with shapes/gradients). Sound is OK via the Web Audio API (oscillator beeps) — no audio files.
-- JavaScript only — NO TypeScript syntax (no type annotations, interfaces, enums, generics).
+- NEVER use external libraries, assets, images, or fonts. Vanilla JS + canvas only (procedural art with shapes/gradients). Sound is OK via the Web Audio API (oscillator beeps), no audio files.
+- JavaScript only, NO TypeScript syntax (no type annotations, interfaces, enums, generics).
 
-QUALITY BAR (this is what makes the game GOOD — do all of it):
+QUALITY BAR (this is what makes the game GOOD, do all of it):
 - START SCREEN: open on a titled start screen with the game name, a one-line how-to-play, and "Tap / Press any key to start". Don't drop the player straight into motion.
 - GAME FEEL / JUICE: add particles on impacts/pickups/deaths, a short screen-shake on big hits, easing/tweening on UI, and satisfying Web Audio blips for actions (jump, score, hit, game over). Juice is the difference between bland and fun.
-- COHESIVE ART: pick a deliberate, attractive color palette (a themed background — NOT plain black — plus 3-4 harmonious colors) and stick to it. Use gradients, glows, rounded shapes; make it look designed.
+- COHESIVE ART: pick a deliberate, attractive color palette (a themed background, NOT plain black, plus 3-4 harmonious colors) and stick to it. Use gradients, glows, rounded shapes; make it look designed.
 - DIFFICULTY CURVE: start easy and ramp up (speed/spawn-rate/complexity) so it stays engaging; escalating challenge, not a flat loop.
 - FEEDBACK: score pops, combo/streak counter where it fits, a persistent hi-score kept in a variable for the session, clear visual/audio feedback for every action.
 - CONTROLS: full keyboard AND touch/pointer support, both working well; show the controls on the start screen.
 - GAME OVER: a proper game-over screen with final score, hi-score, and one-tap restart.
-- Aim for something a player would actually want to replay — tight controls, clear goal, mounting tension. Make it fun for well past 60 seconds.
+- Aim for something a player would actually want to replay: tight controls, clear goal, mounting tension. Make it fun for well past 60 seconds.
 
-EXAMPLE OF A PERFECT OUTPUT STRUCTURE (study the tag structure — your game must be richer than this):
+EXAMPLE OF A PERFECT OUTPUT STRUCTURE (study the tag structure, your game must be richer than this):
 
 <!DOCTYPE html>
 <html lang="en">
@@ -86,11 +86,11 @@ function buildMessages(prompt: string, remixContext?: string, remixCode?: string
         // request, and require a complete standalone game back (not a diff).
         const src = remixCode.slice(0, 120_000); // cap so we never blow the context window
         userMessage =
-            `You are REMIXING an existing HTML5 game. Here is its COMPLETE current source code between the markers — study it, then apply the requested change while keeping what already works.\n\n` +
+            `You are REMIXING an existing HTML5 game. Here is its COMPLETE current source code between the markers. Study it, then apply the requested change while keeping what already works.\n\n` +
             `----- BEGIN SOURCE GAME -----\n${src}\n----- END SOURCE GAME -----\n\n` +
             (remixContext ? `Original concept: "${remixContext}".\n` : '') +
             `Requested change / new twist: "${prompt}"\n\n` +
-            `Output the COMPLETE modified game as a single self-contained HTML file (same format rules as always — no diffs, no explanation, keep it fully playable).`;
+            `Output the COMPLETE modified game as a single self-contained HTML file (same format rules as always: no diffs, no explanation, keep it fully playable).`;
     } else if (remixContext) {
         userMessage = `Remix this game concept/description: "${remixContext}" with the following new twist: "${prompt}"`;
     } else {
@@ -104,13 +104,13 @@ function buildMessages(prompt: string, remixContext?: string, remixCode?: string
 
 /**
  * Strip markdown code fences the model sometimes wraps output in despite the
- * prompt — a stray ``` in the served HTML breaks the game. Handles fences with
+ * prompt. A stray ``` in the served HTML breaks the game. Handles fences with
  * leading whitespace/prose, a language tag, and a trailing fence; as a last
  * resort trims anything before <!DOCTYPE and after </html>.
  */
 export function stripMarkdown(code: string): string {
     const out = (code || '').trim();
-    // If the full document markers exist, clamp to them — this removes fences,
+    // If the full document markers exist, clamp to them. This removes fences,
     // language tags, and any prose the model wrapped around the game in one cut.
     const lower = out.toLowerCase();
     const start = lower.indexOf('<!doctype html');
@@ -127,7 +127,7 @@ export function stripMarkdown(code: string): string {
 }
 
 /**
- * Non-streaming generation — returns the complete game HTML string. Used by the
+ * Non-streaming generation. Returns the complete game HTML string. Used by the
  * "report broken" flow, which regenerates a game server-side (analyze + fix) without
  * a live token stream. Throws on API error or empty output so the caller can refund
  * the regeneration slot (never consume a cap on failure).
@@ -170,7 +170,7 @@ export async function generateGameCode(
 }
 
 /**
- * Streaming version — returns a ReadableStream of SSE text events.
+ * Streaming version. Returns a ReadableStream of SSE text events.
  * Each event is `data: <token>\n\n`. Final event is `data: [DONE]\n\n`.
  * A heartbeat `data: [PING]\n\n` is sent every 15 s to keep Cloudflare alive.
  */
@@ -185,7 +185,7 @@ export function generateGameCodeStream(prompt: string, remixContext?: string, re
 
     return new ReadableStream<Uint8Array>({
         async start(controller) {
-            // Heartbeat interval — keeps Cloudflare from treating the connection as idle
+            // Heartbeat interval: keeps Cloudflare from treating the connection as idle
             const heartbeat = setInterval(() => {
                 try {
                     controller.enqueue(encoder.encode('data: [PING]\n\n'));
@@ -257,13 +257,13 @@ export function generateGameCodeStream(prompt: string, remixContext?: string, re
 
                 controller.enqueue(encoder.encode('data: [DONE]\n\n'));
             } catch (err: any) {
-                // The client may already be gone — enqueue on a closed controller throws.
+                // The client may already be gone: enqueue on a closed controller throws.
                 try {
                     controller.enqueue(
                         encoder.encode(`data: [ERROR] ${encodeURIComponent(err.message)}\n\n`)
                     );
                 } catch {
-                    /* client disconnected — nothing to report to */
+                    /* client disconnected, nothing to report to */
                 }
             } finally {
                 clearInterval(heartbeat);

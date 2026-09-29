@@ -52,7 +52,7 @@
 			<p>
 				{$page.url.hostname} is dedicated to protecting the privacy of our users and handling any
 				data we obtain with care and respect. An overall principle is that we do not collect more
-				information than is reasonably necessary to provide you with the best user experience —
+				information than is reasonably necessary to provide you with the best user experience,
 				and this site is built so that it can be used without providing any personal information
 				at all.
 			</p>
@@ -90,7 +90,7 @@
 				</h2>
 				<p class="mt-3">
 					<strong class="font-bold text-base-content">1.1</strong> The Website offers a diverse
-					and exciting mix of online games — titles curated by us as well as games created by the
+					and exciting mix of online games: titles curated by us as well as games created by the
 					community using the Website's built-in AI game creator. Players can access the Website
 					and play games without registering: there are no accounts, no sign-up forms, and no
 					passwords anywhere on the Website. Visitors can also browse the library, join
@@ -118,34 +118,34 @@
 				</p>
 				<ul class="mt-3 list-disc space-y-2 pl-5">
 					<li>
-						<strong class="font-bold text-base-content">A random session identifier</strong> —
+						<strong class="font-bold text-base-content">A random session identifier</strong>:
 						generated in your browser and stored in localStorage. It identifies your browser, not
 						you.
 					</li>
 					<li>
-						<strong class="font-bold text-base-content">A display name, if you set one</strong> —
+						<strong class="font-bold text-base-content">A display name, if you set one</strong>:
 						optional and self-chosen (please don't use your real name).
 					</li>
 					<li>
-						<strong class="font-bold text-base-content">Content you submit</strong> — posts,
+						<strong class="font-bold text-base-content">Content you submit</strong>: posts,
 						comments, community notes, game ratings, AI game prompts, uploaded games, and shop
 						listings, stored on our infrastructure.
 					</li>
 					<li>
-						<strong class="font-bold text-base-content">Usage information</strong> — page views,
+						<strong class="font-bold text-base-content">Usage information</strong>: page views,
 						games played, and similar coarse events tied to the anonymous session identifier,
 						along with browser type and user agent, referral source, and information about the
 						timing and pattern of your use of the Website.
 					</li>
 					<li>
-						<strong class="font-bold text-base-content">Your IP address</strong> — collected
+						<strong class="font-bold text-base-content">Your IP address</strong>: collected
 						server-side only, for rate limiting, abuse prevention, and debugging.
 					</li>
 					<li>
 						<strong class="font-bold text-base-content">
 							Information collected through cookies or similar technologies
 						</strong>
-						— see sections 3 and 4 below.
+						: see sections 3 and 4 below.
 					</li>
 				</ul>
 				<p class="mt-3">
@@ -173,7 +173,7 @@
 					information in your browser using localStorage and similar technologies: your session
 					identifier, your settings, and similar site state. This is used to operate the Website
 					and its features, to remember your preferences, and to keep your coin balance and
-					activity tied to your browser. Clearing your browser data removes all of it — along
+					activity tied to your browser. Clearing your browser data removes all of it, along
 					with the identity your posts and balance are tied to.
 				</p>
 				<p class="mt-3">
@@ -229,7 +229,7 @@
 				</h2>
 				<p class="mt-3">
 					<strong class="font-bold text-base-content">5.1</strong> We may provide information to
-					parties whose services we engage for the purposes of our normal operations — for
+					parties whose services we engage for the purposes of our normal operations, for
 					example, providers of hosting and storage infrastructure for the Website, the
 					third-party AI model provider that generates community games from user prompts, and the
 					advertising partners described in section 4. We may also supply information to other
@@ -254,7 +254,7 @@
 				<ul class="mt-3 list-disc space-y-2 pl-5">
 					<li>To provide you access to the Website and its games, features, and services, and to continuously improve them;</li>
 					<li>To store your Website settings, gaming activity, and coin balance, and to show your posts and profile;</li>
-					<li>To analyze and optimize the functioning of the Website and games in aggregate — which games and features people actually use;</li>
+					<li>To analyze and optimize the functioning of the Website and games in aggregate: which games and features people actually use;</li>
 					<li>To present advertisements on the Website;</li>
 					<li>To prevent cheating, spam, abuse, fraud, and crime;</li>
 					<li>To meet legal obligations.</li>
@@ -266,8 +266,8 @@
 					<span class="text-base-content/40">7.</span> Publicly visible content
 				</h2>
 				<p class="mt-3">
-					Everything you publish on the Website — posts, comments, community notes, AI-created
-					games, uploaded games, shop listings, and your display name — is publicly visible to
+					Everything you publish on the Website (posts, comments, community notes, AI-created
+					games, uploaded games, shop listings, and your display name) is publicly visible to
 					anyone on the Website. Do not put personal information in any of it. Content goes
 					through automated moderation, and we may remove content at our discretion.
 				</p>
@@ -281,7 +281,7 @@
 					The Website is designed to be usable without providing any personal information, and we
 					do not knowingly collect personal information from anyone, including children. If you
 					are a minor, use a made-up display name and never post your real name, school,
-					location, or anything else identifying — that rule is in our
+					location, or anything else identifying. That rule is in our
 					<a href="/legal/terms-of-service" class="font-semibold text-primary hover:underline"
 						>Terms of Use</a
 					>
@@ -295,7 +295,7 @@
 					<span class="text-base-content/40">9.</span> Retention and removal
 				</h2>
 				<p class="mt-3">
-					Public content stays up until it is removed — by moderation or at our discretion. Usage
+					Public content stays up until it is removed, by moderation or at our discretion. Usage
 					events are kept in coarse, aggregate-oriented form. If something on the Website exposes
 					your personal information and you want it taken down, reach us through the
 					<a href="/contact" class="font-semibold text-primary hover:underline">contact page</a>

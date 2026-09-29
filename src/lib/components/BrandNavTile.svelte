@@ -13,7 +13,7 @@
 >
 	<!-- Top Section: Brand (Compact).
 	     Explicitly self-lit (white bg + dark ink) so the wordmark stays readable in the
-	     real dark theme — base-100 is deep navy in dark mode and text-black vanished. -->
+	     real dark theme: base-100 is deep navy in dark mode and text-black vanished. -->
 	<a
 		href="/"
 		data-sveltekit-reload

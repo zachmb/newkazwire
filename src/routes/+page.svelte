@@ -72,7 +72,7 @@
 		.filter((g) => $userProfile.favoriteGames.includes(idOf(g)))
 		.map(toItem) as Item[];
 
-	// Category rails — a DELIBERATELY ordered, tag-grouped set (not raw tag count,
+	// Category rails: a DELIBERATELY ordered, tag-grouped set (not raw tag count,
 	// which buries the fun genres under generic buckets like "Casual"). Each entry
 	// folds related tags together; a row leads with games where the category is the
 	// PRIMARY (first) tag so rows stay distinct instead of all opening with 2048.
@@ -116,7 +116,7 @@
 		};
 	}).filter((r) => r.count >= 6).slice(0, MAX_CATEGORY_ROWS);
 
-	// The full library, pinned games first then the rest — so you can scroll to the
+	// The full library, pinned games first then the rest, so you can scroll to the
 	// bottom of the home page and reach EVERY game, not just the capped rails above.
 	$: allGames = (() => {
 		const pinned = pinnedIds.map((id) => games.find((g) => idOf(g) === id)).filter(Boolean) as G[];
@@ -161,7 +161,7 @@
 </svelte:head>
 
 <div class="min-h-screen w-full bg-base-100">
-	<!-- HERO — flat editorial: wordmark + tagline, then the 4 things you can do, then
+	<!-- HERO: flat editorial: wordmark + tagline, then the 4 things you can do, then
 	     a clear cue to scroll into the games library below. -->
 	<section class="kz-wide pb-8 pt-8 md:pt-12">
 		<div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
@@ -193,7 +193,7 @@
 			{/each}
 		</div>
 
-		<!-- Scroll cue into the library — a real, tappable pill so it reads actionable. -->
+		<!-- Scroll cue into the library: a real, tappable pill so it reads actionable. -->
 		<div class="mt-7 flex justify-center sm:mt-8">
 			<a
 				href="#games"
@@ -206,7 +206,7 @@
 		</div>
 	</section>
 
-	<!-- RAILS — games lead (popular/continue/favorites), then apps, community, categories -->
+	<!-- RAILS: games lead (popular/continue/favorites), then apps, community, categories -->
 	<div class="kz-wide flex flex-col gap-9 scroll-mt-24 pb-16 md:gap-11" id="games">
 		<HomeRail title="Popular" viewMoreHref="/g" items={popular} />
 
@@ -224,7 +224,7 @@
 			<HomeRail title={r.label} viewMoreHref={`/g?tag=${encodeURIComponent(r.tag)}`} items={r.games} />
 		{/each}
 
-		<!-- ALL GAMES — the full library in one grid so you can scroll to the very
+		<!-- ALL GAMES: the full library in one grid so you can scroll to the very
 		     bottom and reach every game. Filter box narrows the 400+ tiles. -->
 		<section id="all-games" class="scroll-mt-24">
 			<div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

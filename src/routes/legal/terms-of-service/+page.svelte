@@ -108,7 +108,7 @@
 					are no accounts. Your browser receives a random identifier stored in localStorage, and
 					that identifier is your identity on the Service. You may pick a display name if you
 					want one; nothing requires you to give a real name, email address, or any other
-					personal information. Clearing your browser data means starting over — we cannot
+					personal information. Clearing your browser data means starting over. We cannot
 					recover a lost identifier, and anything tied to it (a display name, a coin balance,
 					posts) stays tied to it.
 				</p>
@@ -130,7 +130,7 @@
 					<strong class="font-bold text-base-content">3.1</strong> The Service contains content
 					from players ("User Generated Content"), such as posts, comments, community notes,
 					AI-created games, uploaded games, and shop listings. All User Generated Content is
-					<strong class="font-bold text-base-content">publicly visible</strong> — assume anyone
+					<strong class="font-bold text-base-content">publicly visible</strong>: assume anyone
 					can see anything you publish. We are not actively involved in the creation of User
 					Generated Content and do not endorse it, nor do we warrant that such content does not
 					infringe any third-party rights or is not otherwise unlawful. By using the Service, you
@@ -176,8 +176,8 @@
 				</p>
 				<p class="mt-3">
 					<strong class="font-bold text-base-content">4.2</strong> Because it is a game, we may
-					adjust, reset, or wipe any balance, item, or listing at any time — to fix bugs, undo
-					exploits, or for any other reason — with no compensation owed.
+					adjust, reset, or wipe any balance, item, or listing at any time (to fix bugs, undo
+					exploits, or for any other reason) with no compensation owed.
 				</p>
 			</section>
 
@@ -189,7 +189,7 @@
 					<strong class="font-bold text-base-content">5.1</strong> Games in the AI section are
 					generated from user prompts by a third-party AI model. They are made by a machine on
 					the spot, so there is no guarantee a generated game works, is fun, or does what the
-					prompt asked. If one is broken, use the report option — reporting a broken game can
+					prompt asked. If one is broken, use the report option. Reporting a broken game can
 					trigger a regeneration.
 				</p>
 				<p class="mt-3">
@@ -254,7 +254,7 @@
 					</li>
 					<li>
 						use cheats, exploits, automation software, bots, hacks, or any unauthorized
-						third-party software designed to modify or interfere with the Service — including
+						third-party software designed to modify or interfere with the Service, including
 						exploiting bugs for coins;
 					</li>
 					<li>
@@ -299,7 +299,7 @@
 						disability;
 					</li>
 					<li>
-						contains personal information — yours or anyone else's, including real names,
+						contains personal information, yours or anyone else's, including real names,
 						schools, or locations;
 					</li>
 					<li>impersonates any person, business, or entity, including other users or site staff;</li>
@@ -315,7 +315,7 @@
 				<p class="mt-3">
 					<strong class="font-bold text-base-content">8.4</strong> We reserve the right to
 					determine what conduct we consider to be in violation of these Terms of Use or
-					otherwise outside their intent or spirit, and to take action as a result — which may
+					otherwise outside their intent or spirit, and to take action as a result, which may
 					include removing content and prohibiting you from using the Service in whole or in
 					part.
 				</p>
@@ -327,7 +327,7 @@
 				</h2>
 				<p class="mt-3">
 					The Service is provided "as is" and "as available," with no warranties of any kind,
-					express or implied — including fitness for a particular purpose, uptime, or accuracy.
+					express or implied, including fitness for a particular purpose, uptime, or accuracy.
 					It is a free service; things break, games disappear, and features change.
 				</p>
 			</section>
@@ -338,7 +338,7 @@
 				</h2>
 				<p class="mt-3">
 					To the fullest extent the law allows, we are not liable for any damages arising from
-					your use of (or inability to use) the Service — including lost data, lost coin
+					your use of (or inability to use) the Service, including lost data, lost coin
 					balances, removed content, or anything in third-party or User Generated Content.
 				</p>
 			</section>

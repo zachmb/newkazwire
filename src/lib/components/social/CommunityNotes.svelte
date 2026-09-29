@@ -1,15 +1,15 @@
 <script lang="ts">
 	/**
-	 * CommunityNotes — self-contained, X/Community-Notes-style reader context for a game.
+	 * CommunityNotes: self-contained, X/Community-Notes-style reader context for a game.
 	 *
 	 * Give it a `gameId`; it loads its own notes (server returns them most-helpful first),
 	 * renders a name-gated composer, and a list of notes with Helpful / Not helpful vote
 	 * buttons + counts. The top note whose (helpful − notHelpful) score is >= 2 is promoted
-	 * to a highlighted "Community Note" card — icon + "Readers added context".
+	 * to a highlighted "Community Note" card: icon + "Readers added context".
 	 *
 	 * Design grounded in Particle News' community-context card
 	 * (mobbin.com/screens/e23e0486-55c1-435d-a8a9-db81c427a9af): a bordered card with a
-	 * left accent rule and a source label reading "readers added context" — and komoot's
+	 * left accent rule and a source label reading "readers added context", and komoot's
 	 * Tips thumbs-up / thumbs-down helpful vote with counts
 	 * (mobbin.com/screens/9f6834b0-98fd-4393-a3d5-c66f6235693e). Recolored to Kazwire's
 	 * brand primary + daisyUI tokens (light/dark safe). User text uses `{text}` (auto-escaped).
@@ -120,7 +120,7 @@
 			draft = '';
 			showComposer = false;
 		} catch {
-			composerError = 'Network error — try again.';
+			composerError = 'Network error. Try again.';
 		} finally {
 			posting = false;
 		}
@@ -196,7 +196,7 @@
 		<h3 class="text-2xl font-black text-base-content">Community Notes</h3>
 	</div>
 	<p class="mb-5 text-sm text-base-content/60">
-		Readers add context — quirks, fixes, and things to know before you play.
+		Readers add context: quirks, fixes, and things to know before you play.
 	</p>
 
 	<!-- Highlighted top note -->
@@ -277,7 +277,7 @@
 						class="textarea textarea-bordered w-full"
 						rows="3"
 						maxlength="1000"
-						placeholder="Add helpful context — a bug, a workaround, a tip…"
+						placeholder="Add helpful context: a bug, a workaround, a tip…"
 						bind:value={draft}
 					></textarea>
 					{#if composerError}

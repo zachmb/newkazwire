@@ -3,7 +3,7 @@
  *
  * A visitor is identified by a random uid in localStorage (`kazwire_uid`) plus an
  * optional display name (`kazwire_player_name`). Nothing here touches cookies or
- * accounts — it's a lightweight, per-browser identity used only for the streak +
+ * accounts. It's a lightweight, per-browser identity used only for the streak +
  * leaderboard.
  *
  * SSR-safe: every function that touches `window`/`localStorage` guards on
@@ -74,7 +74,7 @@ export function setPlayerName(name: string): void {
 }
 
 /**
- * Records a daily play. Safe to call on every game load — it's guarded to fire at
+ * Records a daily play. Safe to call on every game load. It's guarded to fire at
  * most once per browser session (sessionStorage), so navigating between games
  * won't spam the endpoint. Pass `{ force: true }` to bypass the guard.
  *
@@ -87,7 +87,7 @@ export async function pingStreak(opts: { force?: boolean } = {}): Promise<MyStre
 		try {
 			if (sessionStorage.getItem(PING_SESSION_KEY)) return getMyStreak();
 		} catch {
-			/* sessionStorage unavailable — just proceed to ping */
+			/* sessionStorage unavailable: just proceed to ping */
 		}
 	}
 

@@ -57,7 +57,7 @@
 		return `${proto}://${location.host}/w/`;
 	}
 
-	// Drop any proxy service worker registered before this asset version — including
+	// Drop any proxy service worker registered before this asset version, including
 	// the pre-cloak `/service/`-scoped UV2 worker and any unversioned `/uv.js` a
 	// browser cached. Without this, a returning user runs stale UV2 code against the
 	// new config and hits `new URL(undefined)`.
@@ -88,7 +88,7 @@
 			await loadUVConfig();
 			const cfg = (window as any).__uv$config;
 
-			// bare-mux + epoxy(Wisp) transport — set the transport first so the SW
+			// bare-mux + epoxy(Wisp) transport: set the transport first so the SW
 			// has a live connection the instant it takes control. The specifier is
 			// held in a variable + @vite-ignore so it stays a RUNTIME URL (served
 			// from static/baremux/), not something the bundler/TS tries to resolve.
@@ -222,7 +222,7 @@
 				<div>
 					<h1 class="text-3xl font-black tracking-tight text-base-content"><Cloak text="Private Browser" /></h1>
 					<p class="mx-auto mt-2 max-w-md text-base-content/70">
-						Browse any site right here — search above or jump to a favorite. Traffic routes through {$page.url.hostname}'s own server.
+						Browse any site right here. Search above or jump to a favorite. Traffic routes through {$page.url.hostname}'s own server.
 					</p>
 				</div>
 				<div class="flex flex-wrap justify-center gap-2">

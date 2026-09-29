@@ -68,7 +68,7 @@
 				</h2>
 				<p class="mt-3">
 					{$page.url.hostname} hosts and links to games, apps, and user-submitted content. The
-					third-party games and apps in the library belong to their owners — we don't claim them as
+					third-party games and apps in the library belong to their owners. We don't claim them as
 					ours. We respect copyright, and under the Digital Millennium Copyright Act (DMCA) we
 					respond to valid takedown notices from copyright owners or their authorized agents.
 				</p>
@@ -86,7 +86,7 @@
 				<ol class="mt-3 list-decimal space-y-2 pl-5">
 					<li>Identification of the copyrighted work you claim is infringed.</li>
 					<li>
-						Identification of the material you claim is infringing — a URL on this site is the
+						Identification of the material you claim is infringing. A URL on this site is the
 						fastest way for us to find it.
 					</li>
 					<li>Your contact information: name, address, phone number, and email.</li>
@@ -115,8 +115,8 @@
 				</div>
 				<p class="mt-3">
 					If email doesn't work for you, you can also reach us through the
-					<a href="/contact" class="font-semibold text-primary hover:underline">contact page</a> —
-					include everything from section 2 either way.
+					<a href="/contact" class="font-semibold text-primary hover:underline">contact page</a>.
+					Include everything from section 2 either way.
 				</p>
 			</section>
 
@@ -126,7 +126,7 @@
 				</h2>
 				<p class="mt-3">
 					We review complete notices promptly and remove or disable access to material we determine
-					is infringing. Incomplete notices may be ignored — the list in section 2 is what makes a
+					is infringing. Incomplete notices may be ignored. The list in section 2 is what makes a
 					notice actionable. Where user-submitted content is involved, we may also restrict repeat
 					infringers' access to the site.
 				</p>

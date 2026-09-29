@@ -2,7 +2,7 @@
 	// S&P-500-style area chart: flat semi-transparent fill under a trend-colored line,
 	// faint gridlines. Pure SVG, no deps. `values` is a price series (oldest → newest).
 	// Line/fill hue is a data-semantic up/down indicator (green up, red down), not a
-	// brand color — kept so the trend direction stays legible.
+	// brand color, kept so the trend direction stays legible.
 	export let values: number[] = [];
 	export let height = 220;
 	export let showGrid = true;

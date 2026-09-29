@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ url }) => {
         } else {
             games.sort(newer);
         }
-        // Strip the raw creatorIp — the browser only ever gets the public creator name
+        // Strip the raw creatorIp: the browser only ever gets the public creator name
         // + coarse location, never the IP.
         return json({ success: true, games: games.map(toPublicGame) });
     } catch (error: any) {

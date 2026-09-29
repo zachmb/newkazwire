@@ -1,5 +1,5 @@
 <script lang="ts">
-	// KazMarket — a "stock market" for games, AI creations and posts (Giggles-style).
+	// KazMarket: a "stock market" for games, AI creations and posts (Giggles-style).
 	// Invest Kazcoins early; if others pile in after you, the price rises and you profit.
 	// Extracted from /market so it can also live inside the account Shop tab.
 	// Mobbin ref: Robinhood watchlist/holdings + sparkline rows (https://mobbin.com/apps/robinhood-ios).
@@ -145,7 +145,7 @@
 			<h1 class="flex items-center gap-2 text-2xl font-black tracking-tight text-base-content sm:text-3xl">
 				<Icon icon="mdi:chart-line" class="text-primary" /> KazMarket
 			</h1>
-			<p class="mt-1 text-sm text-base-content/60">Invest Kazcoins in games, creations & posts. Get in early — if they take off, so does your stake.</p>
+			<p class="mt-1 text-sm text-base-content/60">Invest Kazcoins in games, creations & posts. Get in early. If they take off, so does your stake.</p>
 		</div>
 		<div class="flex items-center gap-2">
 			<div class="flex items-center gap-2 rounded-full bg-warning/15 px-4 py-2 font-black text-warning"><Icon icon="mdi:hand-coin" /> {coins.toLocaleString()}</div>
@@ -173,7 +173,7 @@
 		</div>
 	{/if}
 
-	<!-- KazMarket Index — S&P-style composite chart -->
+	<!-- KazMarket Index: S&P-style composite chart -->
 	{#if indexValues.length >= 2}
 		<div class="rounded-box border border-base-content/10 bg-base-200 p-4">
 			<div class="mb-2 flex items-end justify-between">
@@ -226,7 +226,7 @@
 			<div class="flex flex-col items-center gap-2 rounded-box bg-base-200 p-10 text-center">
 				<Icon icon="mdi:chart-line-variant" class="text-5xl text-base-content/30" />
 				<p class="font-bold text-base-content">No assets yet</p>
-				<p class="text-sm text-base-content/60">Be the first to invest — tap "Invest" and back a game you believe in.</p>
+				<p class="text-sm text-base-content/60">Be the first to invest. Tap "Invest" and back a game you believe in.</p>
 			</div>
 		{:else}
 			{#each assets as a (a.id)}

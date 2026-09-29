@@ -10,7 +10,7 @@
 	function send(e: Event) {
 		e.preventDefault();
 		const subject = encodeURIComponent(`Message from ${name || 'a player'}`);
-		const body = encodeURIComponent(`${message}\n\n— ${name}${email ? ` (${email})` : ''}`);
+		const body = encodeURIComponent(`${message}\n\nFrom ${name}${email ? ` (${email})` : ''}`);
 		window.location.href = `mailto:${config.branding.supportEmail}?subject=${subject}&body=${body}`;
 	}
 

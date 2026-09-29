@@ -1,5 +1,5 @@
 <!--
-  /u/[uid] — public, searchable player profile.
+  /u/[uid]: public, searchable player profile.
 
   Mobbin references (design source):
   - TikTok "Profile" screen (iOS): big avatar + name + location + joined, then a
@@ -119,7 +119,7 @@
 	<meta
 		name="description"
 		content={profile
-			? `${profile.name}'s profile — ${profile.gamesCreated} games created, ${profile.postsCount} posts.`
+			? `${profile.name}'s profile: ${profile.gamesCreated} games created, ${profile.postsCount} posts.`
 			: 'A player profile.'}
 	/>
 </svelte:head>

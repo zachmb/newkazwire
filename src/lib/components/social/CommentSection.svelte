@@ -1,6 +1,6 @@
 <script lang="ts">
 	/**
-	 * CommentSection — self-contained threaded comments for a game page.
+	 * CommentSection: self-contained threaded comments for a game page.
 	 *
 	 * Fully self-contained: give it a `gameId` and it loads its own data, renders a
 	 * name-gated composer, a list of top-level comments each with ONE level of replies
@@ -9,12 +9,12 @@
 	 * Design grounded in Digg's threaded thread view
 	 * (mobbin.com/screens/c90b74cc-d68b-48ea-8430-324c6043f115): a top comment, an
 	 * indented single level of replies with a left rule, an inline "Reply" affordance,
-	 * and a compact vote control — plus Beli's clean indented reply + heart-tap like
+	 * and a compact vote control, plus Beli's clean indented reply + heart-tap like
 	 * (mobbin.com/screens/4887d28c-df84-492f-8a03-c991d0177a67). Kazwire recolors to
 	 * the brand primary + daisyUI tokens (light/dark safe).
 	 *
 	 * Safety: user text is rendered via Svelte's `{text}` interpolation, which HTML-escapes
-	 * automatically — no {@html}, so no XSS from comment/reply/author bodies.
+	 * automatically. No {@html}, so no XSS from comment/reply/author bodies.
 	 */
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
@@ -131,7 +131,7 @@
 			comments = [{ ...data.comment, replies: data.comment.replies ?? [] }, ...comments];
 			draft = '';
 		} catch {
-			composerError = 'Network error — try again.';
+			composerError = 'Network error. Try again.';
 		} finally {
 			posting = false;
 		}
@@ -169,7 +169,7 @@
 			replyDraft = { ...replyDraft, [commentId]: '' };
 			openReply = { ...openReply, [commentId]: false };
 		} catch {
-			replyError = { ...replyError, [commentId]: 'Network error — try again.' };
+			replyError = { ...replyError, [commentId]: 'Network error. Try again.' };
 		} finally {
 			replyPosting = { ...replyPosting, [commentId]: false };
 		}

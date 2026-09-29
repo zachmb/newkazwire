@@ -1,4 +1,4 @@
-// Deterministic cover art for AI games that have no canvas snapshot. Pure SVG —
+// Deterministic cover art for AI games that have no canvas snapshot. Pure SVG:
 // free, instant, and SAFE on arbitrary user titles (no image model). Flat, on-brand
 // (Kazwire amber/steel-blue family), seeded by the game id/title so each game gets a
 // distinct-but-stable cover. Used as the gallery fallback so NO game is ever blank.
@@ -20,7 +20,7 @@ function escapeXml(s: string): string {
 const BG = ['#111827', '#1e293b', '#7c2d12', '#0f3d3a', '#3b1d5e', '#1e3a8a', '#7c1d3a', '#334155'];
 const FG = ['#f59e0b', '#38bdf8', '#fb923c', '#2dd4bf', '#c084fc', '#60a5fa', '#fb7185', '#e2e8f0'];
 
-/** First grapheme of the title as the cover glyph — an emoji if it leads with one,
+/** First grapheme of the title as the cover glyph: an emoji if it leads with one,
  *  else the first letter uppercased. */
 function glyphOf(title: string): string {
 	const t = title.trim();

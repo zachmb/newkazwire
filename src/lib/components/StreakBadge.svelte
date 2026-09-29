@@ -36,7 +36,7 @@
 {#if loaded && streak > 0}
 	<span
 		class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary ring-1 ring-primary/20"
-		title="{streak}-day play streak — come back tomorrow to keep it alive!"
+		title="{streak}-day play streak. Come back tomorrow to keep it alive!"
 		aria-label="{streak} day play streak"
 	>
 		<Icon icon="mdi:fire" class="text-base text-primary" />

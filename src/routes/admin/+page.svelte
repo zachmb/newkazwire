@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Owner-only admin dashboard. Password is verified server-side against ADMIN_PASSWORD
-	// (env) — nothing sensitive is hardcoded here.
+	// (env). Nothing sensitive is hardcoded here.
 	import Icon from '@iconify/svelte';
 	import { config } from '$lib/config';
 
@@ -41,8 +41,8 @@
 		{ label: 'Shop sales', value: s.shopSales, icon: 'mdi:cart' },
 		{ label: 'Market assets', value: s.marketAssets, icon: 'mdi:chart-line' },
 		{ label: 'Market invested', value: s.marketInvested, icon: 'mdi:cash-multiple' },
-		{ label: 'Live rooms', value: p?.rooms ?? '—', icon: 'mdi:account-multiple' },
-		{ label: 'Dictionary', value: p?.words ?? '—', icon: 'mdi:book-open-variant' }
+		{ label: 'Live rooms', value: p?.rooms ?? '-', icon: 'mdi:account-multiple' },
+		{ label: 'Dictionary', value: p?.words ?? '-', icon: 'mdi:book-open-variant' }
 	];
 </script>
 

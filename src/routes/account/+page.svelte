@@ -62,7 +62,7 @@
 				}
 			}
 		} catch {
-			/* offline — leave zeros */
+			/* offline: leave zeros */
 		}
 
 		// Profile aggregate: games created, posts, comments. 404 for a brand-new user.
@@ -83,14 +83,14 @@
 					if (p.name && getPlayerName() === 'Anonymous') displayName = p.name;
 				}
 			}
-			// A 404 is expected for a user with no created content — zeros stand.
+			// A 404 is expected for a user with no created content. Zeros stand.
 		} catch {
-			/* offline — leave zeros */
+			/* offline: leave zeros */
 		}
 
 		statsLoading = false;
 
-		// Real leaderboard — top players by current streak.
+		// Real leaderboard: top players by current streak.
 		try {
 			const res = await fetch('/api/leaderboard');
 			if (res.ok) {
@@ -98,7 +98,7 @@
 				if (data?.success && Array.isArray(data.leaders)) leaders = data.leaders;
 			}
 		} catch {
-			/* offline — leave empty */
+			/* offline: leave empty */
 		}
 		leaderboardLoading = false;
 	});
@@ -107,7 +107,7 @@
 	let leaders = [];
 	let leaderboardLoading = true;
 
-	// Dark-mode toggle (real — mirrors the /settings theme switch: data-theme + kz-theme).
+	// Dark-mode toggle (real, mirrors the /settings theme switch: data-theme + kz-theme).
 	let isDark = false;
 	onMount(() => {
 		isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
@@ -283,7 +283,7 @@
 					</div>
 				</div>
 
-				<!-- Stat strip — inside the banner, darker bottom. Every value is real. -->
+				<!-- Stat strip, inside the banner, darker bottom. Every value is real. -->
 				<div class="grid grid-cols-2 border-t border-white/10 sm:grid-cols-4 lg:grid-cols-8">
 					{#each [
 						{ icon: 'mdi:fire',            value: currentStreak,      label: 'Day Streak'     },
@@ -404,7 +404,7 @@
 						{#if $userProfile.favoriteGames.length === 0}
 							<div class="flex h-32 flex-col items-center justify-center gap-2 rounded-lg bg-base-200 text-center">
 								<Icon icon="mdi:heart-outline" class="text-3xl text-base-content/20" />
-								<p class="text-sm font-bold text-base-content/30">No favorites yet — heart a game to save it.</p>
+								<p class="text-sm font-bold text-base-content/30">No favorites yet. Heart a game to save it.</p>
 							</div>
 						{:else}
 							<div class="grid grid-cols-4 gap-2">
@@ -553,7 +553,7 @@
 						{:else if leaders.length === 0}
 							<div class="flex h-48 flex-col items-center justify-center gap-3 text-center">
 								<Icon icon="mdi:trophy-outline" class="text-5xl text-base-content/15" />
-								<p class="text-sm font-bold text-base-content/40">No ranked players yet — play a game today to start a streak and claim a spot.</p>
+								<p class="text-sm font-bold text-base-content/40">No ranked players yet. Play a game today to start a streak and claim a spot.</p>
 							</div>
 						{:else}
 							<table class="table w-full">

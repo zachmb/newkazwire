@@ -1,5 +1,5 @@
 <!--
-  FeedSlide.svelte — one full-screen game "slide" in the vertical swipe feed.
+  FeedSlide.svelte: one full-screen game "slide" in the vertical swipe feed.
 
   Mobbin reference: TikTok "Watching videos" flow (iOS)
   https://mobbin.com/flows/c7203035-45cc-4ed9-aeb7-73626b6f6b4d
@@ -20,7 +20,7 @@
 		creatorLocation?: string;
 		rating: number; // 0..5
 		chip: string; // "AI" or a category
-		postId?: string; // for kind === 'post' — used by like/reply
+		postId?: string; // for kind === 'post', used by like/reply
 		postText?: string; // for kind === 'post'
 		gameTitle?: string; // attached game title on a post
 		link?: string; // optional user link on a post
@@ -79,7 +79,7 @@
 	// Long posts get a slightly smaller size so they stay readable and fit.
 	const longPost = $derived((item.postText || item.title || '').length > 180);
 
-	// Optimistic like on the post slide — POSTs to the same /api/posts/:id/like
+	// Optimistic like on the post slide. POSTs to the same /api/posts/:id/like
 	// endpoint the timeline card uses; reconciles to server truth, rolls back on error.
 	let liked = $state(false);
 	let likes = $state(item.likes ?? 0);
@@ -110,7 +110,7 @@
 		}
 	}
 
-	// Inline reply on the post slide — same /api/posts/:id/reply the timeline uses.
+	// Inline reply on the post slide. Same /api/posts/:id/reply the timeline uses.
 	let showReply = $state(false);
 	let replyText = $state('');
 	let replying = $state(false);
@@ -160,7 +160,7 @@
 >
 	{#if item.kind === 'post'}
 		<!--
-		  POST slide — deliberately distinct from the full-bleed game slides: a flat
+		  POST slide: deliberately distinct from the full-bleed game slides: a flat
 		  base-200 canvas with a centered card so a text post reads like something you
 		  read, not a video you watch. Card scrolls internally if the post is long.
 		-->
@@ -319,7 +319,7 @@
 	{/if}
 
 	<!-- Scrims: darken top (for chip) and bottom (for text) so content stays legible.
-	     These MUST fade smoothly — flat bands were tried here and their hard edges
+	     These MUST fade smoothly. Flat bands were tried here and their hard edges
 	     painted visible horizontal lines across every game cover. -->
 	<div
 		class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent"

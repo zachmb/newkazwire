@@ -49,7 +49,7 @@
 	/**
 	 * Capture the game's first canvas frame as a PNG data URL for the gallery cover.
 	 * Renders the code in a hidden SAME-ORIGIN srcdoc iframe (so we can read its
-	 * canvas — the public codeUrl is cross-origin and can't be captured), waits for it
+	 * canvas, the public codeUrl is cross-origin and can't be captured), waits for it
 	 * to draw, then reads the largest canvas. Best-effort: resolves '' on any failure
 	 * so it never blocks publishing.
 	 */
@@ -253,7 +253,7 @@
 			sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: gameCode }));
 
 			// Every generated game is auto-published to the community gallery (with a
-			// captured cover + creator attribution). Best-effort — a publish hiccup
+			// captured cover + creator attribution). Best-effort: a publish hiccup
 			// still leaves the game playable locally.
 			await publishGame();
 		} catch (err: any) {
@@ -292,7 +292,7 @@
 			publishedId = data.gameId;
 			publishedPublicUrl = data.publicUrl || '';
 		} catch (err: any) {
-			// Surface but don't block — the game is still playable from this page.
+			// Surface but don't block. The game is still playable from this page.
 			error = err.message;
 		} finally {
 			isPublishing = false;
@@ -419,7 +419,7 @@
 					<div class="flex-1">
 						<h1 class="text-3xl font-black tracking-tight sm:text-4xl">AI Lab</h1>
 						<p class="mt-1 text-base text-base-content/60">
-							Describe a game and play it in seconds — or upload your own. Everything you make is shared to the community gallery.
+							Describe a game and play it in seconds, or upload your own. Everything you make is shared to the community gallery.
 						</p>
 					</div>
 					{#if hasName}
@@ -477,7 +477,7 @@
 
 						<div class="flex w-full flex-col gap-4">
 							<label class="form-control w-full">
-								<span class="label-text mb-1 font-bold">Game title <span class="font-normal opacity-50">— optional, AI names it for you</span></span>
+								<span class="label-text mb-1 font-bold">Game title <span class="font-normal opacity-50">(optional, AI names it for you)</span></span>
 								<input
 									type="text"
 									placeholder="Leave blank and the AI will name it"
@@ -500,7 +500,7 @@
 							{#if !hasName && !showNameGate}
 								<p class="flex items-center gap-1.5 text-sm text-base-content/60">
 									<Icon icon="mdi:information-outline" class="text-base text-primary" />
-									You'll be asked to add your name before generating — it's shown as the creator.
+									You'll be asked to add your name before generating. It's shown as the creator.
 								</p>
 							{/if}
 
@@ -717,7 +717,7 @@
 						{#if !hasName && !showNameGate}
 							<p class="flex items-center gap-1.5 text-sm text-base-content/60">
 								<Icon icon="mdi:information-outline" class="text-base text-primary" />
-								You'll be asked to add your name before uploading — it's shown as the creator.
+								You'll be asked to add your name before uploading. It's shown as the creator.
 							</p>
 						{/if}
 
@@ -822,7 +822,7 @@
 					</li>
 					<li class="flex items-start gap-3">
 						<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">2</div>
-						<p class="text-sm">The AI writes a complete, playable game in one file — no setup, nothing to install.</p>
+						<p class="text-sm">The AI writes a complete, playable game in one file: no setup, nothing to install.</p>
 					</li>
 					<li class="flex items-start gap-3">
 						<div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">3</div>

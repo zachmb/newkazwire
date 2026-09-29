@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         }
 
         // The streamed generation path assembles code client-side, so stray ```
-        // markdown fences from the model can reach publish — they break the game
+        // markdown fences from the model can reach publish. They break the game
         // (black screen). Strip them server-side no matter which path sent this.
         const code = stripMarkdown(String(rawCode));
         if (!code) {
@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         const descMod = cleanText(description, { maxLength: 500 });
         const safeDescription = descMod.blocked ? '' : descMod.text;
 
-        // Real visitor IP (behind nginx, getClientAddress() is 127.0.0.1 — read XFF).
+        // Real visitor IP (behind nginx, getClientAddress() is 127.0.0.1, read XFF).
         const ip = getRealIp(request, getClientAddress);
 
         // Measure the game file size in bytes (UTF-8)
@@ -83,7 +83,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
         const creatorLocation = await geolocate(ip);
 
         // Cover snapshot: the client captures the game's first canvas frame as a PNG
-        // data URL and sends it here. Upload it as the gallery cover (best-effort — a
+        // data URL and sends it here. Upload it as the gallery cover (best-effort: a
         // missing/malformed cover just falls back to the default art in the UI).
         let coverUrl: string | undefined;
         try {

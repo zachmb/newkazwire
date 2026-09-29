@@ -1,7 +1,7 @@
 <!--
-  PostCard.svelte — one post row in the Twitter/X-style /feed.
+  PostCard.svelte: one post row in the Twitter/X-style /feed.
 
-  Mobbin reference (design source): X (Twitter) home timeline — For You (iOS)
+  Mobbin reference (design source): X (Twitter) home timeline, For You (iOS)
   https://mobbin.com/screens/996603fa-1a10-4bc1-9431-030fa88848f2
   Borrowed structure: circular avatar on the left, a header line of bold author
   name + subdued handle/meta + relative time, the post body below, then a light
@@ -96,7 +96,7 @@
 		}
 	}
 
-	// Optimistic like state — increments locally on tap, POSTs in the background,
+	// Optimistic like state: increments locally on tap, POSTs in the background,
 	// reconciles to the server's authoritative count, and rolls back on failure.
 	let liked = $state(false);
 	let likes = $state(post.likes ?? 0);
@@ -151,7 +151,7 @@
 
 	// Split into lines so we can preserve author-authored line breaks WITHOUT ever
 	// using {@html}. Svelte auto-escapes each text node, so HTML in a post is
-	// rendered as literal, harmless text (emoji still render — they're just chars).
+	// rendered as literal, harmless text (emoji still render, they're just chars).
 	const lines = $derived((src.text || '').split('\n'));
 </script>
 

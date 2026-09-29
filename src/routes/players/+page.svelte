@@ -1,11 +1,11 @@
 <!--
-  /players — public player search.
+  /players: public player search.
 
   Mobbin references (design source):
   - Instagram "Search" screen (iOS): a single sticky search field at top, results
     appear as compact people rows (avatar + name + secondary line).
     https://mobbin.com/apps/instagram-ios
-  - TikTok "Search results — Users" tab: row = round avatar + name + "N · N" meta,
+  - TikTok "Search results, Users" tab: row = round avatar + name + "N · N" meta,
     tapping a row opens that person's profile (here /u/{uid}).
     https://mobbin.com/apps/tiktok-ios
 

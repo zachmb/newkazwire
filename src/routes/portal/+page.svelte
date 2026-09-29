@@ -30,7 +30,7 @@
 			clearTimeout(copyTimer);
 			copyTimer = setTimeout(() => (copied = false), 1500);
 		} catch {
-			/* clipboard unavailable — user can still read/select the value */
+			/* clipboard unavailable: user can still read/select the value */
 		}
 	}
 
@@ -66,7 +66,7 @@
 				result = { ok: false, status: 'error', message: data.error || 'Something went wrong.' };
 			}
 		} catch {
-			result = { ok: false, status: 'error', message: 'Network error — try again.' };
+			result = { ok: false, status: 'error', message: 'Network error. Try again.' };
 		} finally {
 			submitting = false;
 		}
@@ -94,7 +94,7 @@
 		{
 			icon: 'mdi:cart-outline',
 			title: 'Get a domain',
-			body: 'Grab any cheap domain (Namecheap, Porkbun, Cloudflare — often under $10/yr).'
+			body: 'Grab any cheap domain (Namecheap, Porkbun, Cloudflare, often under $10/yr).'
 		},
 		{
 			icon: 'mdi:dns-outline',
@@ -104,13 +104,13 @@
 		{
 			icon: 'mdi:rocket-launch-outline',
 			title: 'Add it below',
-			body: 'Enter your domain here. Within a minute it serves the full site — with automatic HTTPS. Free, forever.'
+			body: 'Enter your domain here. Within a minute it serves the full site, with automatic HTTPS. Free, forever.'
 		}
 	];
 </script>
 
 <svelte:head>
-	<title>Add your domain — {host}</title>
+	<title>Add your domain: {host}</title>
 	<meta name="description" content="Host your own mirror of the site on your own domain, free. Point DNS and go live in a minute." />
 </svelte:head>
 
@@ -123,7 +123,7 @@
 		<h1 class="text-4xl font-black tracking-tight sm:text-5xl">Add your own link</h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/80">
 			Put the whole site on <em>your</em> domain. Point it at us and it goes live in about a
-			minute — HTTPS included, free.
+			minute. HTTPS included, free.
 		</p>
 		{#if count > 0}
 			<div class="mx-auto mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
@@ -266,7 +266,7 @@
 						<div class="flex items-center gap-2">
 							<Icon icon={checkResult.pointsAtUs ? 'mdi:check-circle' : 'mdi:circle-outline'} class="{checkResult.pointsAtUs ? 'text-success' : 'text-base-content/40'}" />
 							<span class="font-semibold">DNS points at our server</span>
-							{#if !checkResult.pointsAtUs}<span class="text-base-content/50">— add the A record above (can take a few minutes)</span>{/if}
+							{#if !checkResult.pointsAtUs}<span class="text-base-content/50">: add the A record above (can take a few minutes)</span>{/if}
 						</div>
 						{#if checkResult.live}
 							<p class="mt-2 flex items-center gap-2 font-black text-success"><Icon icon="mdi:party-popper" /> It’s live! Open it in a new tab.</p>
@@ -279,7 +279,7 @@
 		<p class="mt-4 flex items-start gap-2 text-xs leading-relaxed text-base-content/50">
 			<Icon icon="mdi:information-outline" class="mt-0.5 shrink-0" />
 			Only add domains you own. HTTPS is issued automatically the first time someone visits. DNS changes can take a
-			few minutes to spread. Keep it legal — no illegal or abusive content.
+			few minutes to spread. Keep it legal: no illegal or abusive content.
 		</p>
 	</form>
 </div>

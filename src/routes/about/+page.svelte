@@ -13,14 +13,14 @@
 		{ value: '0', label: 'Downloads' }
 	];
 	const values = [
-		{ icon: 'mdi:flash', title: 'Blazing fast', body: 'Games stream from a global bucket and load instantly — no installs, no waiting.' },
+		{ icon: 'mdi:flash', title: 'Blazing fast', body: 'Games stream from a global bucket and load instantly: no installs, no waiting.' },
 		{ icon: 'mdi:shield-lock', title: 'Playable anywhere', body: 'A built-in private browser keeps the whole library reachable on any network.' },
 		{ icon: 'mdi:sparkles', title: 'Made by the community', body: 'Anyone can build a game with AI and publish it to the library in seconds.' }
 	];
 </script>
 
 <svelte:head>
-	<meta name="description" content="About {$page.url.hostname} — a comprehensive gaming platform offering a variety of free browser games for players of all ages." />
+	<meta name="description" content="About {$page.url.hostname}, a comprehensive gaming platform offering a variety of free browser games for players of all ages." />
 </svelte:head>
 
 <div class="kz-page">
@@ -30,7 +30,7 @@
 		<p class="kz-eyebrow text-white/50">Company</p>
 		<h1 class="mt-2 text-4xl font-black tracking-tight sm:text-5xl">About <Cloak text={host} /></h1>
 		<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-white/70">
-			{config.branding.slogan} A comprehensive gaming platform — free to play, right in your browser.
+			{config.branding.slogan} A comprehensive gaming platform, free to play, right in your browser.
 		</p>
 		<div class="mx-auto mt-8 grid max-w-md grid-cols-3 gap-4">
 			{#each stats as s}
@@ -45,7 +45,7 @@
 	<!-- Body -->
 	<div class="mt-10 space-y-5 text-lg leading-relaxed text-base-content/60">
 		<h2 class="text-2xl font-black tracking-tight text-base-content">
-			<Cloak text={host} /> — a comprehensive gaming platform
+			<Cloak text={host} />, a comprehensive gaming platform
 		</h2>
 		<p>
 			<Cloak text={host} /> is a comprehensive gaming platform that offers a wide variety of exciting
@@ -57,20 +57,20 @@
 			One of the strengths of the platform is that it caters to a broad range of interests and
 			preferences. Whether you enjoy fast-paced action games, brain-teasing puzzles, classic
 			arcade titles, or engaging simulations, you are sure to find something that will keep you
-			entertained for hours. The library is regularly updated with new games — including games
-			created by the community itself with our built-in AI game creator — so there is always
+			entertained for hours. The library is regularly updated with new games (including games
+			created by the community itself with our built-in AI game creator) so there is always
 			something fresh and exciting to try.
 		</p>
 		<p>
 			The site features a clean, user-friendly interface that makes it easy to browse and navigate
 			the full selection of games, and every game is free to play. There are no downloads, no
-			installs, and no accounts required — every title runs directly in your browser and loads in
+			installs, and no accounts required. Every title runs directly in your browser and loads in
 			seconds. This makes the platform an accessible and convenient option for anyone who wants to
 			enjoy their favorite games without any hassle.
 		</p>
 		<p>
 			Beyond the game library, the platform includes a community feed, multiplayer rooms, public
-			player profiles, and a play-money economy — everything you need to play together, not just
+			player profiles, and a play-money economy: everything you need to play together, not just
 			alone. Overall, it is a fantastic destination for anyone looking for an entertaining and
 			engaging gaming experience.
 		</p>
@@ -83,7 +83,7 @@
 			<Cloak text={host} />, founded in 2026, is a comprehensive gaming platform whose goal is to
 			bring more interesting gaming experiences to more players. For more information about
 			<Cloak text={host} />, you can
-			<a href="/contact" class="font-semibold text-primary hover:underline">contact us</a> — or read
+			<a href="/contact" class="font-semibold text-primary hover:underline">contact us</a>, or read
 			our
 			<a href="/legal/privacy-policy" class="font-semibold text-primary hover:underline">Privacy Policy</a>
 			and

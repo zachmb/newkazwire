@@ -77,7 +77,7 @@
 <div
 	class="grid grid-flow-dense auto-rows-[140px] grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8"
 >
-	<!-- Static Header Tiles (tile corners/border live on this wrapper — the tile
+	<!-- Static Header Tiles (tile corners/border live on this wrapper: the tile
 	     itself inherits its radius from here) -->
 	<div
 		class="relative z-10 col-span-1 row-span-1 overflow-hidden rounded-box border border-base-content/10 shadow-sm"

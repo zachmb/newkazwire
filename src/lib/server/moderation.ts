@@ -1,5 +1,5 @@
 /**
- * Server-side text moderation for ALL user-generated content — community AI game
+ * Server-side text moderation for ALL user-generated content: community AI game
  * titles/prompts/descriptions, creator names, posts, comments, notes. Kazwire has
  * no accounts/DB, so this is a self-contained, fail-safe censor (no external
  * service). It is deliberately conservative for a school-audience games site.
@@ -52,9 +52,9 @@ const HARD_SUB = [
 	'clitoris', 'scrotum', 'testicle', 'fellatio', 'cunnilingus',
 	'whore', 'slut', 'sluts', 'hooker', 'nympho', 'footjob', 'titfuck', 'cocksuck',
 	// unambiguous "cum" compounds (the bare "cum*" prefix is ambiguous: cumin,
-	// cumulative, cumberland — so only these explicit compounds go in the sub list)
+	// cumulative, cumberland, so only these explicit compounds go in the sub list)
 	'cumslut', 'cumdump', 'cumlord', 'cumrag', 'cumbucket', 'cumwhore', 'cumdumpster',
-	// CSAM (critical — always block). NB: terms are stored in the DEOBFUSCATED form,
+	// CSAM (critical, always block). NB: terms are stored in the DEOBFUSCATED form,
 	// which folds ph->f, so "pedophile" is listed as "pedofile".
 	'childporn', 'childp', 'lolicon', 'lolita', 'jailbait', 'pedofile', 'pedofil',
 	'underage', 'minorattract', 'cheesepizza', 'toddlercon',
@@ -128,7 +128,7 @@ function scan(text: string): { hard: boolean; prof: boolean } {
 	return { hard, prof };
 }
 
-/** True if the text contains any HARD (slur/sexual/CSAM) term — gate generated content with this. */
+/** True if the text contains any HARD (slur/sexual/CSAM) term: gate generated content with this. */
 export function containsHardTerm(text: unknown): boolean {
 	if (typeof text !== 'string' || !text) return false;
 	return scan(text).hard;

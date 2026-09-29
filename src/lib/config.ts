@@ -1,7 +1,7 @@
 export const config = {
 	branding: {
 		name: 'Kazwire',
-		description: 'Play free browser games anywhere. A big collection of fun games — no downloads, just click and play.',
+		description: 'Play free browser games anywhere. A big collection of fun games, no downloads, just click and play.',
 		slogan: 'Play the internet.',
 		mainDomain: 'https://kazwire.com',
 		supportEmail: 'support@kazwire.com'
@@ -16,7 +16,7 @@ export const config = {
 	// Options: "hero", "main", "faq"
 	// Order: top to bottom
 	homeLayoutOrder: ['hero', 'main'],
-	// "Popular" row — a curated mix of timeless classics and current hits (all
+	// "Popular" row: a curated mix of timeless classics and current hits (all
 	// verified present in the library). Shown first on the home page.
 	pinnedGames: [
 		'subway-surfers', 'steal-a-brainrot', 'retro-bowl', 'geometry-dash', 'clash-royale',
@@ -31,7 +31,7 @@ export const config = {
 	faq: [
 		{
 			question: 'What is Kazwire?',
-			answer: 'Kazwire is a free collection of browser games. Everything runs right in your browser — no downloads, no installs, no accounts required.'
+			answer: 'Kazwire is a free collection of browser games. Everything runs right in your browser. No downloads, no installs, no accounts required.'
 		},
 		{
 			question: 'Is Kazwire free?',

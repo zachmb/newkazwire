@@ -61,7 +61,7 @@ if (browser) {
 		try {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(wins));
 		} catch {
-			/* storage full/blocked — workspace just won't persist */
+			/* storage full/blocked: workspace just won't persist */
 		}
 	});
 }

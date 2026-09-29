@@ -20,6 +20,6 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ success: true, balance: result.balance, item: result.item });
     } catch (err) {
         console.error('[Shop buy API] error:', err);
-        return json({ error: 'Purchase failed — nothing was charged. Try again.' }, { status: 500 });
+        return json({ error: 'Purchase failed. Nothing was charged. Try again.' }, { status: 500 });
     }
 };

@@ -15,6 +15,6 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ success: true, ...result });
     } catch (err) {
         console.error('[Daily API] error:', err);
-        return json({ success: false, error: 'Could not claim right now — try again.' }, { status: 500 });
+        return json({ success: false, error: 'Could not claim right now. Try again.' }, { status: 500 });
     }
 };

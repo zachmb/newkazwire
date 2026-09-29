@@ -80,7 +80,7 @@
 		}
 
 		// Guard: navigator.serviceWorker is undefined in insecure contexts / some
-		// private-browsing modes — calling it there throws and crashes the player.
+		// private-browsing modes: calling it there throws and crashes the player.
 		if (navigator.serviceWorker) {
 			navigator.serviceWorker.getRegistrations().then((registrations) => {
 				if (registrations.length === 0) {
@@ -97,7 +97,7 @@
 			setTimeout(registerServiceWorker, 1000);
 			return;
 		}
-		if (!navigator.serviceWorker) return; // unsupported context — nothing to register
+		if (!navigator.serviceWorker) return; // unsupported context: nothing to register
 		navigator.serviceWorker.register('/uv.js', { scope: __uv$config.prefix }).then((reg) => {
 			if (reg.installing) {
 				const sw = reg.installing || reg.waiting;
@@ -121,7 +121,7 @@
 				canShare = true;
 			}
 		} catch (e) {
-			/* canShare unsupported — non-critical */
+			/* canShare unsupported: non-critical */
 		}
 		const event = new CustomEvent('rendered', {
 			detail: {
@@ -144,7 +144,7 @@
 	async function expandiFrame() {
 		// NOTE: HeroGameCard's two-way bind:playing flips isPlaying to true *before* it
 		// dispatches 'play', so an `if (!isPlaying)` guard here would skip the awaited
-		// tick() and we'd hit the frameContainer null-check before the slot rendered —
+		// tick() and we'd hit the frameContainer null-check before the slot rendered,
 		// leaving the game in the short inline frame (games rendered off-screen). Always
 		// await the render, and load once via the loadedFrame flag.
 		isPlaying = true;
@@ -474,7 +474,7 @@
 					<div class="flex flex-none items-center gap-2">
 						<button
 							class="hidden flex-none items-center gap-1.5 rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary hover:text-white lg:flex"
-							title="Open this game in a floating window — snap it side-by-side with other games and apps"
+							title="Open this game in a floating window. Snap it side-by-side with other games and apps"
 							on:click={openGameWindow}
 						>
 							<Icon icon="mdi:dock-window" /> Window
@@ -497,7 +497,7 @@
 			</div>
 
 			<!-- Comments: works for any game id (library or AI). Mobbin ref: Steam game
-			     detail page — user reviews/discussion list sits directly under the "About"
+			     detail page: user reviews/discussion list sits directly under the "About"
 			     description block. -->
 			<CommentSection gameId={data.game.id} />
 

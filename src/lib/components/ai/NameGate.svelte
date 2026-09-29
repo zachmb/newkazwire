@@ -7,12 +7,12 @@
 
 	/**
 	 * Inline name-capture card shown before a player can generate or upload a game.
-	 * A player must set a display name (persisted via setPlayerName) — that name is
+	 * A player must set a display name (persisted via setPlayerName). That name is
 	 * sent as the public creator attribution on everything they publish.
 	 *
 	 * Emits `saved` with the trimmed name once a non-empty name is committed.
 	 */
-	export let heading = 'One quick thing — what should we call you?';
+	export let heading = 'One quick thing. What should we call you?';
 	export let sub = 'Your name is shown as the creator on every game you make and share.';
 
 	let value = '';

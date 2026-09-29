@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ params }) => {
         }
 
         const fixPrompt =
-            `This game was REPORTED BROKEN by players — it may show a black screen, throw ` +
+            `This game was REPORTED BROKEN by players. It may show a black screen, throw ` +
             `errors, ignore input, or be unplayable. Analyze the source for bugs (merged ` +
             `tags, <script> nested inside <canvas>, undefined variables, a broken game loop, ` +
             `missing resize handling, unwired input) and output a COMPLETELY FIXED, fully ` +

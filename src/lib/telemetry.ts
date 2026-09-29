@@ -102,7 +102,7 @@ class TelemetryManager {
 	}
 
 	private getSelector(el: Element | null): string {
-		// keydown targets can be window/document (e.g. dispatched events) — those
+		// keydown targets can be window/document (e.g. dispatched events), and those
 		// aren't Elements and have no tagName.
 		if (!el || !(el instanceof Element)) return 'unknown';
 		if (el.id) return `#${el.id}`;

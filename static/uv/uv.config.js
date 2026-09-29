@@ -1,5 +1,5 @@
 // ─── Cloaked path map (keep ALL of these in sync) ────────────────────────────
-//   route (UI page) ........ /study            (was /proxy — never say "proxy")
+//   route (UI page) ........ /study            (was /proxy; never say "proxy")
 //   UV service-worker scope . /edu/            (this file's `prefix`; was /service/)
 //   Wisp websocket endpoint . /w/              (backend wisp server; replaces /bare/)
 // The SW scope (registration in the page), this `prefix`, the nginx/Caddy config,
@@ -10,7 +10,7 @@
 // Transport: Ultraviolet 3.x runs over bare-mux → epoxy-transport → Wisp (raw
 // multiplexed TCP over ONE WebSocket to /w/). The old @tomphttp `/bare/` relay is
 // gone; UV 3.x talks to the transport the page selects via BareMux before the SW
-// is registered. There is NO `bare:` key in this config anymore — that is correct.
+// is registered. There is NO `bare:` key in this config anymore. That is correct.
 //
 // ─── Custom XOR codec (kept dependency-free) ─────────────────────────────────
 // This is an EXACT re-implementation of Ultraviolet.codec.xor.encode/decode so the
@@ -21,7 +21,7 @@
 // AFTER the encoded segment (e.g. a GET form submit, or Google/OAuth redirects add
 // ?params to a proxied URL). Only the part BEFORE '?' is XOR-encoded; the query must
 // be passed through untouched. A build that dropped this split and XOR'd the whole
-// string garbled the query on every URL that carried one — exactly the
+// string garbled the query on every URL that carried one, exactly the
 // "SyntaxError / Failed to load accounts.google.com/...?<garbage>" the sign-in flow hit.
 if (!self.__uv$config) {
 const xorEncode = (str) => {

@@ -1,5 +1,5 @@
 <!--
-  PostComposer.svelte — the "what's happening" box at the top of /feed.
+  PostComposer.svelte: the "what's happening" box at the top of /feed.
 
   Mobbin reference (design source): X (Twitter) home timeline + inline composer (iOS)
   https://mobbin.com/screens/996603fa-1a10-4bc1-9431-030fa88848f2
@@ -71,7 +71,7 @@
 					.map((g: any) => ({ id: g.id, title: g.title }));
 			}
 		} catch {
-			/* leave games empty — picker just shows an empty state */
+			/* leave games empty: picker just shows an empty state */
 		} finally {
 			gamesLoaded = true;
 		}
@@ -138,7 +138,7 @@
 			attached = null;
 			onposted?.(data.post as Post);
 		} catch {
-			error = 'Network error — could not post.';
+			error = 'Network error. Could not post.';
 		} finally {
 			posting = false;
 		}
@@ -180,7 +180,7 @@
 		<!-- How-to: anyone can post; spell out the three things a post can carry. -->
 		<p class="mb-3 flex items-start gap-1.5 text-xs leading-relaxed text-base-content/55">
 			<Icon icon="lucide:info" class="mt-0.5 h-3.5 w-3.5 shrink-0" />
-			<span>Anyone can post to the feed — write a message, attach a game, and/or paste any link (https://…). Your post shows up in the scroll feed for everyone.</span>
+			<span>Anyone can post to the feed. Write a message, attach a game, and/or paste any link (https://…). Your post shows up in the scroll feed for everyone.</span>
 		</p>
 		<div class="flex gap-3">
 			<div
@@ -229,7 +229,7 @@
 							type="url"
 							inputmode="url"
 							bind:value={link}
-							placeholder="Add a link (optional) — https://…"
+							placeholder="Add a link (optional): https://…"
 							class="w-full bg-transparent text-sm text-base-content placeholder:text-base-content/40 focus:outline-none"
 						/>
 					</label>
@@ -244,7 +244,7 @@
 							</div>
 						{:else if games.length === 0}
 							<div class="px-4 py-3 text-sm text-base-content/50">
-								No games of yours yet — make one in the AI game maker.
+								No games of yours yet. Make one in the AI game maker.
 							</div>
 						{:else}
 							{#each games as g (g.id)}

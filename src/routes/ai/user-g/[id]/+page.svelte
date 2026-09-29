@@ -103,7 +103,7 @@
 			shareCopied = true;
 			setTimeout(() => (shareCopied = false), 2000);
 		} catch {
-			// clipboard blocked — the link is still shown to copy manually
+			// clipboard blocked: the link is still shown to copy manually
 		}
 	}
 
@@ -298,7 +298,7 @@
 							>
 								<h3 class="mb-2 text-2xl font-black text-base-content">Share this game!</h3>
 								<p class="mb-6 text-sm opacity-60">
-									{#if shareCopied}<span class="font-bold text-success">Link copied to your clipboard ✓</span>{:else}Link copied — or copy it again below.{/if}
+									{#if shareCopied}<span class="font-bold text-success">Link copied to your clipboard ✓</span>{:else}Link copied, or copy it again below.{/if}
 								</p>
 								<div class="mb-6 flex items-center gap-2 rounded-xl bg-neutral/5 p-3">
 									<input

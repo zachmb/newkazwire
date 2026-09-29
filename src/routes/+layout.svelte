@@ -42,7 +42,7 @@
 		}, 60000);
 
 		// AD-OVERLAY ESCAPE HATCH. Google's auto-ads rewarded/vignette prompt
-		// ("Unlock more content — watch a short ad") sometimes renders with no
+		// ("Unlock more content. Watch a short ad") sometimes renders with no
 		// close control and re-fires every ~10 min, trapping the player. Any
 		// full-viewport fixed overlay containing a Google ad iframe gets our own
 		// working ✕ that removes it and restores scrolling. (Root fix lives in the
@@ -78,7 +78,7 @@
 					'font-size:18px;font-weight:700;cursor:pointer;line-height:1;';
 				btn.addEventListener('click', () => {
 					el.remove();
-					// The overlay locks page scroll — undo whatever it pinned.
+					// The overlay locks page scroll. Undo whatever it pinned.
 					document.documentElement.style.overflow = '';
 					document.body.style.overflow = '';
 					document.body.style.position = '';

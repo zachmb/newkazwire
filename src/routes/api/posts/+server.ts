@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
                     safeLink = u.toString().slice(0, 500);
                 }
             } catch {
-                /* not a valid URL — drop it */
+                /* not a valid URL, drop it */
             }
         }
 

@@ -5,7 +5,7 @@ import { getAdminStats } from '$lib/server/oci';
 
 /**
  * Password-gated server stats for the owner. The password lives in env
- * (ADMIN_PASSWORD) — NEVER in git. If it's unset, admin is disabled (fail-closed).
+ * (ADMIN_PASSWORD). NEVER in git. If it's unset, admin is disabled (fail-closed).
  */
 export const POST: RequestHandler = async ({ request }) => {
     const { password } = (await request.json().catch(() => ({}))) as any;

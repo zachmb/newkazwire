@@ -51,7 +51,7 @@
 <!--
 	Leaderboard grounded in the Mimo Weekly Leaderboard
 	(mobbin.com/screens/81103f71-3ffb-4035-b4ef-1cd51050287e): a clean vertical row
-	list — trophy for the top 3, a plain rank number after, a circular avatar, the
+	list: trophy for the top 3, a plain rank number after, a circular avatar, the
 	player name, and a right-aligned bolt/flame + streak count. Kazwire swaps in the
 	orange flame + brand primary tint.
 -->
@@ -79,7 +79,7 @@
 		</p>
 	{:else if leaders.length === 0}
 		<p class="rounded-xl bg-base-200 p-4 text-sm text-base-content/60">
-			No streaks yet — play a game today to start one!
+			No streaks yet. Play a game today to start one!
 		</p>
 	{:else}
 		<ul class="space-y-1.5">

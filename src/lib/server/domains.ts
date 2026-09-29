@@ -1,10 +1,10 @@
 /**
  * Community mirror registry.
  *
- * Kids can add their own domain from /portal — they point its DNS A record at the
+ * Kids can add their own domain from /portal. They point its DNS A record at the
  * Kazwire box (51.81.210.201) and register it here. Every registered domain is then
  * served by the same app (nginx/Caddy is a catch-all), and Caddy's on-demand TLS
- * asks /api/domains/verify before issuing a cert — so ONLY domains that were
+ * asks /api/domains/verify before issuing a cert, so ONLY domains that were
  * registered here (and are actually pointed at us) ever get a certificate. That
  * `ask` gate is what stops the on-demand-TLS endpoint from being abused into
  * unlimited Let's Encrypt requests.
@@ -19,7 +19,7 @@ import { join } from 'node:path';
 
 export const KAZWIRE_SERVER_IP = '51.81.210.201';
 
-/** Domains we own/operate — always served, never treated as user submissions. */
+/** Domains we own/operate: always served, never treated as user submissions. */
 export const BASE_DOMAINS = new Set([
 	'kazwire.com',
 	'wirekaz.com',
@@ -110,7 +110,7 @@ export function normalizeDomain(raw: unknown): { domain?: string; error?: string
 }
 
 /** True for our own domains OR anything already ending in one of them (a subdomain
- * of a Kazwire domain is served automatically — no need to register it). */
+ * of a Kazwire domain is served automatically, no need to register it). */
 export function isOwnedDomain(domain: string): boolean {
 	if (BASE_DOMAINS.has(domain)) return true;
 	for (const base of BASE_DOMAINS) if (domain.endsWith('.' + base)) return true;
@@ -154,7 +154,7 @@ export function listLinks(): string[] {
 	return urls;
 }
 
-// DNS-verify a community domain actually points at Kazwire before we hand it out —
+// DNS-verify a community domain actually points at Kazwire before we hand it out,
 // so a user adding a link can't inject a dead (or malicious) domain into the pool
 // the bot serves to everyone. Owned domains skip the check (always live). Cached.
 const dnsCache = new Map<string, { ok: boolean; ts: number }>();
@@ -222,7 +222,7 @@ export function addDomain(domain: string, ip?: string, now = Date.now()): AddRes
 	}
 	const map = load();
 	if (map.has(domain)) {
-		return { ok: true, status: 'exists', domain, message: 'Already on the list — just point its DNS at us and it goes live.' };
+		return { ok: true, status: 'exists', domain, message: 'Already on the list. Just point its DNS at us and it goes live.' };
 	}
 	if (map.size >= MAX_DOMAINS) {
 		return { ok: false, status: 'full', message: 'The mirror list is full right now. Try again later.' };
@@ -258,7 +258,7 @@ export function rateLimit(ip: string, now = Date.now()): { ok: boolean; retryAft
 	return { ok: true };
 }
 
-/** Reset in-memory state — test helper only. */
+/** Reset in-memory state: test helper only. */
 export function __resetRateLimit() {
 	HITS.clear();
 }

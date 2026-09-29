@@ -13,10 +13,10 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     // Moderation gate: reject inappropriate prompts/titles BEFORE spending a
-    // generation. Strict policy — any slur/sexual/CSAM/profanity hit is refused.
+    // generation. Strict policy: any slur/sexual/CSAM/profanity hit is refused.
     if (moderateStrict(prompt, { maxLength: 2000 }).blocked || moderateStrict(title, { maxLength: 80 }).blocked) {
         return new Response(
-            JSON.stringify({ error: "Let's keep it school-appropriate — try a different idea or title." }),
+            JSON.stringify({ error: "Let's keep it school-appropriate. Try a different idea or title." }),
             { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
     }

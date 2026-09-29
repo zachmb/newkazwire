@@ -1,6 +1,6 @@
 <script lang="ts">
-	// Rooms lobby — jklm.fun-style: land, see live joinable rooms, click one.
-	// Mobbin ref: Jackbox / Among Us lobby (big code entry + name) — https://mobbin.com/apps/among-us-ios
+	// Rooms lobby, jklm.fun-style: land, see live joinable rooms, click one.
+	// Mobbin ref: Jackbox / Among Us lobby (big code entry + name). https://mobbin.com/apps/among-us-ios
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import Icon from '@iconify/svelte';
@@ -30,7 +30,7 @@
 			const j = await r.json();
 			activeRooms = Array.isArray(j.rooms) ? j.rooms : [];
 		} catch {
-			/* party server unreachable — keep whatever we last had */
+			/* party server unreachable: keep whatever we last had */
 		}
 		roomsLoaded = true;
 	}
@@ -106,10 +106,10 @@
 				<Icon icon="mdi:account-group" />
 			</div>
 			<h1 class="text-3xl font-black tracking-tight text-base-content">Rooms</h1>
-			<p class="mt-1 text-sm text-base-content/60">Jump into a live room, or create your own and invite friends with the code — the leader picks a game and everyone jumps in. Or battle it out in BombParty.</p>
+			<p class="mt-1 text-sm text-base-content/60">Jump into a live room, or create your own and invite friends with the code. The leader picks a game and everyone jumps in. Or battle it out in BombParty.</p>
 		</div>
 
-		<!-- Active rooms — the jklm.fun-style lead: you land, you see rooms, you click one. -->
+		<!-- Active rooms: the jklm.fun-style lead: you land, you see rooms, you click one. -->
 		<section class="flex flex-col gap-3">
 			<h2 class="flex items-center gap-2 text-sm font-black uppercase tracking-wider text-base-content/60">
 				<Icon icon="mdi:access-point" class="text-primary" /> Active rooms
@@ -141,7 +141,7 @@
 				<div class="flex flex-col items-center gap-3 rounded-box border border-base-content/10 bg-base-200 p-8 text-center">
 					<Icon icon="mdi:account-group" class="text-4xl text-primary/30" />
 					<p class="text-sm text-base-content/60">
-						{#if roomsLoaded}No open rooms right now — start one and it'll show up here for everyone.{:else}Looking for open rooms…{/if}
+						{#if roomsLoaded}No open rooms right now. Start one and it'll show up here for everyone.{:else}Looking for open rooms…{/if}
 					</p>
 					<button class="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110" on:click={create}>
 						<Icon icon="mdi:plus-circle" /> Create a room

@@ -2,7 +2,7 @@
  * Real client IP + coarse geolocation.
  *
  * Kazwire runs behind nginx, so SvelteKit's getClientAddress() returns 127.0.0.1
- * (the proxy hop) — which is why every published game was logged with creatorIp
+ * (the proxy hop), which is why every published game was logged with creatorIp
  * 127.0.0.1/::1. The real visitor IP is the FIRST entry of X-Forwarded-For (nginx
  * sets it). Use getRealIp() everywhere a client IP matters (publish attribution,
  * per-IP rate limiting, telemetry).
@@ -14,7 +14,7 @@ export function getRealIp(
 ): string {
 	const xff = request.headers.get('x-forwarded-for');
 	if (xff) {
-		// "client, proxy1, proxy2" — the client is the first, left-most entry.
+		// "client, proxy1, proxy2": the client is the first, left-most entry.
 		const first = xff.split(',')[0]?.trim();
 		if (first) return first;
 	}
@@ -42,7 +42,7 @@ function isPrivateIp(ip: string): boolean {
 }
 
 /**
- * Public creator/player location is intentionally DISABLED — Kazwire no longer shows
+ * Public creator/player location is intentionally DISABLED. Kazwire no longer shows
  * where anyone is. Always returns "" so nothing is captured or displayed. (Kept as a
  * function so every caller keeps working; the getReal­Ip path above still runs for
  * rate-limiting/attribution by IP, which is server-only and never shown.)

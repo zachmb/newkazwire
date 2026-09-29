@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 	const rl = rateLimit(ip);
 	if (!rl.ok) {
 		return json(
-			{ error: 'You’ve added a lot of domains — take a break and try again later.' },
+			{ error: 'You’ve added a lot of domains. Take a break and try again later.' },
 			{ status: 429, headers: rl.retryAfterSec ? { 'Retry-After': String(rl.retryAfterSec) } : {} }
 		);
 	}

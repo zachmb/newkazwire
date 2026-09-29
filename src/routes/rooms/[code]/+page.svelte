@@ -1,5 +1,5 @@
 <script lang="ts">
-	// A room — realtime via the Kazwire party WebSocket server.
+	// A room: realtime via the Kazwire party WebSocket server.
 	// Mobbin ref: Discord voice/stage channel (member list + chat + shared stage) and
 	// jklm.fun BombParty (center prompt + bomb timer + player ring).
 	import { onMount, onDestroy, tick } from 'svelte';
@@ -32,7 +32,7 @@
 	let wordError = '';
 
 	// Stable per-player identity color (live-presence style, à la Framer/Miro):
-	// each player keeps the same hue everywhere — sidebar chip AND bomb ring — so
+	// each player keeps the same hue everywhere (sidebar chip AND bomb ring) so
 	// you can track who's who at a glance. Deterministic hash of the id.
 	const PLAYER_HUES = [8, 200, 145, 275, 44, 320, 175, 255, 95, 20];
 	function phue(id: string): number {
@@ -85,7 +85,7 @@
 			// Auto-reconnect after a short delay unless we navigated away.
 			if (!destroyed) setTimeout(connect, 1500);
 		};
-		ws.onerror = () => { errorMsg = 'Connection problem — retrying…'; };
+		ws.onerror = () => { errorMsg = 'Connection problem, retrying…'; };
 		ws.onmessage = (e) => handle(JSON.parse(e.data));
 	}
 
@@ -337,7 +337,7 @@
 					<!-- Lobby idle -->
 					<div class="flex flex-1 flex-col items-center justify-center gap-4 p-10 text-center">
 						<Icon icon="mdi:bomb" class="text-6xl text-primary/30" />
-						<p class="text-xl font-black text-base-content">Everyone's here — let's play</p>
+						<p class="text-xl font-black text-base-content">Everyone's here. Let's play</p>
 						<!-- Who's in the room, at a glance (colored avatar stack). -->
 						<div class="flex flex-wrap items-center justify-center gap-2">
 							{#each room.players as p (p.id)}
@@ -348,7 +348,7 @@
 							{/each}
 						</div>
 						<p class="max-w-sm text-sm text-base-content/60">
-							{#if me.isLeader}Pick a game to play together, or drop the bomb and start BombParty.{:else}The leader starts the game. Grab a friend — tap Invite up top to share the room.{/if}
+							{#if me.isLeader}Pick a game to play together, or drop the bomb and start BombParty.{:else}The leader starts the game. Grab a friend, tap Invite up top to share the room.{/if}
 						</p>
 					</div>
 				{/if}

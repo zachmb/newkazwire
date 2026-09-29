@@ -2,7 +2,7 @@ import { derived, writable } from 'svelte/store';
 
 /**
  * True while some page renders the left-rail brand tile (GameRail). The Nav hides
- * its own wordmark then — the tile IS the site title on those pages — and the tile
+ * its own wordmark then (the tile IS the site title on those pages) and the tile
  * merges up into the nav. Counter-based so back-to-back page swaps (new rail
  * mounting before the old one's onDestroy fires) can't flicker the flag off.
  */

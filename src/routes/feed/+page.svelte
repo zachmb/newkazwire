@@ -1,7 +1,7 @@
 <!--
-  /feed — Kazwire's single scroll feed: a TikTok-style vertical swiper through
+  /feed: Kazwire's single scroll feed: a TikTok-style vertical swiper through
   games AND community posts, one per screen. (The old Twitter-style timeline was
-  removed; posting still exists — a new post shows up as a slide right here in the
+  removed; posting still exists: a new post shows up as a slide right here in the
   games scroll feed.)
 
   Mobbin reference (design source): TikTok "Watching videos" flow (iOS)
@@ -145,7 +145,7 @@
 	let loadingExtras = $state(true);
 	let container = $state<HTMLDivElement | null>(null);
 
-	// Compose overlay (posting still works — the post lands as a slide in this feed).
+	// Compose overlay (posting still works: the post lands as a slide in this feed).
 	let composing = $state(false);
 
 	function rebuild() {
@@ -155,7 +155,7 @@
 	// The global layout renders a static Nav above <main>, so the feed's usable
 	// height is the viewport minus however far <main> is pushed down (varies by
 	// breakpoint). Measure it at runtime so each slide fills exactly the space
-	// under the nav — no double scrollbar, and the nav stays visible/usable.
+	// under the nav: no double scrollbar, and the nav stays visible/usable.
 	let navOffset = $state(0);
 	function measureNav() {
 		const main = container?.closest('main');
@@ -207,7 +207,7 @@
 				}
 				if (!cancelled && (aiItems.length || postItems.length)) rebuild();
 			} catch (e) {
-				// Degrade gracefully — library-only feed already rendered.
+				// Degrade gracefully: library-only feed already rendered.
 				console.warn('Feed: extras unavailable, showing library only.', e);
 			} finally {
 				if (!cancelled) loadingExtras = false;
@@ -291,7 +291,7 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Swipe through games — games, AI community creations and community posts, one at a time." />
+	<meta name="description" content="Swipe through games: games, AI community creations and community posts, one at a time." />
 </svelte:head>
 
 <svelte:window onkeydown={onKey} />
@@ -299,7 +299,7 @@
 <!--
   The single scroller, pinned below the global Nav (top = measured nav height,
   bottom = viewport). Pinning with `fixed` takes it out of document flow so the
-  layout's Footer can't add height below it — the ONLY scroller is this snap
+  layout's Footer can't add height below it: the ONLY scroller is this snap
   container. snap-y + snap-mandatory makes each slide a hard page stop.
 -->
 <div

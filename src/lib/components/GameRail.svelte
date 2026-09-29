@@ -57,13 +57,13 @@
 
 <!-- -mt-4 cancels the page's top padding so the brand tile sits flush against the
      nav's bottom border and reads as one merged unit with the (now wordmark-less)
-     nav — square top corners, card-round bottom corners. NOTE: no `sticky` here —
+     nav: square top corners, card-round bottom corners. NOTE: no `sticky` here.
      the game pages wrap content in overflow-hidden, so sticky can never pin (the
      wrapper isn't the scroller) and its top offset just shoved the rail down,
      breaking the flush merge. -->
 <!-- The rail fills its (absolutely-positioned) wrapper so the game column runs
      all the way to the bottom of the page WITHOUT contributing to the page
-     height itself — the +1rem cancels the -mt-4 flush merge offset. The list
+     height itself. The +1rem cancels the -mt-4 flush merge offset. The list
      scrolls internally when there are more games than fit. -->
 <div
 	data-kz-rail

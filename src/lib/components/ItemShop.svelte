@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Shared item shop — used by both /shop and the account "Shop" tab so they show the
+	// Shared item shop: used by both /shop and the account "Shop" tab so they show the
 	// SAME server-backed items + the SAME Kazcoin wallet. Players earn coins by playing,
 	// list items, and buy each other's; the seller earns the coins.
 	import { onMount } from 'svelte';

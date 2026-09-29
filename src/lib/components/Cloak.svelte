@@ -1,5 +1,5 @@
 <!--
-  Cloak.svelte — render a word so it's VISUALLY readable but hard for keyword
+  Cloak.svelte: render a word so it's VISUALLY readable but hard for keyword
   scanners (GoGuardian, blocker extensions) to find, and impossible to select/copy.
 
   How it works: the characters are stored REVERSED in the DOM, and CSS bidi-override
