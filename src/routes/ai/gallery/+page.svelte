@@ -34,6 +34,15 @@
 	const coverFor = (g: any) =>
 		g.coverUrl || `/api/ai/cover/${g.id}?t=${encodeURIComponent(g.title || 'AI Game')}`;
 
+	/** "~2m 15s" / "~45s" — compact average-playtime label (quality proxy). */
+	function fmtPlaytime(sec: number): string {
+		if (!sec || sec < 1) return '';
+		if (sec < 60) return `~${sec}s`;
+		const m = Math.floor(sec / 60);
+		const s = sec % 60;
+		return s ? `~${m}m ${s}s` : `~${m}m`;
+	}
+
 	async function fetchGallery() {
 		isLoading = true;
 		error = '';
@@ -178,9 +187,18 @@
 									<div
 										class="mt-4 flex items-center justify-between border-t border-neutral/5 pt-4"
 									>
-										<div class="flex items-center gap-1 text-primary">
-											<Icon icon="mdi:star" />
-											<span class="font-bold">{game.avgRating || 'New'}</span>
+										<div class="flex items-center gap-3">
+											<div class="flex items-center gap-1 text-primary">
+												<Icon icon="mdi:star" />
+												<span class="font-bold">{game.avgRating || 'New'}</span>
+											</div>
+											{#if game.avgPlaySec && game.playSessions}
+												<!-- Avg playtime: how long people actually stick with it (quality proxy). -->
+												<div class="flex items-center gap-1 text-xs font-bold opacity-60" title="{game.playSessions} play{game.playSessions === 1 ? '' : 's'}">
+													<Icon icon="mdi:timer-outline" />
+													<span>{fmtPlaytime(game.avgPlaySec)}</span>
+												</div>
+											{/if}
 										</div>
 										<span class="text-xs opacity-40"
 											>{new Date(game.createdAt).toLocaleDateString()}</span

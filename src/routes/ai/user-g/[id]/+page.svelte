@@ -195,9 +195,72 @@
 		}
 	}
 
+	// --- Playtime tracking (quality proxy) ---
+	// Accumulate ACTIVE (tab-visible) time on the game, then report it once when the
+	// player leaves so the gallery can rank + show average playtime per game.
+	let playStart = 0; // 0 = not counting; else the ms timestamp the current segment began
+	let accumMs = 0;
+	let playtimeSent = false;
+
+	function startCounting() {
+		if (playStart === 0) playStart = Date.now();
+	}
+	function pauseCounting() {
+		if (playStart !== 0) {
+			accumMs += Date.now() - playStart;
+			playStart = 0;
+		}
+	}
+	function flushPlaytime() {
+		pauseCounting();
+		const id = game?.id;
+		if (playtimeSent || !id || accumMs < 2000) return;
+		playtimeSent = true;
+		const body = JSON.stringify({ gameId: id, ms: accumMs });
+		try {
+			// sendBeacon survives the page unload; fetch keepalive is the fallback.
+			if (navigator.sendBeacon) {
+				navigator.sendBeacon('/api/ai/playtime', new Blob([body], { type: 'application/json' }));
+			} else {
+				fetch('/api/ai/playtime', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body,
+					keepalive: true
+				});
+			}
+		} catch {
+			/* telemetry is best-effort */
+		}
+	}
+
+	/** "~2m 15s" / "~45s" — compact average-playtime label. */
+	function fmtPlaytime(sec: number): string {
+		if (!sec || sec < 1) return '';
+		if (sec < 60) return `~${sec}s`;
+		const m = Math.floor(sec / 60);
+		const s = sec % 60;
+		return s ? `~${m}m ${s}s` : `~${m}m`;
+	}
+
 	onMount(() => {
 		window.scrollTo(0, 0);
-		fetchGame();
+		fetchGame().then(() => {
+			if (game?.id) startCounting();
+		});
+
+		// Pause/resume across tab visibility so idle background time isn't counted.
+		const onVis = () => (document.hidden ? pauseCounting() : startCounting());
+		// Report on the terminal events (leaving the page / SPA navigation away).
+		const onHide = () => flushPlaytime();
+		document.addEventListener('visibilitychange', onVis);
+		window.addEventListener('pagehide', onHide);
+
+		return () => {
+			document.removeEventListener('visibilitychange', onVis);
+			window.removeEventListener('pagehide', onHide);
+			flushPlaytime();
+		};
 	});
 </script>
 
@@ -357,6 +420,16 @@
 									<div class="text-xs font-bold uppercase tracking-wider opacity-40">Created on</div>
 									<div class="font-bold">{new Date(game.createdAt).toLocaleDateString()}</div>
 								</div>
+								{#if game.avgPlaySec && game.playSessions}
+									<!-- Average playtime: a proxy for how engaging the game actually is. -->
+									<div class="flex flex-col gap-1">
+										<div class="text-xs font-bold uppercase tracking-wider opacity-40">Avg. playtime</div>
+										<div class="flex items-center gap-1 font-bold text-primary" title="{game.playSessions} play{game.playSessions === 1 ? '' : 's'}">
+											<Icon icon="mdi:timer-outline" />
+											{fmtPlaytime(game.avgPlaySec)}
+										</div>
+									</div>
+								{/if}
 							</div>
 
 							<div class="mt-6 flex flex-wrap gap-3">

@@ -20,6 +20,8 @@
 		creatorLocation?: string;
 		rating: number; // 0..5
 		chip: string; // "AI" or a category
+		avgPlaySec?: number; // average playtime (quality proxy, AI games)
+		playSessions?: number; // how many plays back the average
 		postId?: string; // for kind === 'post', used by like/reply
 		postText?: string; // for kind === 'post'
 		gameTitle?: string; // attached game title on a post
@@ -75,6 +77,13 @@
 	// Post text: preserve author line breaks (auto-escaped; never {@html}).
 	const postLines = $derived((item.postText || item.title || '').split('\n'));
 	const relTime = $derived(formatAgo(item.createdAt));
+	const playtimeLabel = $derived(
+		item.avgPlaySec && item.playSessions
+			? item.avgPlaySec < 60
+				? `~${item.avgPlaySec}s`
+				: `~${Math.floor(item.avgPlaySec / 60)}m`
+			: ''
+	);
 	const initial = $derived((item.creatorName?.trim()?.[0] || '?').toUpperCase());
 	// Long posts get a slightly smaller size so they stay readable and fit.
 	const longPost = $derived((item.postText || item.title || '').length > 180);
@@ -354,6 +363,13 @@
 			<Icon icon="lucide:star" class="h-8 w-8 fill-primary text-primary" />
 			<span class="text-xs font-bold tabular-nums">{item.rating.toFixed(1)}</span>
 		</div>
+		{#if playtimeLabel}
+			<!-- Avg playtime: a proxy for how engaging the game is (how long people stay). -->
+			<div class="flex flex-col items-center gap-1" aria-label="Average playtime {playtimeLabel}">
+				<Icon icon="lucide:timer" class="h-7 w-7 text-white" />
+				<span class="text-xs font-bold tabular-nums">{playtimeLabel}</span>
+			</div>
+		{/if}
 		<a
 			href={item.href}
 			class="flex flex-col items-center gap-1"

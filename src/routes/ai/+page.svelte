@@ -118,6 +118,7 @@
 	}));
 
 	let streamProgress = 0; // rough char count for a live progress feel
+	let fixStatus = ''; // shown while the auto-fix loop repairs a broken first draft
 
 	/** Gate helper: returns true if the player is named; otherwise reveals the gate. */
 	function ensureNamed(): boolean {
@@ -252,10 +253,43 @@
 			// Save to sessionStorage for full-screen playback
 			sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: gameCode }));
 
-			// Every generated game is auto-published to the community gallery (with a
-			// captured cover + creator attribution). Best-effort: a publish hiccup
+			// HEALTH GATE: a game only works if it renders a real (non-blank) frame — the
+			// exact signal the gallery/feed use (a working game produces a screenshot). Probe
+			// the fresh draft; if it's a black screen / blank canvas, ask the server to repair
+			// it and re-probe, up to twice, BEFORE publishing. This is why new games work.
+			let cover = await captureCover(generatedGame.code);
+			let attempt = 0;
+			while (!cover && attempt < 2) {
+				attempt++;
+				fixStatus = attempt === 1 ? 'First draft looked broken — auto-fixing it…' : 'Still polishing…';
+				try {
+					const fixRes = await fetch('/api/ai/fix', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ code: generatedGame.code, title, description })
+					});
+					const fixData = await fixRes.json();
+					if (!fixRes.ok || !fixData?.code) break; // give up gracefully; publish what we have
+					// Adopt the repaired code everywhere the original was used.
+					generatedGame = { ...generatedGame, code: fixData.code };
+					sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: fixData.code }));
+					try {
+						// saveGame dedupes by id, so re-saving with savedId updates the local mirror.
+						localAiGames.saveGame({ id: savedId, title, description, code: fixData.code, prompt });
+					} catch {
+						/* local mirror is best-effort */
+					}
+					cover = await captureCover(fixData.code);
+				} catch {
+					break;
+				}
+			}
+			fixStatus = '';
+
+			// Every generated game is auto-published to the community gallery (with the
+			// cover we just captured + creator attribution). Best-effort: a publish hiccup
 			// still leaves the game playable locally.
-			await publishGame();
+			await publishGame(cover);
 		} catch (err: any) {
 			error = err.message;
 		} finally {
@@ -263,13 +297,14 @@
 		}
 	}
 
-	async function publishGame() {
+	async function publishGame(precapturedCover?: string) {
 		if (!generatedGame || isPublishing || publishSuccess) return;
 
 		isPublishing = true;
 		try {
-			// Snapshot a cover frame client-side (same-origin srcdoc) before publishing.
-			const cover = await captureCover(generatedGame.code);
+			// Use the cover captured by the health gate, or snapshot one now (same-origin
+			// srcdoc) as a fallback for any caller that didn't pass one.
+			const cover = precapturedCover ?? (await captureCover(generatedGame.code));
 			const response = await fetch('/api/ai/user-g', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -540,7 +575,7 @@
 									<div>
 										<h3 class="font-black">AI is coding your game...</h3>
 										<p class="text-sm text-base-content/60">
-											{#if streamProgress > 0}{streamProgress.toLocaleString()} characters written...{:else}Connecting to AI... this takes ~2 minutes{/if}
+											{#if fixStatus}{fixStatus}{:else if streamProgress > 0}{streamProgress.toLocaleString()} characters written...{:else}Connecting to AI... this takes ~2 minutes{/if}
 										</p>
 									</div>
 								</div>
@@ -595,7 +630,7 @@
 												Publishing…
 											</span>
 										{:else if !publishSuccess}
-											<button type="button" class="btn btn-accent font-black" on:click|preventDefault={publishGame}>
+											<button type="button" class="btn btn-accent font-black" on:click|preventDefault={() => publishGame()}>
 												<Icon icon="mdi:cloud-upload" />
 												Retry publish
 											</button>

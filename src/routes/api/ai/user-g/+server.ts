@@ -118,7 +118,11 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
             sizeBytes,
             creatorUid: typeof creatorUid === 'string' ? creatorUid : undefined,
             source: source === 'upload' ? 'upload' : 'ai',
-            regenCount: 0
+            regenCount: 0,
+            // A captured cover means the client's render probe saw a real (non-blank) frame,
+            // so the game works — mark it healthy. No cover => let the sweep render-check it.
+            health: coverUrl ? 'ok' : 'unknown',
+            lastHealthAt: new Date().toISOString()
         };
 
         await addToRegistry(newGame);

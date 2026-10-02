@@ -30,6 +30,32 @@
 		}
 	}
 
+	// --- Game health sweep: render-check every AI game, fix broken ones, backfill covers. ---
+	let sweeping = false;
+	let sweepError = '';
+	let sweepResult: any = null;
+	let recheckOk = false;
+
+	async function runSweep() {
+		if (sweeping) return;
+		sweeping = true;
+		sweepError = '';
+		try {
+			const res = await fetch('/api/admin/health-sweep', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ password, limit: 20, recheckOk })
+			});
+			const j = await res.json();
+			if (!res.ok || !j.success) throw new Error(j.error || 'Sweep failed');
+			sweepResult = j;
+		} catch (e: any) {
+			sweepError = e.message || 'Sweep failed';
+		} finally {
+			sweeping = false;
+		}
+	}
+
 	const STAT_TILES = (s: any, p: any) => [
 		{ label: 'AI games', value: s.aiGames, icon: 'mdi:robot' },
 		{ label: 'Storage (MB)', value: s.totalStorageMB, icon: 'mdi:database' },
@@ -100,6 +126,50 @@
 						{/each}
 					</div>
 				</div>
+			</div>
+
+			<!-- Game health: render-check games, auto-fix broken ones, backfill covers. -->
+			<div class="mt-6 rounded-xl border border-base-content/10 bg-base-100 p-4 shadow-sm">
+				<div class="flex flex-wrap items-center justify-between gap-3">
+					<div>
+						<h2 class="flex items-center gap-2 font-black text-base-content"><Icon icon="mdi:heart-pulse" class="text-primary" /> Game health sweep</h2>
+						<p class="mt-1 text-xs text-base-content/60">Renders each AI game headlessly, auto-fixes broken ones, and backfills covers for games that work but have no screenshot. Processes 20 per run — click again for the next batch.</p>
+					</div>
+					<div class="flex items-center gap-3">
+						<label class="flex items-center gap-1.5 text-xs font-bold text-base-content/70">
+							<input type="checkbox" class="checkbox checkbox-sm" bind:checked={recheckOk} />
+							Re-check healthy games
+						</label>
+						<button class="rounded-xl bg-primary px-4 py-2 font-bold text-white hover:brightness-110 disabled:opacity-50" on:click={runSweep} disabled={sweeping}>
+							{sweeping ? 'Sweeping…' : 'Run sweep'}
+						</button>
+					</div>
+				</div>
+
+				{#if sweepError}<p class="mt-3 text-sm font-bold text-error">{sweepError}</p>{/if}
+
+				{#if sweepResult}
+					<div class="mt-4">
+						{#if !sweepResult.browserAvailable}
+							<p class="mb-2 rounded-lg bg-warning/10 p-2 text-xs font-bold text-warning">No headless browser on the server — ran structural checks only. Install Chromium for full render verification.</p>
+						{/if}
+						<div class="flex flex-wrap gap-2 text-xs font-bold">
+							<span class="rounded-full bg-base-200 px-3 py-1">Processed: {sweepResult.processed}</span>
+							<span class="rounded-full bg-base-200 px-3 py-1">Remaining: {sweepResult.remaining}</span>
+							{#each Object.entries(sweepResult.tally) as [outcome, count]}
+								<span class="rounded-full bg-primary/10 px-3 py-1 text-primary">{outcome}: {count}</span>
+							{/each}
+						</div>
+						<div class="mt-3 max-h-64 overflow-y-auto rounded-lg border border-base-200">
+							{#each sweepResult.results as r}
+								<div class="flex items-center justify-between gap-2 border-b border-base-200 px-3 py-1.5 text-xs last:border-0">
+									<a href={`/ai/user-g/${r.id}`} class="truncate font-semibold text-base-content hover:text-primary">{r.title}</a>
+									<span class="flex-none opacity-60">{r.outcome}{#if r.reason} · {r.reason}{/if}</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>

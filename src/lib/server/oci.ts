@@ -34,7 +34,12 @@ export interface UserGame {
     sizeBytes: number;    // Size of the game HTML file in bytes
     creatorUid?: string;  // public social identity (kazwire_uid) — links a game to a profile
     source?: 'ai' | 'upload'; // how the game entered the gallery (default 'ai')
-    regenCount?: number;  // times "report broken" has regenerated this game (cap 2)
+    regenCount?: number;  // times the game has been regenerated (report-broken + auto health-fix share this cap of 2)
+    health?: 'ok' | 'broken' | 'unknown'; // last automated health verdict (renders + non-blank + no fatal error)
+    lastHealthAt?: string; // ISO timestamp of the last health check
+    // Playtime quality signal — populated at read time from playtimes.json, never stored on the registry entry.
+    avgPlaySec?: number;  // average seconds played per session (quality proxy)
+    playSessions?: number; // how many play sessions have been recorded
 }
 
 /** A public view of a game with the private creatorIp stripped — what any client
@@ -477,6 +482,62 @@ export async function updateGameInRegistry(
     registry[idx] = { ...registry[idx], ...patch };
     await uploadToOCI(OCI_REGISTRY_PATH, JSON.stringify(registry), 'application/json');
     return registry[idx];
+    });
+}
+
+/* ------------------------------------------------------------------ *
+ * PLAYTIME — a quality proxy for AI games. We accumulate total played time
+ * + a session count per game in one compact aggregate file, and surface the
+ * AVERAGE seconds/session on the gallery/feed (a genuinely engaging game keeps
+ * players longer than a broken or boring one). Kept OUT of the registry so a
+ * play ping doesn't rewrite the whole 224-entry games array.
+ *
+ *   user-games/playtimes.json  — { [gameId]: { totalMs, sessions } }
+ * ------------------------------------------------------------------ */
+
+const OCI_PLAYTIMES_PATH = 'user-games/playtimes.json';
+/** Ignore absurd pings: a single session over 2h is almost certainly a left-open tab. */
+const MAX_PLAY_SESSION_MS = 2 * 60 * 60 * 1000;
+/** Pings under 2s aren't a real "play" — don't let bounce traffic dilute the average. */
+const MIN_PLAY_SESSION_MS = 2_000;
+
+export interface PlaytimeRec {
+    totalMs: number;
+    sessions: number;
+}
+
+export async function getPlaytimes(): Promise<Record<string, PlaytimeRec>> {
+    return (await readJsonFromOCI<Record<string, PlaytimeRec>>(OCI_PLAYTIMES_PATH)) || {};
+}
+
+/**
+ * Record one play session's duration for a game (clamped to sane bounds). Returns the
+ * updated average seconds/session, or null if the ping was too short to count.
+ */
+export async function recordPlaytime(gameId: string, ms: number): Promise<number | null> {
+    if (!gameId || !Number.isFinite(ms)) return null;
+    const clamped = Math.min(MAX_PLAY_SESSION_MS, Math.floor(ms));
+    if (clamped < MIN_PLAY_SESSION_MS) return null;
+    return withLock('playtimes', async () => {
+        const map = await getPlaytimes();
+        const rec = map[gameId] || { totalMs: 0, sessions: 0 };
+        rec.totalMs += clamped;
+        rec.sessions += 1;
+        map[gameId] = rec;
+        await uploadToOCI(OCI_PLAYTIMES_PATH, JSON.stringify(map), 'application/json');
+        return Math.round(rec.totalMs / rec.sessions / 1000);
+    });
+}
+
+/** Attach avgPlaySec + playSessions (from the playtimes aggregate) to public games. */
+export function withPlaytime(
+    games: PublicUserGame[],
+    map: Record<string, PlaytimeRec>
+): PublicUserGame[] {
+    return games.map((g) => {
+        const rec = map[g.id];
+        if (!rec || rec.sessions <= 0) return { ...g, avgPlaySec: 0, playSessions: 0 };
+        return { ...g, avgPlaySec: Math.round(rec.totalMs / rec.sessions / 1000), playSessions: rec.sessions };
     });
 }
 

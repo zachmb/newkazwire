@@ -28,6 +28,8 @@
 		creatorLocation?: string;
 		rating: number;
 		chip: string;
+		avgPlaySec?: number;
+		playSessions?: number;
 		postId?: string;
 		postText?: string;
 		gameTitle?: string;
@@ -44,6 +46,8 @@
 		creatorLocation?: string;
 		coverUrl?: string;
 		avgRating?: number;
+		avgPlaySec?: number;
+		playSessions?: number;
 	};
 
 	type Post = {
@@ -90,7 +94,9 @@
 			creatorName: g.creatorName || 'Anonymous',
 			creatorLocation: g.creatorLocation,
 			rating: typeof g.avgRating === 'number' && g.avgRating > 0 ? g.avgRating : 4.5,
-			chip: 'AI'
+			chip: 'AI',
+			avgPlaySec: g.avgPlaySec,
+			playSessions: g.playSessions
 		};
 	}
 
