@@ -37,6 +37,7 @@ export interface UserGame {
     regenCount?: number;  // times the game has been regenerated (report-broken + auto health-fix share this cap of 2)
     health?: 'ok' | 'broken' | 'unknown'; // last automated health verdict (renders + non-blank + no fatal error)
     lastHealthAt?: string; // ISO timestamp of the last health check
+    healthFixAttempts?: number; // auto health-fix attempts that did NOT yield a working game (bounded)
     // Playtime quality signal — populated at read time from playtimes.json, never stored on the registry entry.
     avgPlaySec?: number;  // average seconds played per session (quality proxy)
     playSessions?: number; // how many play sessions have been recorded

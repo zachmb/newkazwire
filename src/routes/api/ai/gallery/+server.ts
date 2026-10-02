@@ -7,11 +7,13 @@ import { moderateStrict, containsHardTerm } from '$lib/server/moderation';
 // rank it — otherwise one long session would rocket a fluke to the top of "Top".
 const MIN_SESSIONS_FOR_RANK = 3;
 
-/** Defense-in-depth: hide any already-published game whose title/description is
- *  inappropriate (older games predate the publish-time moderation gate). */
+/** Defense-in-depth: hide inappropriate games (older games predate the publish-time
+ *  moderation gate) AND games the health check has confirmed broken + unfixable. A game
+ *  only drops out once it's definitively 'broken'; unchecked games still show. */
 function isDisplayable(g: any): boolean {
     if (moderateStrict(g.title, { maxLength: 80 }).blocked) return false;
     if (containsHardTerm(g.description)) return false;
+    if (g.health === 'broken') return false;
     return true;
 }
 

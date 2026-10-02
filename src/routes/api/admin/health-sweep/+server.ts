@@ -13,13 +13,16 @@ import { staticValidate, renderCheck, closeBrowser } from '$lib/server/gamehealt
 // A game can be regenerated at most twice total (shared with the "report broken" flow)
 // so a persistently-broken game can't burn unbounded DeepSeek calls across sweeps.
 const MAX_REGENS = 2;
+// Auto-fix attempts that produced a STILL-broken game are bounded separately, so the
+// sweep stops spending on a game DeepSeek can't repair (it's hidden instead).
+const MAX_FIX_ATTEMPTS = 2;
 
 type Outcome =
     | 'ok'                // already works, nothing to do
     | 'cover-backfilled'  // works but had no screenshot — captured one (now feed-eligible)
-    | 'fixed'             // was broken, regenerated into a working game
-    | 'fixed-still-broken'// regenerated but the fix still doesn't render
-    | 'broken-capped'     // broken and out of regen attempts
+    | 'fixed'             // was broken, regenerated into a VERIFIED working game
+    | 'fix-failed'        // regenerated but the fix still doesn't render — original kept, attempt counted
+    | 'broken-capped'     // broken and out of fix attempts — hidden from the gallery/feed
     | 'fix-error'         // DeepSeek threw while fixing (no attempt consumed)
     | 'skip';
 
@@ -128,8 +131,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
             // Broken.
             const used = game.regenCount || 0;
+            const attempts = game.healthFixAttempts || 0;
             const issues = render.available ? [render.reason || 'broken', ...render.errors] : stat.issues;
-            if (used >= MAX_REGENS) {
+            // Out of budget (either the shared regen cap or our auto-fix-attempt cap) →
+            // leave it marked broken so the gallery/feed hide it, and stop spending.
+            if (used >= MAX_REGENS || attempts >= MAX_FIX_ATTEMPTS) {
                 await updateGameInRegistry(game.id, { health: 'broken', lastHealthAt: now });
                 results.push({ id: game.id, title: game.title, outcome: 'broken-capped', reason: render.reason });
                 continue;
@@ -147,17 +153,30 @@ export const POST: RequestHandler = async ({ request }) => {
 
             const fixRender = await renderCheck(fixed);
             const fixWorks = fixRender.available ? fixRender.ok : staticValidate(fixed).ok;
-            const nextCount = used + 1;
 
+            if (!fixWorks) {
+                // Don't replace a game with a fix that's still broken — keep the original,
+                // just count the attempt so we stop trying after MAX_FIX_ATTEMPTS.
+                await updateGameInRegistry(game.id, {
+                    health: 'broken',
+                    lastHealthAt: now,
+                    healthFixAttempts: attempts + 1
+                });
+                results.push({ id: game.id, title: game.title, outcome: 'fix-failed', reason: fixRender.reason });
+                continue;
+            }
+
+            // Verified working fix → commit it (overwrite source, bump the regen cap, cover).
+            const nextCount = used + 1;
             const baseUrl = await uploadToOCI(`user-games/${game.id}.html`, fixed, 'text/html');
             const patch: Partial<UserGame> = {
                 codeUrl: `${baseUrl}?v=${nextCount}`,
                 regenCount: nextCount,
                 sizeBytes: new TextEncoder().encode(fixed).length,
-                health: fixWorks ? 'ok' : 'broken',
+                health: 'ok',
                 lastHealthAt: now
             };
-            if (fixWorks && fixRender.coverPng) {
+            if (fixRender.coverPng) {
                 try {
                     patch.coverUrl = await uploadCover(game.id, fixRender.coverPng);
                 } catch {
@@ -165,12 +184,7 @@ export const POST: RequestHandler = async ({ request }) => {
                 }
             }
             await updateGameInRegistry(game.id, patch);
-            results.push({
-                id: game.id,
-                title: game.title,
-                outcome: fixWorks ? 'fixed' : 'fixed-still-broken',
-                reason: fixWorks ? undefined : fixRender.reason
-            });
+            results.push({ id: game.id, title: game.title, outcome: 'fixed' });
         }
     } finally {
         // Reclaim the headless browser between runs so a long-lived node process
