@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getGameById, updateGameInRegistry, uploadToOCI } from '$lib/server/oci';
+import { getGameById, updateGameInRegistry, uploadToOCI, type UserGame } from '$lib/server/oci';
 import { generateGameCode } from '$lib/server/deepseek';
+import { renderCheck } from '$lib/server/gamehealth';
 
 // A community game can be regenerated at most twice via "report broken".
 const MAX_REGENS = 2;
@@ -59,11 +60,30 @@ export const POST: RequestHandler = async ({ params }) => {
         const baseUrl = await uploadToOCI(codePath, fixed, 'text/html');
         const nextCount = used + 1;
 
-        const updated = await updateGameInRegistry(id, {
+        // Verify the regenerated game actually renders (headless), so a successful fix
+        // immediately gets a real cover + 'ok' health (and becomes feed-eligible). Falls
+        // back to 'unknown' when no browser is available — the game is still committed.
+        const render = await renderCheck(fixed);
+        const patch: Partial<UserGame> = {
             codeUrl: `${baseUrl}?v=${nextCount}`,
             regenCount: nextCount,
-            sizeBytes: new TextEncoder().encode(fixed).length
-        });
+            sizeBytes: new TextEncoder().encode(fixed).length,
+            health: render.available ? (render.ok ? 'ok' : 'broken') : 'unknown',
+            lastHealthAt: new Date().toISOString()
+        };
+        if (render.ok && render.coverPng) {
+            try {
+                patch.coverUrl = await uploadToOCI(
+                    `user-games/${id}.png`,
+                    new Blob([new Uint8Array(render.coverPng)], { type: 'image/png' }),
+                    'image/png'
+                );
+            } catch {
+                /* cover is best-effort */
+            }
+        }
+
+        const updated = await updateGameInRegistry(id, patch);
 
         return json({
             success: true,

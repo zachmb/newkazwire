@@ -134,6 +134,14 @@
 					<div>
 						<h2 class="flex items-center gap-2 font-black text-base-content"><Icon icon="mdi:heart-pulse" class="text-primary" /> Game health sweep</h2>
 						<p class="mt-1 text-xs text-base-content/60">Renders each AI game headlessly, auto-fixes broken ones, and backfills covers for games that work but have no screenshot. Processes 20 per run — click again for the next batch.</p>
+						{#if stats.gameHealth}
+							<div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+								<span class="rounded-full bg-success/10 px-3 py-1 text-success">Healthy: {stats.gameHealth.ok}</span>
+								<span class="rounded-full bg-error/10 px-3 py-1 text-error">Broken (hidden): {stats.gameHealth.broken}</span>
+								<span class="rounded-full bg-base-200 px-3 py-1">Unchecked: {stats.gameHealth.unchecked}</span>
+								<span class="rounded-full bg-base-200 px-3 py-1">No cover: {stats.gameHealth.noCover}</span>
+							</div>
+						{/if}
 					</div>
 					<div class="flex items-center gap-3">
 						<label class="flex items-center gap-1.5 text-xs font-bold text-base-content/70">

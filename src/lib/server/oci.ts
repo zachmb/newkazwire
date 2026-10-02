@@ -1150,6 +1150,7 @@ export interface AdminStats {
     shopSales: number;
     marketAssets: number;
     marketInvested: number;
+    gameHealth: { ok: number; broken: number; unchecked: number; noCover: number };
     topStreaks: PublicLeaderboardEntry[];
     recentGames: Array<{ id: string; title: string; creatorName?: string; creatorLocation?: string; createdAt: string; source?: string }>;
 }
@@ -1169,6 +1170,15 @@ export async function getAdminStats(): Promise<AdminStats> {
     const marketMap = market || {};
     const totalBytes = registry.reduce((s, g) => s + (g.sizeBytes || 0), 0);
 
+    // Game-health breakdown (AI games only; uploads aren't health-checked).
+    const aiGamesList = registry.filter((g) => g.source !== 'upload');
+    const gameHealth = {
+        ok: aiGamesList.filter((g) => g.health === 'ok').length,
+        broken: aiGamesList.filter((g) => g.health === 'broken').length,
+        unchecked: aiGamesList.filter((g) => g.health !== 'ok' && g.health !== 'broken').length,
+        noCover: aiGamesList.filter((g) => !g.coverUrl).length
+    };
+
     return {
         aiGames: registry.length,
         totalStorageMB: Math.round((totalBytes / (1024 * 1024)) * 10) / 10,
@@ -1180,6 +1190,7 @@ export async function getAdminStats(): Promise<AdminStats> {
         shopSales: shopArr.reduce((s, i) => s + (i.soldCount || 0), 0),
         marketAssets: Object.keys(marketMap).length,
         marketInvested: Object.values(marketMap).reduce((s, a) => s + (a.invested || 0), 0),
+        gameHealth,
         topStreaks: leaderboard,
         recentGames: registry
             .slice()
