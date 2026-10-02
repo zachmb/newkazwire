@@ -78,11 +78,18 @@ export const POST: RequestHandler = async ({ request }) => {
     const registry = await getRegistry();
 
     // Candidates: AI games (never regenerate user uploads — they may be non-canvas) that
-    // haven't passed a health check yet. Games with no cover come first (most impactful:
-    // a cover makes them feed-eligible).
+    // still have something to do. We EXCLUDE terminal games so the sweep converges to
+    // remaining:0 instead of re-processing the same stuck games forever:
+    //   - health 'ok' (already working), and
+    //   - health 'broken' with no fix budget left (already hidden; nothing more to try).
+    // Games with no cover come first (most impactful: a cover makes them feed-eligible).
+    const isTerminal = (g: UserGame) =>
+        g.health === 'ok' ||
+        (g.health === 'broken' &&
+            ((g.regenCount || 0) >= MAX_REGENS || (g.healthFixAttempts || 0) >= MAX_FIX_ATTEMPTS));
     const candidates = registry
         .filter((g) => g.source !== 'upload')
-        .filter((g) => (recheckOk ? true : g.health !== 'ok'))
+        .filter((g) => (recheckOk ? true : !isTerminal(g)))
         .sort((a, b) => {
             const ac = a.coverUrl ? 1 : 0;
             const bc = b.coverUrl ? 1 : 0;
@@ -101,9 +108,22 @@ export const POST: RequestHandler = async ({ request }) => {
             try {
                 html = await fetchSource(game.codeUrl);
             } catch {
-                // Can't read the source — mark unknown and move on (don't regenerate blindly).
-                await updateGameInRegistry(game.id, { health: 'unknown', lastHealthAt: now });
-                results.push({ id: game.id, title: game.title, outcome: 'skip', reason: 'source-unreadable' });
+                // Can't read the source (a game whose code 404s is effectively broken, but
+                // don't regenerate blindly). Count the attempt so a permanently-unreadable
+                // game eventually goes terminal (hidden) instead of being retried forever.
+                const attempts = (game.healthFixAttempts || 0) + 1;
+                const terminal = attempts >= MAX_FIX_ATTEMPTS;
+                await updateGameInRegistry(game.id, {
+                    health: terminal ? 'broken' : 'unknown',
+                    lastHealthAt: now,
+                    healthFixAttempts: attempts
+                });
+                results.push({
+                    id: game.id,
+                    title: game.title,
+                    outcome: terminal ? 'broken-capped' : 'skip',
+                    reason: 'source-unreadable'
+                });
                 continue;
             }
 
