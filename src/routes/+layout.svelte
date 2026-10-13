@@ -4,6 +4,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { config } from '$lib/config';
+	import { gaPageview } from '$lib/ga';
 	import '../app.css';
 	import customMessage from '$lib/console';
 	import { onMount } from 'svelte';
@@ -20,6 +21,10 @@
 
 			document.title = tabName || location.hostname;
 			if (tabIcon) (document.getElementById('favicon') as HTMLLinkElement).href = tabIcon;
+
+			// GA4 page_view for this route (gtag config uses send_page_view:false, so this
+			// fires both the initial load and every SPA navigation, on every domain).
+			gaPageview();
 		}
 	});
 

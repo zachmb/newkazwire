@@ -11,7 +11,10 @@ export const config = {
 		discord: 'https://joinkaz.com'
 	},
 	analytics: {
-		gtmID: 'GTM-KVGNDGZ7'
+		// GA4 is loaded directly via gtag.js in src/app.html (see $lib/ga.ts). The old
+		// GTM container (GTM-KVGNDGZ7) is retired — it only carried GA4 and sat behind an
+		// unanswered consent framework, so it never reported on any domain.
+		ga4ID: 'G-5FV89GN2T2'
 	},
 	// Options: "hero", "main", "faq"
 	// Order: top to bottom
