@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 // loader hardcoded in src/app.html. gtag.js reports by Measurement ID, so the SAME
 // id works across every domain Kazwire is served from — the hostname is just a
 // dimension, no per-domain setup needed.
-export const GA4_ID = 'G-5FV89GN2T2';
+export const GA4_ID = 'G-FLBJ64LGWV';
 
 declare global {
 	interface Window {
