@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { generateGameCode } from '$lib/server/deepseek';
+import { generateGameCode, buildFixPrompt } from '$lib/server/deepseek';
 import { staticValidate } from '$lib/server/gamehealth';
 
 /**
@@ -21,18 +21,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
         // Surface the concrete structural problems we can detect so the model targets them.
         const detected = staticValidate(code).issues;
-        const allIssues = [...new Set([...(Array.isArray(issues) ? issues : []), ...detected])];
+        const allIssues = [...(Array.isArray(issues) ? issues : []), ...detected];
 
-        const fixPrompt =
-            `This freshly-generated HTML5 game is BROKEN (black screen, uncaught errors, a ` +
-            `blank canvas, or unplayable).` +
-            (allIssues.length ? ` Detected problems: ${allIssues.join(', ')}.` : '') +
-            ` Analyze the source for bugs (markdown fences, merged tags like "<canvasid=", a ` +
-            `<script> nested inside <canvas>, undefined variables, a broken game loop, missing ` +
-            `resize handling, unwired input) and output a COMPLETELY FIXED, fully playable ` +
-            `version that keeps the concept "${title || 'the game'}". Fix every bug.`;
-
-        const fixed = await generateGameCode(fixPrompt, description || undefined, code);
+        const fixed = await generateGameCode(buildFixPrompt(title, allIssues), description || undefined, code);
         return json({ success: true, code: fixed });
     } catch (error: any) {
         console.error('Pre-publish fix failed:', error);

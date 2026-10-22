@@ -10,9 +10,10 @@ HARD FORMAT RULES (no exceptions, breaking these produces a black screen):
 - SIBLING TAGS: The <script> tag MUST be a sibling of the <canvas> tag, NEVER nested inside it. Browsers treat content inside <canvas> as fallback and will NOT execute the script if it's a child.
 - All CSS must include: * { margin:0; padding:0; box-sizing:border-box; } and html,body { width:100%; height:100%; overflow:hidden; }
 - Use a single <canvas> that fills the viewport, and handle window 'resize' so it always fits.
-- Use requestAnimationFrame with delta-time so speed is frame-rate independent.
+- Use requestAnimationFrame with delta-time so speed is frame-rate independent. The loop MUST keep running every frame for the life of the game — never a single draw-once or a loop that can silently stop.
 - All in-game UI/score/text is drawn on the canvas with ctx.fillText, never HTML <div>/<p> for game UI.
-- All variables declared/initialized before use. No runtime errors, ever.
+- All variables declared/initialized before use. No runtime errors EVER — not at load, not on a key press, not on a click, not on collision/game-over. Wire every input handler before the first frame draws.
+- AUTOMATED PLAY TEST (your game is rendered headless, then Space/Enter/click/arrows/WASD/mouse are fired at it; it must PASS): (1) something on the canvas must VISIBLY ANIMATE on its own or clearly CHANGE in response to that input — a frozen, unresponsive screen is a FAIL; (2) the start screen MUST advance to live gameplay on a key press or click; (3) zero uncaught errors throughout. Build so it passes.
 - NEVER use external libraries, assets, images, or fonts. Vanilla JS + canvas only (procedural art with shapes/gradients). Sound is OK via the Web Audio API (oscillator beeps), no audio files.
 - JavaScript only, NO TypeScript syntax (no type annotations, interfaces, enums, generics).
 
@@ -124,6 +125,29 @@ export function stripMarkdown(code: string): string {
         .replace(/\n?```\s*$/, '')
         .replace(/^```[a-zA-Z]*\s*$/gm, '')
         .trim();
+}
+
+/**
+ * One coherent repair prompt for every pre-publish fix path (the /api/ai/verify gate
+ * and the standalone /api/ai/fix route). It names the exact failure classes the
+ * rigorous renderCheck can now detect — including a FROZEN frame (nothing animates)
+ * and ignored input — and restates the hard liveness requirements so the rebuilt game
+ * passes the same test players effectively run.
+ */
+export function buildFixPrompt(title: string | undefined, issues: string[]): string {
+    const detail = [...new Set(issues.filter(Boolean))];
+    return (
+        `This freshly-generated HTML5 game is BROKEN. It may show a black screen, throw an ` +
+        `uncaught error, render a blank or FROZEN frame (nothing moves), or ignore all input.` +
+        (detail.length ? ` Detected problems: ${detail.join(', ')}.` : '') +
+        ` Analyze the source for bugs (markdown fences, merged tags like "<canvasid=", a ` +
+        `<script> nested inside <canvas>, undefined variables, a broken or never-started game ` +
+        `loop, missing resize handling, unwired keyboard/pointer input) and output a COMPLETELY ` +
+        `FIXED, fully playable version that keeps the concept "${title || 'the game'}". The fixed ` +
+        `game MUST run a continuous requestAnimationFrame loop that visibly animates every frame, ` +
+        `MUST advance from the start screen to gameplay on a key press or click, and MUST visibly ` +
+        `respond to keyboard and pointer input. Fix every bug.`
+    );
 }
 
 /**

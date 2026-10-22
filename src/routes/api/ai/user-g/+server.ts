@@ -19,8 +19,17 @@ function visibleText(html: string): string {
 
 export const POST: RequestHandler = async ({ request, getClientAddress, url }) => {
     try {
-        const { title, description, code: rawCode, sourceGameId, creatorName, cover, creatorUid, source } =
-            await request.json();
+        const {
+            title,
+            description,
+            code: rawCode,
+            sourceGameId,
+            creatorName,
+            cover,
+            creatorUid,
+            source,
+            health: healthHint
+        } = await request.json();
 
         if (!rawCode) {
             return json({ error: 'Code is required' }, { status: 400 });
@@ -119,9 +128,17 @@ export const POST: RequestHandler = async ({ request, getClientAddress, url }) =
             creatorUid: typeof creatorUid === 'string' ? creatorUid : undefined,
             source: source === 'upload' ? 'upload' : 'ai',
             regenCount: 0,
-            // A captured cover means the client's render probe saw a real (non-blank) frame,
-            // so the game works — mark it healthy. No cover => let the sweep render-check it.
-            health: coverUrl ? 'ok' : 'unknown',
+            // Prefer the server-authoritative verdict from the /api/ai/verify gate (it proved
+            // the game is actually live — animates/responds, no errors). When that's absent
+            // (older client, no browser on host, or a direct upload), fall back to the cover
+            // signal: a captured cover means a render probe saw a real frame. The nightly sweep
+            // re-verifies either way.
+            health:
+                healthHint === 'ok' || healthHint === 'broken' || healthHint === 'unknown'
+                    ? healthHint
+                    : coverUrl
+                      ? 'ok'
+                      : 'unknown',
             lastHealthAt: new Date().toISOString()
         };
 

@@ -253,43 +253,67 @@
 			// Save to sessionStorage for full-screen playback
 			sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: gameCode }));
 
-			// HEALTH GATE: a game only works if it renders a real (non-blank) frame — the
-			// exact signal the gallery/feed use (a working game produces a screenshot). Probe
-			// the fresh draft; if it's a black screen / blank canvas, ask the server to repair
-			// it and re-probe, up to twice, BEFORE publishing. This is why new games work.
-			let cover = await captureCover(generatedGame.code);
+			// HEALTH GATE (server-authoritative): render the game in headless Chromium and
+			// verify it's actually LIVE — it animates and/or responds to real injected input
+			// and throws no errors — not just "drew one non-blank frame" (a dead title screen
+			// passes that). If it's broken the server makes a bounded repair and re-verifies;
+			// we adopt the repaired source + its real cover and retry up to twice. The final
+			// health verdict is what we publish, so a game in the gallery is one that worked.
+			let cover = '';
+			let health: 'ok' | 'broken' | 'unknown' = 'unknown';
 			let attempt = 0;
-			while (!cover && attempt < 2) {
+			while (attempt < 2) {
 				attempt++;
-				fixStatus = attempt === 1 ? 'First draft looked broken — auto-fixing it…' : 'Still polishing…';
+				fixStatus =
+					attempt === 1 ? 'Testing your game in a real browser…' : 'First try had a snag — auto-fixing and re-testing…';
 				try {
-					const fixRes = await fetch('/api/ai/fix', {
+					const vRes = await fetch('/api/ai/verify', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ code: generatedGame.code, title, description })
 					});
-					const fixData = await fixRes.json();
-					if (!fixRes.ok || !fixData?.code) break; // give up gracefully; publish what we have
-					// Adopt the repaired code everywhere the original was used.
-					generatedGame = { ...generatedGame, code: fixData.code };
-					sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: fixData.code }));
-					try {
-						// saveGame dedupes by id, so re-saving with savedId updates the local mirror.
-						localAiGames.saveGame({ id: savedId, title, description, code: fixData.code, prompt });
-					} catch {
-						/* local mirror is best-effort */
+					const v = await vRes.json().catch(() => null);
+					if (!vRes.ok || !v) break; // gate errored; publish what we have (health stays 'unknown')
+
+					// Host has no browser → can't verify server-side; fall back to the local probe.
+					if (v.available === false) {
+						cover = await captureCover(generatedGame.code);
+						health = 'unknown';
+						break;
 					}
-					cover = await captureCover(fixData.code);
+
+					// Adopt any repaired source the server produced (so local play + publish match).
+					if (typeof v.code === 'string' && v.code) {
+						generatedGame = { ...generatedGame, code: v.code };
+						sessionStorage.setItem('ephemeral_ai_game', JSON.stringify({ title, code: v.code }));
+						try {
+							// saveGame dedupes by id, so re-saving with savedId updates the local mirror.
+							localAiGames.saveGame({ id: savedId, title, description, code: v.code, prompt });
+						} catch {
+							/* local mirror is best-effort */
+						}
+					}
+					if (typeof v.cover === 'string' && v.cover.startsWith('data:image/')) cover = v.cover;
+
+					if (v.ok) {
+						health = 'ok';
+						break; // verified working — stop
+					}
+					health = 'broken';
+					// not ok: loop again (the verify route already tried one repair; a second
+					// pass re-tests the adopted code and can repair once more) up to the cap.
 				} catch {
 					break;
 				}
 			}
+			// Fall back to a local cover if the server never produced one (e.g. no browser).
+			if (!cover) cover = await captureCover(generatedGame.code);
 			fixStatus = '';
 
-			// Every generated game is auto-published to the community gallery (with the
-			// cover we just captured + creator attribution). Best-effort: a publish hiccup
-			// still leaves the game playable locally.
-			await publishGame(cover);
+			// Every generated game is auto-published to the community gallery with the
+			// verified cover + health verdict. Best-effort: a publish hiccup still leaves
+			// the game playable locally.
+			await publishGame(cover, health);
 		} catch (err: any) {
 			error = err.message;
 		} finally {
@@ -297,7 +321,7 @@
 		}
 	}
 
-	async function publishGame(precapturedCover?: string) {
+	async function publishGame(precapturedCover?: string, health: 'ok' | 'broken' | 'unknown' = 'unknown') {
 		if (!generatedGame || isPublishing || publishSuccess) return;
 
 		isPublishing = true;
@@ -316,7 +340,9 @@
 					creatorName: getPlayerName(),
 					creatorUid: getUid(),
 					source: 'ai',
-					cover
+					cover,
+					// The server-verified health verdict (ok/broken/unknown) from the gate above.
+					health
 				})
 			});
 
