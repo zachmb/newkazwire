@@ -12,7 +12,6 @@
   friendly empty state on 404 or fetch failure.
 -->
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 
@@ -47,13 +46,14 @@
 		gameTitle?: string;
 	};
 
-	const uid = $derived($page.params.uid ?? '');
+	let { data }: { data: { profile: Profile | null; games: Game[]; posts: Post[] } } = $props();
 
-	let loading = $state(true);
-	let notFound = $state(false);
-	let profile = $state<Profile | null>(null);
-	let games = $state<Game[]>([]);
-	let posts = $state<Post[]>([]);
+	// Data is loaded server-side (see +page.ts) so the profile is present at SSR — this
+	// is what gives the page a real <title>. Derived so it also tracks client navigation.
+	const profile = $derived<Profile | null>(data?.profile ?? null);
+	const games = $derived<Game[]>(data?.games ?? []);
+	const posts = $derived<Post[]>(data?.posts ?? []);
+	const notFound = $derived(!profile);
 
 	function initial(name: string | undefined): string {
 		const n = (name || '').trim();
@@ -67,38 +67,6 @@
 		return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 
-	onMount(() => {
-		let cancelled = false;
-		(async () => {
-			try {
-				const res = await fetch(`/api/profile/${encodeURIComponent(uid)}`);
-				if (res.status === 404) {
-					if (!cancelled) notFound = true;
-					return;
-				}
-				if (!res.ok) throw new Error(`profile ${res.status}`);
-				const data = await res.json();
-				if (!data?.success || !data?.profile) {
-					if (!cancelled) notFound = true;
-					return;
-				}
-				if (!cancelled) {
-					profile = data.profile as Profile;
-					games = Array.isArray(data.games) ? (data.games as Game[]) : [];
-					posts = Array.isArray(data.posts) ? (data.posts as Post[]) : [];
-				}
-			} catch (e) {
-				// Treat any failure as "nothing public to show" rather than a hard error.
-				console.warn('Profile: load failed.', e);
-				if (!cancelled) notFound = true;
-			} finally {
-				if (!cancelled) loading = false;
-			}
-		})();
-		return () => {
-			cancelled = true;
-		};
-	});
 
 	// Stat tiles, derived once the profile resolves. Icon-only (no emoji in chrome).
 	const stats = $derived(
@@ -126,23 +94,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-	{#if loading}
-		<!-- Loading skeleton -->
-		<div class="animate-pulse">
-			<div class="flex items-center gap-5">
-				<div class="h-24 w-24 rounded-full bg-base-300"></div>
-				<div class="flex-1 space-y-3">
-					<div class="h-7 w-48 rounded bg-base-300"></div>
-					<div class="h-4 w-32 rounded bg-base-300"></div>
-				</div>
-			</div>
-			<div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-				{#each Array(6) as _}
-					<div class="h-24 rounded-2xl bg-base-300"></div>
-				{/each}
-			</div>
-		</div>
-	{:else if notFound || !profile}
+	{#if notFound || !profile}
 		<!-- Graceful 404 / nothing-public state -->
 		<div class="rounded-box border border-base-content/10 bg-base-200 px-6 py-16 text-center">
 			<Icon icon="mdi:account-off-outline" class="mx-auto text-6xl text-base-content/30" />

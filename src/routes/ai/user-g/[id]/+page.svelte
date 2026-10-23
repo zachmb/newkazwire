@@ -11,9 +11,19 @@
 	import CommunityNotes from '$lib/components/social/CommunityNotes.svelte';
 	import CommentSection from '$lib/components/social/CommentSection.svelte';
 
-	let game: any = null;
-	let isLoading = true;
+	export let data: { game: any };
+
+	// Seed from the SSR load so the <title> + first paint have the real game; the
+	// client fetch below still refreshes it (and drives play-counting).
+	let game: any = data?.game ?? null;
+	let isLoading = !game;
 	let error = '';
+
+	// Keep in sync on client-side navigation to another game (load reruns, data changes).
+	$: if (data?.game && data.game.id !== game?.id) {
+		game = data.game;
+		isLoading = false;
+	}
 	let rating = 0;
 	let isSubmittingReview = false;
 	let isPlaying = false;
@@ -245,9 +255,12 @@
 
 	onMount(() => {
 		window.scrollTo(0, 0);
-		fetchGame().then(() => {
+		// The SSR load usually already provided the game; only fetch if it didn't.
+		const afterLoad = () => {
 			if (game?.id) startCounting();
-		});
+		};
+		if (game) afterLoad();
+		else fetchGame().then(afterLoad);
 
 		// Pause/resume across tab visibility so idle background time isn't counted.
 		const onVis = () => (document.hidden ? pauseCounting() : startCounting());
