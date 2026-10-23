@@ -3,6 +3,7 @@
 	import { blogs } from '$lib/data/blogs';
 	import { onMount } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
+	import { page } from '$app/stores';
 
 	export let data;
 	const { blog } = data;
@@ -25,6 +26,7 @@
 </script>
 
 <svelte:head>
+	<title>{blog.title} · {$page.url.hostname}</title>
 	<meta name="description" content={blog.description} />
 	<meta name="author" content={blog.author} />
 </svelte:head>

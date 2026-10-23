@@ -265,6 +265,7 @@
 </script>
 
 <svelte:head>
+	<title>{game?.title ? `${game.title} · ${$page.url.hostname}` : $page.url.hostname}</title>
 </svelte:head>
 
 <div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">

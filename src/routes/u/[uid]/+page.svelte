@@ -116,6 +116,7 @@
 </script>
 
 <svelte:head>
+	<title>{profile?.name ? `${profile.name} · ${$page.url.hostname}` : $page.url.hostname}</title>
 	<meta
 		name="description"
 		content={profile

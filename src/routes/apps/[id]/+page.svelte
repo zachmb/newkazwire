@@ -235,6 +235,7 @@
 
 <svelte:window bind:innerWidth={innerWidth} />
 <svelte:head>
+	<title>{data.app.title} · {$page.url.hostname}</title>
 	<meta property="og:title" content="{$page.url.hostname} - {data.app.title}" />
 	<meta
 		name="description"

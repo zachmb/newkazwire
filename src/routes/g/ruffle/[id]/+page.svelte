@@ -7,6 +7,7 @@
 </script>
 
 <svelte:head>
+	<title>{data.game.title} · {$page.url.hostname}</title>
 	<meta
 		name="description"
 		content="Play {data.game.title} for free now on {$page.url.hostname}!"

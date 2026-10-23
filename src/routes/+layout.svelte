@@ -10,6 +10,44 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 
+	// Per-route tab title so every link has its OWN metadata title (not a blanket
+	// hostname). Known static routes get a friendly label; entity pages (a specific
+	// game, profile, blog post, app) set their own richer <title> in their route and
+	// override this. Unmapped paths fall back to the first path segment so they're
+	// still unique. The hostname stays as the suffix so titles adapt across mirror
+	// domains. Home keeps the bare hostname.
+	const ROUTE_TITLES: Record<string, string> = {
+		'/feed': 'Feed',
+		'/ai': 'AI Games',
+		'/ai/gallery': 'AI Game Gallery',
+		'/ai/play': 'Play AI Games',
+		'/g': 'Games',
+		'/apps': 'Apps',
+		'/players': 'Players',
+		'/search': 'Search',
+		'/blog': 'Blog',
+		'/about': 'About',
+		'/contact': 'Contact',
+		'/plans': 'Plans',
+		'/study': 'Study',
+		'/settings': 'Settings',
+		'/account': 'Account',
+		'/notifications': 'Notifications',
+		'/legal/privacy-policy': 'Privacy Policy',
+		'/legal/terms-of-service': 'Terms of Service',
+		'/legal/dmca': 'DMCA'
+	};
+	function routeTitle(path: string, host: string): string {
+		const clean = path.length > 1 ? path.replace(/\/$/, '') : path;
+		let label = ROUTE_TITLES[clean];
+		if (!label && clean !== '/') {
+			const seg = clean.split('/').filter(Boolean)[0] || '';
+			label = seg ? seg.charAt(0).toUpperCase() + seg.slice(1) : '';
+		}
+		return label ? `${label} · ${host}` : host;
+	}
+	$: tabTitle = routeTitle($page.url.pathname, $page.url.hostname);
+
 	afterNavigate(() => {
 		if (browser) {
 			// The tab title is ALWAYS just the current domain (never the brand or a
@@ -113,9 +151,10 @@
 </script>
 
 <svelte:head>
-	<!-- Single source of truth for the tab title: the current domain, SSR-rendered
-	     from the request host so even the raw HTML response carries no brand/keyword. -->
-	<title>{$page.url.hostname}</title>
+	<!-- Default tab title: a unique label per route (see routeTitle), SSR-rendered
+	     from the request host so it adapts across mirror domains. Entity pages (a
+	     specific game, profile, blog post, app) override this with their own name. -->
+	<title>{tabTitle}</title>
 	<link
 		href="https://fonts.googleapis.com/css2?family={config.fonts
 			.googleFont}:wght@100;200;300;400;500;600;700;800;900&display=swap"
