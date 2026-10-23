@@ -36,6 +36,7 @@
 		link?: string;
 		likes?: number;
 		replyCount?: number;
+		replies?: Reply[]; // for kind === 'post' — the actual replies to show
 		createdAt?: number | string;
 	};
 
@@ -50,6 +51,15 @@
 		playSessions?: number;
 	};
 
+	type Reply = {
+		id: string;
+		uid: string;
+		author: string;
+		location?: string;
+		text: string;
+		createdAt: number | string;
+		likes: number;
+	};
 	type Post = {
 		id: string;
 		uid: string;
@@ -61,7 +71,7 @@
 		link?: string;
 		createdAt: number | string;
 		likes: number;
-		replies?: unknown[];
+		replies?: Reply[];
 	};
 
 	// Deterministic pseudo-rating for library games (no rating field in data).
@@ -115,6 +125,7 @@
 			link: p.link,
 			likes: p.likes,
 			replyCount: Array.isArray(p.replies) ? p.replies.length : 0,
+			replies: Array.isArray(p.replies) ? p.replies : [],
 			createdAt: p.createdAt
 		};
 	}

@@ -11,6 +11,16 @@
 	import Icon from '@iconify/svelte';
 	import { getUid, getPlayerName, setPlayerName, hasPlayerName } from '$lib/utils/streak';
 
+	type Reply = {
+		id: string;
+		uid: string;
+		author: string;
+		location?: string;
+		text: string;
+		createdAt: number | string;
+		likes: number;
+	};
+
 	type FeedItem = {
 		kind: 'ai' | 'library' | 'post';
 		title: string;
@@ -28,6 +38,7 @@
 		link?: string; // optional user link on a post
 		likes?: number;
 		replyCount?: number; // for kind === 'post'
+		replies?: Reply[]; // for kind === 'post' — existing replies to display
 		createdAt?: number | string; // for kind === 'post'
 	};
 
@@ -119,13 +130,15 @@
 		}
 	}
 
-	// Inline reply on the post slide. Same /api/posts/:id/reply the timeline uses.
+	// Inline replies on the post slide. Same /api/posts/:id/reply the timeline uses;
+	// existing replies arrive on the item (from the feed's /api/posts fetch) so they
+	// render here, not just the composer.
 	let showReply = $state(false);
 	let replyText = $state('');
 	let replying = $state(false);
 	let replyErr = $state('');
-	let replyCount = $state(item.replyCount ?? 0);
-	let replyDone = $state(false);
+	let replies = $state<Reply[]>(item.replies ?? []);
+	let replyCount = $derived(replies.length || item.replyCount || 0);
 
 	function ensureNamed(): boolean {
 		if (hasPlayerName()) return true;
@@ -149,10 +162,9 @@
 			});
 			const data = await res.json().catch(() => null);
 			if (!res.ok || !data?.success) throw new Error(data?.error || 'Failed to reply');
+			// Show the new reply immediately in the thread (keep it open so it's visible).
+			if (data.reply) replies = [...replies, data.reply];
 			replyText = '';
-			replyCount += 1;
-			replyDone = true;
-			showReply = false;
 		} catch (e: any) {
 			replyErr = e?.message || 'Failed to reply';
 		} finally {
@@ -269,9 +281,21 @@
 					</button>
 				</div>
 
-				<!-- Inline reply composer -->
+				<!-- Replies thread + inline composer -->
 				{#if showReply}
 					<div class="mt-3 flex flex-col gap-2">
+						{#if replies.length}
+							<div class="flex max-h-44 flex-col gap-2 overflow-y-auto border-l-2 border-base-300 pl-3">
+								{#each replies as r (r.id)}
+									<div class="text-sm">
+										<a href="/u/{r.uid}" class="font-bold text-base-content hover:underline">{r.author}</a>
+										<span class="whitespace-pre-wrap break-words text-base-content/80"> {r.text}</span>
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<p class="text-xs font-semibold text-base-content/40">No replies yet. Be the first.</p>
+						{/if}
 						<div class="flex gap-2">
 							<input
 								class="input input-sm input-bordered flex-1"
@@ -294,11 +318,6 @@
 							<span class="text-xs font-semibold text-error">{replyErr}</span>
 						{/if}
 					</div>
-				{:else if replyDone}
-					<p class="mt-2 flex items-center gap-1.5 text-xs font-semibold text-base-content/50">
-						<Icon icon="lucide:check" class="h-3.5 w-3.5" />
-						Reply posted
-					</p>
 				{/if}
 			</div>
 		</div>
