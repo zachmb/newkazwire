@@ -276,7 +276,6 @@
 
 <svelte:window bind:innerWidth={innerWidth} on:keydown={onKey} />
 <svelte:head>
-	<title>{data.game.name} · {$page.url.hostname}</title>
 	<meta property="og:title" content="{$page.url.hostname} - {data.game.name}" />
 	<meta
 		name="description"

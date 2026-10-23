@@ -12,7 +12,6 @@
   friendly empty state on 404 or fetch failure.
 -->
 <script lang="ts">
-	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 
 	type Profile = {
@@ -84,7 +83,6 @@
 </script>
 
 <svelte:head>
-	<title>{profile?.name ? `${profile.name} · ${$page.url.hostname}` : $page.url.hostname}</title>
 	<meta
 		name="description"
 		content={profile

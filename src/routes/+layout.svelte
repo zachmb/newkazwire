@@ -37,7 +37,25 @@
 		'/legal/terms-of-service': 'Terms of Service',
 		'/legal/dmca': 'DMCA'
 	};
-	function routeTitle(path: string, host: string): string {
+	// Entity name from the active route's load data (each dynamic +page.ts returns its
+	// game/app/blog/profile). The layout is the SINGLE source of the tab title — pages
+	// don't set their own <title> — so there's always exactly one <title> in <head> and
+	// no SSR title-dedup ambiguity. (`games`/`apps` here are the root layout's plural
+	// arrays; the singular keys below come from the per-route loads.)
+	function entityTitle(data: any): string {
+		if (!data) return '';
+		return (
+			data.game?.title || // AI community game + ruffle game
+			data.game?.name || // library game
+			data.app?.title || // app
+			data.blog?.title || // blog post
+			data.profile?.name || // player profile
+			''
+		);
+	}
+	function routeTitle(path: string, host: string, data: any): string {
+		const entity = entityTitle(data);
+		if (entity) return `${entity} · ${host}`;
 		const clean = path.length > 1 ? path.replace(/\/$/, '') : path;
 		let label = ROUTE_TITLES[clean];
 		if (!label && clean !== '/') {
@@ -46,7 +64,7 @@
 		}
 		return label ? `${label} · ${host}` : host;
 	}
-	$: tabTitle = routeTitle($page.url.pathname, $page.url.hostname);
+	$: tabTitle = routeTitle($page.url.pathname, $page.url.hostname, $page.data);
 
 	afterNavigate(() => {
 		if (browser) {
