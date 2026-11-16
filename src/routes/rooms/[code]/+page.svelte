@@ -202,37 +202,37 @@
 		<!-- MAIN -->
 		<main class="flex min-h-[70vh] flex-col gap-4">
 			<!-- Header -->
-			<div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-content/10 bg-base-100 p-4">
+			<div class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-base-content/10 bg-base-100 p-4">
 				<div class="flex items-center gap-3">
-					<a href="/rooms" class="grid h-9 w-9 place-items-center rounded-full bg-base-200 text-base-content hover:bg-base-300" aria-label="Leave"><Icon icon="mdi:arrow-left" /></a>
-					<div>
-						<div class="text-xs font-bold uppercase tracking-wider text-base-content/50">Room</div>
-						<div class="text-2xl font-black tracking-[0.2em] text-base-content">{code}</div>
+					<a href="/rooms" class="grid h-9 w-9 place-items-center rounded-md bg-base-200 text-base-content hover:bg-base-300" aria-label="Leave"><Icon icon="mdi:arrow-left" /></a>
+					<div class="border-l border-base-content/10 pl-3">
+						<div class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-base-content/40">Room</div>
+						<div class="font-mono text-2xl font-black tracking-[0.25em] text-base-content">{code}</div>
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
-					<button class="flex items-center gap-1.5 rounded-full bg-base-200 px-3 py-2 text-sm font-bold text-base-content hover:bg-base-300" on:click={copyLink}>
-						<Icon icon={copied ? 'mdi:check' : 'mdi:link-variant'} /> {copied ? 'Copied!' : 'Invite'}
+					<button class="flex items-center gap-1.5 rounded-md bg-base-200 px-3 py-2 text-sm font-bold text-base-content hover:bg-base-300" on:click={copyLink}>
+						<Icon icon={copied ? 'mdi:check' : 'mdi:link-variant'} /> {copied ? 'Copied' : 'Invite'}
 					</button>
-					<span class="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-bold {connected ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}">
-						<Icon icon={connected ? 'mdi:access-point' : 'mdi:access-point-off'} /> {connected ? 'Live' : 'Connecting…'}
+					<span class="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-bold {connected ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}">
+						<span class="h-2 w-2 rounded-full {connected ? 'bg-success' : 'bg-warning'} {connected ? 'animate-pulse' : ''}"></span> {connected ? 'Live' : 'Connecting…'}
 					</span>
 				</div>
 			</div>
 
 			{#if errorMsg}
-				<div class="flex items-center gap-2 rounded-xl bg-error/10 px-4 py-3 text-sm font-bold text-error"><Icon icon="mdi:alert-circle" /> {errorMsg}</div>
+				<div class="flex items-center gap-2 rounded-md border-l-4 border-error bg-error/10 px-4 py-3 text-sm font-bold text-error"><Icon icon="mdi:alert-circle" /> {errorMsg}</div>
 			{/if}
 
 			<!-- Leader controls -->
 			{#if me.isLeader && room.mode !== 'bomb'}
-				<div class="flex flex-wrap items-center gap-2 rounded-box border border-base-content/10 bg-base-100 p-3">
-					<span class="px-1 text-xs font-bold uppercase tracking-wider text-base-content/50">You're the leader</span>
-					<button class="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-110" on:click={() => (showPicker = !showPicker)}>
+				<div class="flex flex-wrap items-center gap-2 rounded-md border border-base-content/10 bg-base-100 p-3">
+					<span class="mr-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-base-content/50"><Icon icon="mdi:crown" class="text-warning" /> Leader</span>
+					<button class="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-110" on:click={() => (showPicker = !showPicker)}>
 						<Icon icon="mdi:gamepad-variant" /> Pick a game
 					</button>
 					<button
-						class="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+						class="flex items-center gap-1.5 rounded-md bg-secondary px-4 py-2 text-sm font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
 						disabled={!canStartBomb}
 						title={canStartBomb ? 'Start BombParty' : 'Need at least 2 players'}
 						on:click={() => send({ t: 'startBomb' })}
@@ -243,7 +243,7 @@
 						<span class="px-1 text-xs font-semibold text-base-content/50">Grab one more player to start</span>
 					{/if}
 					{#if room.currentGame}
-						<button class="flex items-center gap-1.5 rounded-full bg-base-200 px-4 py-2 text-sm font-bold text-base-content hover:bg-base-300" on:click={() => send({ t: 'backToLobby' })}>
+						<button class="flex items-center gap-1.5 rounded-md bg-base-200 px-4 py-2 text-sm font-bold text-base-content hover:bg-base-300" on:click={() => send({ t: 'backToLobby' })}>
 							<Icon icon="mdi:home" /> Lobby
 						</button>
 					{/if}
@@ -252,11 +252,11 @@
 
 			<!-- Game picker -->
 			{#if showPicker}
-				<div class="flex flex-col gap-2 rounded-box border border-base-content/10 bg-base-100 p-3">
-					<input class="input input-bordered w-full" placeholder="Search games…" bind:value={pickerQuery} />
+				<div class="flex flex-col gap-2 rounded-md border border-base-content/10 bg-base-100 p-3">
+					<input class="input input-bordered w-full rounded-md" placeholder="Search games…" bind:value={pickerQuery} />
 					<div class="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
 						{#each pickerResults as g (g.id)}
-							<button class="flex items-center gap-2 rounded-xl bg-base-200 p-2 text-left transition hover:ring-2 hover:ring-primary" on:click={() => pushGame(g)}>
+							<button class="flex items-center gap-2 rounded-md border border-base-content/10 bg-base-200 p-2 text-left transition hover:border-primary hover:bg-base-300" on:click={() => pushGame(g)}>
 								<Icon icon={g.ai ? 'mdi:robot-happy' : 'mdi:gamepad-variant'} class="flex-none text-lg text-primary" />
 								<span class="truncate text-sm font-semibold text-base-content">{g.title}</span>
 							</button>
@@ -266,17 +266,29 @@
 			{/if}
 
 			<!-- STAGE -->
-			<div class="flex flex-1 flex-col overflow-hidden rounded-box border border-base-content/10 bg-base-100">
+			<div class="flex flex-1 flex-col overflow-hidden rounded-md border border-base-content/10 bg-base-100">
 				{#if room.mode === 'bomb' && bomb}
-					<!-- BombParty -->
+					<!-- BombParty: round strip -> players -> bomb -> input -->
+					<div class="flex items-center justify-between border-b border-base-content/10 bg-base-200 px-4 py-2">
+						<span class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-base-content/60">
+							<Icon icon="mdi:bomb" class="text-primary" /> BombParty
+						</span>
+						<div class="flex items-center gap-2">
+							<span class="rounded bg-base-content/10 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-base-content/70">Round {bomb.round}</span>
+							{#if (bomb.minLen || 3) > 3}
+								<span class="rounded bg-primary/15 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-primary">{bomb.minLen}+ letters</span>
+							{/if}
+						</div>
+					</div>
+
 					<div class="flex flex-1 flex-col items-center justify-center gap-6 p-6">
-						<div class="flex flex-wrap justify-center gap-3">
+						<div class="flex flex-wrap justify-center gap-2.5">
 							{#each bomb.players as p (p.id)}
 								<div
-									class="flex flex-col items-center gap-1 rounded-box px-4 py-3 ring-2 transition-all duration-200 {p.id === bomb.currentPlayerId ? 'scale-110 shadow-md' : ''} {p.lives <= 0 ? 'opacity-40 grayscale' : ''}"
-									style="background:{p.id === bomb.currentPlayerId ? pbg(p.id) : 'var(--fallback-b2,#f2f2f2)'};box-shadow:{p.id === bomb.currentPlayerId ? `0 0 0 3px ${pring(p.id)}` : 'none'}"
+									class="flex flex-col items-center gap-1 rounded-md px-4 py-3 transition-all duration-200 {p.id === bomb.currentPlayerId ? 'scale-105 shadow-md' : ''} {p.lives <= 0 ? 'opacity-40 grayscale' : ''}"
+									style="background:{p.id === bomb.currentPlayerId ? pbg(p.id) : 'var(--fallback-b2,#f2f2f2)'};box-shadow:{p.id === bomb.currentPlayerId ? `inset 0 0 0 2px ${pring(p.id)}` : 'inset 0 0 0 1px rgba(0,0,0,0.06)'}"
 								>
-									<span class="grid h-8 w-8 place-items-center rounded-full text-sm font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
+									<span class="grid h-8 w-8 place-items-center rounded-md text-sm font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
 									<span class="text-sm font-bold text-base-content">{p.name}</span>
 									<span class="flex gap-0.5 text-error">
 										{#each Array(Math.max(0, p.lives)) as _}<Icon icon="mdi:heart" />{/each}
@@ -306,17 +318,17 @@
 
 						{#if myTurn}
 							<div class="flex w-full max-w-md flex-col items-center gap-2">
-								<span class="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-widest text-white animate-pulse">Your turn</span>
+								<span class="rounded bg-primary px-3 py-1 text-xs font-black uppercase tracking-widest text-white animate-pulse">Your turn</span>
 								<div class="flex w-full gap-2">
 									<input
-										class="input input-bordered flex-1 text-center text-lg font-bold uppercase"
-										placeholder="type a word with {bomb.prompt.toUpperCase()}"
+										class="input input-bordered flex-1 rounded-md text-center text-lg font-bold uppercase"
+										placeholder="word with {bomb.prompt.toUpperCase()}{(bomb.minLen || 3) > 3 ? ` (${bomb.minLen}+)` : ''}"
 										bind:value={wordInput}
 										on:input={onWordType}
 										on:keydown={(e) => e.key === 'Enter' && submitWord()}
 										autofocus
 									/>
-									<button class="rounded-xl bg-primary px-5 font-bold text-white hover:brightness-110" on:click={submitWord}>Go</button>
+									<button class="rounded-md bg-primary px-5 font-bold text-white hover:brightness-110" on:click={submitWord}>Go</button>
 								</div>
 								{#if wordError}<span class="text-center text-sm font-bold text-error">{wordError}</span>{/if}
 							</div>
@@ -329,7 +341,7 @@
 					</div>
 				{:else if room.mode === 'push' && room.currentGame}
 					<!-- Pushed game -->
-					<div class="flex items-center justify-between border-b border-base-300 px-4 py-2">
+					<div class="flex items-center justify-between border-b border-base-content/10 bg-base-200 px-4 py-2">
 						<span class="flex items-center gap-2 font-bold text-base-content"><Icon icon="mdi:gamepad-variant" class="text-primary" /> {room.currentGame.title}</span>
 					</div>
 					<iframe title={room.currentGame.title} src={room.currentGame.url} class="h-[70vh] w-full bg-black" allow="accelerometer; gyroscope; gamepad; autoplay; clipboard-write; fullscreen" />
@@ -341,8 +353,8 @@
 						<!-- Who's in the room, at a glance (colored avatar stack). -->
 						<div class="flex flex-wrap items-center justify-center gap-2">
 							{#each room.players as p (p.id)}
-								<span class="flex items-center gap-1.5 rounded-full py-1 pl-1 pr-3" style="background:{pbg(p.id)}">
-									<span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-black" style="background:{pfg(p.id)};color:#fff">{p.name?.[0]?.toUpperCase() || '?'}</span>
+								<span class="flex items-center gap-1.5 rounded-md py-1 pl-1 pr-3" style="background:{pbg(p.id)}">
+									<span class="grid h-6 w-6 place-items-center rounded text-[11px] font-black" style="background:{pfg(p.id)};color:#fff">{p.name?.[0]?.toUpperCase() || '?'}</span>
 									<span class="text-xs font-bold" style="color:{pfg(p.id)}">{p.name}</span>
 								</span>
 							{/each}
@@ -357,14 +369,14 @@
 
 		<!-- SIDEBAR: players + chat -->
 		<aside class="flex max-h-[86vh] flex-col gap-4">
-			<div class="rounded-box border border-base-content/10 bg-base-100 p-4">
+			<div class="rounded-md border border-base-content/10 bg-base-100 p-4">
 				<h2 class="mb-2 flex items-center gap-2 text-sm font-black uppercase tracking-wider text-base-content/60">
 					<Icon icon="mdi:account-multiple" /> Players ({room.players.length})
 				</h2>
 				<div class="flex flex-col gap-1">
 					{#each room.players as p (p.id)}
-						<div class="flex items-center gap-2 rounded-lg px-2 py-1.5 {p.id === me.id ? 'bg-primary/5' : ''}">
-							<span class="grid h-7 w-7 flex-none place-items-center rounded-full text-xs font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
+						<div class="flex items-center gap-2 rounded-md px-2 py-1.5 {p.id === me.id ? 'bg-primary/5' : ''}">
+							<span class="grid h-7 w-7 flex-none place-items-center rounded-md text-xs font-black" style="background:{pbg(p.id)};color:{pfg(p.id)}">{p.name?.[0]?.toUpperCase() || '?'}</span>
 							<span class="flex-1 truncate text-sm font-semibold text-base-content">{p.name}{#if p.id === me.id}<span class="text-base-content/40"> (you)</span>{/if}</span>
 							{#if p.isLeader}<Icon icon="mdi:crown" class="text-warning" title="Leader" />{/if}
 							{#if p.score > 0}<span class="text-xs font-bold text-base-content/50">{p.score}</span>{/if}
@@ -373,8 +385,8 @@
 				</div>
 			</div>
 
-			<div class="flex min-h-0 flex-1 flex-col rounded-box border border-base-content/10 bg-base-100">
-				<h2 class="flex items-center gap-2 border-b border-base-300 px-4 py-3 text-sm font-black uppercase tracking-wider text-base-content/60">
+			<div class="flex min-h-0 flex-1 flex-col rounded-md border border-base-content/10 bg-base-100">
+				<h2 class="flex items-center gap-2 border-b border-base-content/10 px-4 py-3 text-sm font-black uppercase tracking-wider text-base-content/60">
 					<Icon icon="mdi:chat" /> Chat
 				</h2>
 				<div bind:this={chatBox} class="flex-1 space-y-1.5 overflow-y-auto p-3 text-sm">
@@ -386,9 +398,9 @@
 						{/if}
 					{/each}
 				</div>
-				<div class="flex gap-2 border-t border-base-300 p-2">
-					<input class="input input-sm input-bordered flex-1" placeholder="Say something…" maxlength="300" bind:value={chatText} on:keydown={(e) => e.key === 'Enter' && sendChat()} />
-					<button class="btn btn-sm btn-primary text-white" on:click={sendChat} aria-label="Send"><Icon icon="mdi:send" /></button>
+				<div class="flex gap-2 border-t border-base-content/10 p-2">
+					<input class="input input-sm input-bordered flex-1 rounded-md" placeholder="Say something…" maxlength="300" bind:value={chatText} on:keydown={(e) => e.key === 'Enter' && sendChat()} />
+					<button class="btn btn-sm btn-primary rounded-md text-white" on:click={sendChat} aria-label="Send"><Icon icon="mdi:send" /></button>
 				</div>
 			</div>
 		</aside>
@@ -397,11 +409,11 @@
 	<!-- Winner overlay -->
 	{#if winner}
 		<div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4" on:click={() => (winner = null)} on:keydown role="button" tabindex="0">
-			<div class="flex flex-col items-center gap-3 rounded-box border border-base-content/10 bg-base-100 p-8 text-center shadow-md">
+			<div class="flex flex-col items-center gap-3 rounded-md border border-base-content/10 bg-base-100 p-8 text-center shadow-md">
 				<Icon icon="mdi:trophy" class="text-6xl text-warning" />
 				<h3 class="text-2xl font-black text-base-content">{winner.name} wins!</h3>
 				<p class="text-sm text-base-content/60">BombParty champion 🎉</p>
-				<button class="rounded-full bg-primary px-6 py-2 font-bold text-white" on:click={() => (winner = null)}>Nice</button>
+				<button class="rounded-md bg-primary px-6 py-2 font-bold text-white" on:click={() => (winner = null)}>Nice</button>
 			</div>
 		</div>
 	{/if}

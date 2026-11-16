@@ -273,14 +273,36 @@
 		return () => observer?.disconnect();
 	});
 
-	// Wheel: hijack to page one slide at a time (debounced).
+	// A post slide scrolls its own content (long text + a thread of replies). When
+	// the pointer is inside that inner scroller and it can still move in the swipe
+	// direction, let it scroll NATIVELY instead of paging the feed. This is what
+	// kills the "double scroll" feeling: the slide consumes the gesture until it
+	// bottoms/tops out, THEN the next gesture pages. Walk up to the snap container.
+	function innerScrollerCanConsume(target: EventTarget | null, dir: number): boolean {
+		let el = target as HTMLElement | null;
+		while (el && el !== container) {
+			const oy = getComputedStyle(el).overflowY;
+			if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight - el.clientHeight > 1) {
+				const atTop = el.scrollTop <= 0;
+				const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+				if (dir > 0 ? !atBottom : !atTop) return true;
+			}
+			el = el.parentElement;
+		}
+		return false;
+	}
+
+	// Wheel: hijack to page one slide at a time (debounced) UNLESS an inner post
+	// scroller still has room to move in this direction.
 	let wheelLock = false;
 	function onWheel(e: WheelEvent) {
 		if (Math.abs(e.deltaY) < 20) return;
+		const dir = e.deltaY > 0 ? 1 : -1;
+		if (innerScrollerCanConsume(e.target, dir)) return; // let the post scroll
 		e.preventDefault();
 		if (wheelLock) return;
 		wheelLock = true;
-		go(e.deltaY > 0 ? 1 : -1);
+		go(dir);
 		setTimeout(() => (wheelLock = false), 550);
 	}
 
@@ -298,12 +320,19 @@
 	// Touch swipe (native scroll-snap handles most, but this makes short flicks
 	// reliably advance exactly one slide).
 	let touchStartY = 0;
+	let touchTarget: EventTarget | null = null;
 	function onTouchStart(e: TouchEvent) {
 		touchStartY = e.touches[0].clientY;
+		touchTarget = e.target;
 	}
 	function onTouchEnd(e: TouchEvent) {
 		const dy = touchStartY - e.changedTouches[0].clientY;
-		if (Math.abs(dy) > 60) go(dy > 0 ? 1 : -1);
+		if (Math.abs(dy) <= 60) return;
+		const dir = dy > 0 ? 1 : -1;
+		// Don't force-page when the post under the finger can still scroll itself:
+		// native touch scrolling already handled the gesture.
+		if (innerScrollerCanConsume(touchTarget, dir)) return;
+		go(dir);
 	}
 </script>
 

@@ -100,8 +100,9 @@
 	];
 	// Keep the home page tight: only the strongest few genre rows (they're ordered
 	// by appeal above). The rest stay reachable via the All Games grid, search, and
-	// each row's "View More" -> /g?tag=.
-	const MAX_CATEGORY_ROWS = 10;
+	// each row's "View More" -> /g?tag=. Trimmed to the top 5 so the page doesn't
+	// read as an endless wall of near-identical horizontal rails.
+	const MAX_CATEGORY_ROWS = 5;
 	$: rails = CATEGORIES.map((c) => {
 		const set = new Set(c.tags);
 		const inCat = games.filter((g) => (g.tags || []).some((t) => set.has(t)));

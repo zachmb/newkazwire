@@ -8,6 +8,7 @@
   attribution), a right-hand action rail, and a small chip up top.
 -->
 <script lang="ts">
+	import { tick } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { getUid, getPlayerName, setPlayerName, hasPlayerName } from '$lib/utils/streak';
 
@@ -139,6 +140,13 @@
 	let replyErr = $state('');
 	let replies = $state<Reply[]>(item.replies ?? []);
 	let replyCount = $derived(replies.length || item.replyCount || 0);
+	let replyInput = $state<HTMLInputElement | null>(null);
+
+	// X-style: tapping Reply opens the composer and drops the cursor straight in.
+	function toggleReply() {
+		showReply = !showReply;
+		if (showReply) tick().then(() => replyInput?.focus());
+	}
 
 	function ensureNamed(): boolean {
 		if (hasPlayerName()) return true;
@@ -246,67 +254,55 @@
 					</a>
 				{/if}
 
-				<!-- Actions: like + reply (reply opens the full thread on the post) -->
-				<div class="mt-5 flex items-center gap-2 border-t border-base-300 pt-4">
+				<!-- Actions: like + reply. X-style: tapping Reply focuses the composer;
+				     the thread itself always renders below (no hidden/nested scrollbox). -->
+				<div class="mt-5 flex items-center gap-1 border-t border-base-300 pt-3">
 					<button
 						type="button"
 						onclick={likePost}
 						disabled={liked}
 						aria-pressed={liked}
 						aria-label={liked ? 'Liked' : 'Like this post'}
-						class="group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-primary/10 disabled:cursor-default {liked
+						class="group inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-primary/10 disabled:cursor-default {liked
 							? 'text-primary'
 							: 'text-base-content/60 hover:text-primary'}"
 					>
 						<Icon
 							icon="lucide:heart"
-							class="h-4 w-4 transition-transform group-active:scale-125 {liked ? 'fill-primary text-primary' : ''}"
+							class="h-[1.1rem] w-[1.1rem] transition-transform group-active:scale-125 {liked ? 'fill-primary text-primary' : ''}"
 						/>
 						<span class="tabular-nums">{likes}</span>
-						<span>Like{likes === 1 ? '' : 's'}</span>
 					</button>
 
 					<button
 						type="button"
-						onclick={() => (showReply = !showReply)}
+						onclick={toggleReply}
 						aria-expanded={showReply}
-						class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-primary/10 hover:text-primary {showReply
+						class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-semibold transition-colors hover:bg-primary/10 hover:text-primary {showReply
 							? 'text-primary'
 							: 'text-base-content/60'}"
 						aria-label="Reply to this post"
 					>
-						<Icon icon="lucide:message-circle" class="h-4 w-4" />
-						{#if replyCount > 0}<span class="tabular-nums">{replyCount}</span>{/if}
-						<span>Reply</span>
+						<Icon icon="lucide:message-circle" class="h-[1.1rem] w-[1.1rem]" />
+						<span class="tabular-nums">{replyCount}</span>
 					</button>
 				</div>
 
-				<!-- Replies thread + inline composer -->
+				<!-- Inline composer (toggled by Reply) -->
 				{#if showReply}
-					<div class="mt-3 flex flex-col gap-2">
-						{#if replies.length}
-							<div class="flex max-h-44 flex-col gap-2 overflow-y-auto border-l-2 border-base-300 pl-3">
-								{#each replies as r (r.id)}
-									<div class="text-sm">
-										<a href="/u/{r.uid}" class="font-bold text-base-content hover:underline">{r.author}</a>
-										<span class="whitespace-pre-wrap break-words text-base-content/80"> {r.text}</span>
-									</div>
-								{/each}
-							</div>
-						{:else}
-							<p class="text-xs font-semibold text-base-content/40">No replies yet. Be the first.</p>
-						{/if}
+					<div class="mt-3 flex flex-col gap-1.5">
 						<div class="flex gap-2">
 							<input
-								class="input input-sm input-bordered flex-1"
-								placeholder="Write a reply…"
+								bind:this={replyInput}
+								class="input input-sm input-bordered flex-1 rounded-md"
+								placeholder="Post your reply…"
 								maxlength="500"
 								bind:value={replyText}
 								onkeydown={(e) => e.key === 'Enter' && sendReply()}
 							/>
 							<button
 								type="button"
-								class="btn btn-sm btn-primary text-primary-content"
+								class="btn btn-sm btn-primary rounded-md text-primary-content"
 								onclick={sendReply}
 								disabled={replying || !replyText.trim()}
 							>
@@ -318,6 +314,29 @@
 							<span class="text-xs font-semibold text-error">{replyErr}</span>
 						{/if}
 					</div>
+				{/if}
+
+				<!-- Thread: replies listed inline (X/Twitter style). No nested scroller,
+				     so the post card is the ONE thing that scrolls on this slide. -->
+				{#if replies.length}
+					<div class="mt-3 flex flex-col border-t border-base-300">
+						{#each replies as r (r.id)}
+							<div class="flex gap-2.5 border-b border-base-300/70 py-3 last:border-b-0">
+								<a href="/u/{r.uid}" class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-base-300 text-sm font-black text-base-content/70">
+									{(r.author?.trim()?.[0] || '?').toUpperCase()}
+								</a>
+								<div class="min-w-0 flex-1">
+									<div class="flex items-baseline gap-1.5 text-sm">
+										<a href="/u/{r.uid}" class="truncate font-bold text-base-content hover:underline">{r.author}</a>
+										{#if formatAgo(r.createdAt)}<span class="shrink-0 text-xs text-base-content/40">· {formatAgo(r.createdAt)}</span>{/if}
+									</div>
+									<p class="mt-0.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-base-content/90">{r.text}</p>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else if showReply}
+					<p class="mt-3 border-t border-base-300 pt-3 text-sm text-base-content/40">No replies yet. Start the thread.</p>
 				{/if}
 			</div>
 		</div>

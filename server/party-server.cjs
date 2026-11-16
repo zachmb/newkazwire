@@ -28,12 +28,17 @@ const MAX_CHAT = 300;
 const MAX_WORD = 30;
 const CHAT_HISTORY = 60;
 const START_LIVES = 2;
-const TURN_TIME_START = 20; // seconds
-const TURN_TIME_MIN = 8;
+const TURN_TIME_START = 15; // seconds (tightened from 20 — the clock is the pressure)
+const TURN_TIME_MIN = 5;
 
 /* ----------------------------- dictionary ----------------------------- */
 const WORDS = new Set();
-let SYLLABLES = [];
+// Two prompt pools so difficulty can RAMP within a game: EASY = the most common
+// 2-letter combos (tons of everyday answers); HARD = 3-letter combos including
+// rarer ones that force you to actually think. randomSyllable(round) leans
+// harder as the round climbs — early turns stay friendly, late turns bite.
+let EASY_SYLLABLES = [];
+let HARD_SYLLABLES = [];
 (function loadDictionary() {
 	try {
 		const file = path.join(__dirname, 'wordlist.txt');
@@ -42,12 +47,7 @@ let SYLLABLES = [];
 			const word = w.trim();
 			if (word) WORDS.add(word);
 		}
-		// Prompt syllables: rank 2- and 3-letter substrings by how many words contain
-		// them, then keep only the MOST COMMON ones so prompts are EASY for a human to
-		// answer. (The old pool allowed rare combos that were technically "solvable"
-		// only via obscure dictionary words — brutally hard in practice.) We pick
-		// uniformly from this common pool: varied, but every prompt has tons of
-		// everyday answers. 2-letter prompts (easiest) are favored over 3-letter.
+		// Rank 2- and 3-letter substrings by how many words contain them.
 		const counts = new Map();
 		for (const w of WORDS) {
 			if (w.length < 2 || !/^[a-z]+$/.test(w)) continue; // ignore junk / non-plain words
@@ -61,25 +61,39 @@ let SYLLABLES = [];
 				}
 			}
 		}
-		const topByLen = (len, take) =>
+		const topByLen = (len, minCount, take) =>
 			[...counts.entries()]
-				.filter(([s, n]) => s.length === len && n >= (len === 2 ? 1500 : 400))
+				.filter(([s, n]) => s.length === len && n >= minCount)
 				.sort((a, b) => b[1] - a[1])
 				.slice(0, take)
 				.map(([s]) => s);
-		// ~130 of the most common 2-letter combos + ~70 common 3-letter combos.
-		SYLLABLES = [...topByLen(2, 130), ...topByLen(3, 70)];
-		if (SYLLABLES.length < 20) throw new Error('too few common syllables');
-		console.log(`[party] dictionary: ${WORDS.size} words, ${SYLLABLES.length} common prompt syllables`);
+		// EASY: the ~90 most common 2-letter combos. HARD: ~140 three-letter combos
+		// with a LOWER frequency floor, so the tail includes genuinely tricky prompts.
+		EASY_SYLLABLES = topByLen(2, 1500, 90);
+		HARD_SYLLABLES = topByLen(3, 250, 140);
+		if (EASY_SYLLABLES.length < 10) throw new Error('too few common syllables');
+		if (HARD_SYLLABLES.length < 10) HARD_SYLLABLES = EASY_SYLLABLES.slice(); // degrade safely
+		console.log(`[party] dictionary: ${WORDS.size} words, ${EASY_SYLLABLES.length} easy + ${HARD_SYLLABLES.length} hard prompts`);
 	} catch (err) {
 		console.error('[party] failed to load wordlist.txt:', err.message);
 		// Fallback so the game still runs (degraded) if the wordlist is missing.
-		SYLLABLES = ['ing', 'ary', 'tion', 'er', 'an', 'ent', 'ere', 'con', 'ate', 'ish'];
+		EASY_SYLLABLES = ['er', 'an', 'in', 'on', 'at', 'en', 'or', 'es', 'te', 'ri'];
+		HARD_SYLLABLES = ['ing', 'ary', 'tion', 'ent', 'ere', 'con', 'ate', 'ish', 'str', 'pro'];
 	}
 })();
 
-function randomSyllable() {
-	return SYLLABLES[Math.floor(Math.random() * SYLLABLES.length)] || 'er';
+// Pick a prompt for the given round. Chance of a HARD (3-letter / rarer) prompt
+// climbs from ~10% at round 1 to a 80% ceiling, so the game escalates on its own.
+function randomSyllable(round = 1) {
+	const hardChance = Math.min(0.8, 0.1 + (round - 1) * 0.035);
+	const useHard = HARD_SYLLABLES.length && Math.random() < hardChance;
+	const pool = useHard ? HARD_SYLLABLES : EASY_SYLLABLES;
+	return pool[Math.floor(Math.random() * pool.length)] || EASY_SYLLABLES[0] || 'er';
+}
+
+// Minimum word length also grows with the round: 3 early, up to 6 deep in a game.
+function bombMinLen(round = 1) {
+	return Math.min(6, 3 + Math.floor((round - 1) / 12));
 }
 
 /* ----------------------------- moderation ----------------------------- */
@@ -214,7 +228,7 @@ function startBomb(room) {
 	room.bomb = {
 		order: alive.map((p) => p.id),
 		turnIdx: 0,
-		prompt: randomSyllable(),
+		prompt: randomSyllable(1),
 		used: new Set(),
 		timeLeft: TURN_TIME_START,
 		turnTime: TURN_TIME_START,
@@ -245,6 +259,7 @@ function broadcastBomb(room) {
 			timeLeft: b.timeLeft,
 			turnTime: b.turnTime,
 			round: b.round,
+			minLen: bombMinLen(b.round),
 			lastWord: b.lastWord,
 			message: b.message,
 			players: [...room.players.values()].map((p) => ({ id: p.id, name: p.name, lives: p.lives, connected: p.connected }))
@@ -269,10 +284,10 @@ function advanceTurn(room, { lostLife } = {}) {
 		if (p && p.connected && p.lives > 0) break;
 	}
 	b.turnIdx = idx;
-	b.prompt = randomSyllable();
 	b.round += 1;
-	// Ramp difficulty: shave time as rounds progress.
-	b.turnTime = Math.max(TURN_TIME_MIN, TURN_TIME_START - Math.floor(b.round / 4));
+	b.prompt = randomSyllable(b.round);
+	// Ramp difficulty: shave a second off the clock every 2 rounds, down to the floor.
+	b.turnTime = Math.max(TURN_TIME_MIN, TURN_TIME_START - Math.floor(b.round / 2));
 	b.timeLeft = b.turnTime;
 	if (!lostLife) b.message = '';
 	broadcastState(room);
@@ -330,7 +345,8 @@ function submitWord(room, player, wordRaw) {
 		return send(player.ws, { t: 'wordResult', ok: false, reason: "It's not your turn." });
 	}
 	const word = String(wordRaw || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, MAX_WORD);
-	if (word.length < 3) return send(player.ws, { t: 'wordResult', ok: false, reason: 'Too short.' });
+	const minLen = bombMinLen(b.round);
+	if (word.length < minLen) return send(player.ws, { t: 'wordResult', ok: false, reason: minLen > 3 ? `Need ${minLen}+ letters.` : 'Too short.' });
 	if (!word.includes(b.prompt)) return send(player.ws, { t: 'wordResult', ok: false, reason: `Must contain "${b.prompt.toUpperCase()}".` });
 	if (b.used.has(word)) return send(player.ws, { t: 'wordResult', ok: false, reason: 'Already used.' });
 	if (!WORDS.has(word)) return send(player.ws, { t: 'wordResult', ok: false, reason: 'Not in the dictionary.' });
