@@ -10,13 +10,14 @@
 	let browsing = false;
 	let error = '';
 
-	// Bump on any change to the proxy asset set (uv.*/baremux/epoxy) so returning
+	// Bump on any change to the proxy asset set (uv.*/baremux/transport) so returning
 	// browsers can't run a STALE cached service worker against the new config. The
 	// pre-Wisp UV2 SW read `__uv$config.bare` (removed in the Wisp migration), so a
 	// cached UV2 /uv.js did `new URL(undefined)` → "Could not start the private
 	// browser". Versioned URLs + updateViaCache:'none' + unregistering old workers
 	// force a clean, matched set. (Assets are served without Cache-Control.)
-	const UV_VERSION = '2026-09-08a';
+	// 2026-11-17: swapped the epoxy transport for libcurl.js (see setTransport below).
+	const UV_VERSION = '2026-11-17a';
 	const v = (path: string) => `${path}${path.includes('?') ? '&' : '?'}v=${UV_VERSION}`;
 
 	function toUrl(input: string): string {
@@ -88,14 +89,23 @@
 			await loadUVConfig();
 			const cfg = (window as any).__uv$config;
 
-			// bare-mux + epoxy(Wisp) transport: set the transport first so the SW
+			// bare-mux + libcurl(Wisp) transport: set the transport first so the SW
 			// has a live connection the instant it takes control. The specifier is
 			// held in a variable + @vite-ignore so it stays a RUNTIME URL (served
 			// from static/baremux/), not something the bundler/TS tries to resolve.
+			//
+			// Transport = libcurl.js (static/curl/index.mjs), NOT epoxy. Epoxy's Rust
+			// `hyper` HTTP/2 client resets YouTube's stream with a PROTOCOL_ERROR
+			// (`Reset(StreamId(1), PROTOCOL_ERROR, Library)`) → UV "Internal Server
+			// Error"; it was unfixed across every epoxy 2.x build, and epoxy 3.x needs
+			// a bare-mux newer than any published (2.1.9). libcurl.js uses a different
+			// HTTP engine that loads YouTube fine while keeping Google/Reddit/Wikipedia/
+			// DuckDuckGo working. Same Wisp server (/w/); only the option key differs
+			// (libcurl wants `websocket`, epoxy wanted `wisp`).
 			const baremuxUrl = v('/baremux/index.mjs');
 			const baremux: any = await import(/* @vite-ignore */ baremuxUrl);
 			const conn = new baremux.BareMuxConnection(v('/baremux/worker.js'));
-			await conn.setTransport(v('/epoxy/index.mjs'), [{ wisp: wispUrl() }]);
+			await conn.setTransport(v('/curl/index.mjs'), [{ websocket: wispUrl() }]);
 
 			// Register the UV 3.x service worker under the cloaked scope (/edu/).
 			// updateViaCache:'none' makes the browser fetch the SW script AND its
