@@ -17,6 +17,7 @@ import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { enforceRoom } from './bucket-guard.mjs';
 
 const WRITE_PAR =
 	'https://objectstorage.us-chicago-1.oraclecloud.com/p/WfZnDpcAp7J5E9byE9rDkZISyiMWqh2qtvMQupM2EaVSuzSqZJLtiUBcLnb4IBFA/n/ax6lk2xbmw8z/b/frogbase/o/';
@@ -85,6 +86,10 @@ async function writer() {
 		}
 	}
 }
+// Fail-closed free-tier gate before any PUT (shared guard). These are tiny HTML
+// shims so storage growth is negligible, but we still refuse to write if the
+// bucket is already at/over the ceiling or its live size can't be read.
+enforceRoom(targets.length * 2 * PRE_HTML.length, { addFiles: targets.length * 2, label: 'duckmath-fix-prehtml' });
 await Promise.all(Array.from({ length: 8 }, writer));
 console.log(`\nDONE: ${done}/${targets.length} games got pre.html + pre-gg.html | ${failed.length} failed`);
 if (failed.length) console.log('failed:', failed.slice(0, 10));

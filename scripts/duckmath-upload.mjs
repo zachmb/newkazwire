@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { enforceRoom, DEFAULT_CEILING_GB } from './bucket-guard.mjs';
 
 const OUT = path.join(os.homedir(), 'duckmath-games');
 const args = process.argv.slice(2);
@@ -19,25 +19,10 @@ const FILE_CONCURRENCY = parseInt(argOf('--concurrency', '12'), 10);
 const DRY = args.includes('--dry');
 
 // ---- Oracle FREE-TIER guard (Always Free: 20 GB storage, 50k requests/mo) ----
-// Fail-closed pre-flight: query the LIVE bucket size and refuse to upload if it
-// would push total storage past a safe ceiling below the 20 GB free-tier cap.
-// The ceiling leaves headroom for user-generated AI games to keep growing.
-const NAMESPACE = 'ax6lk2xbmw8z';
-const BUCKET = 'frogbase';
-const FREE_TIER_GB = 20;
-const CEILING_GB = parseFloat(argOf('--ceiling-gb', '17')); // hard stop; 3 GB buffer
-const MONTHLY_REQUEST_BUDGET = 50000;
-
-function liveBucketBytes() {
-	// execFileSync throws if oci is missing/unauthorized -> caller fails closed.
-	const out = execFileSync(
-		'oci',
-		['os', 'bucket', 'get', '--bucket-name', BUCKET, '--namespace', NAMESPACE, '--fields', 'approximateSize', '--fields', 'approximateCount'],
-		{ encoding: 'utf8', timeout: 60000 }
-	);
-	const d = JSON.parse(out).data;
-	return { bytes: d['approximate-size'], count: d['approximate-count'] };
-}
+// The actual fail-closed enforcement lives in bucket-guard.mjs (single source of
+// truth, shared by every writer). We just compute the local payload and hand it
+// to enforceRoom() below, which aborts if the write would breach the ceiling.
+const CEILING_GB = parseFloat(argOf('--ceiling-gb', String(DEFAULT_CEILING_GB))); // hard stop; buffer below 20 GB
 
 function localPayload(slugs) {
 	let bytes = 0;
@@ -120,32 +105,14 @@ const notYetUploaded = candidates.filter((s) => {
 	return !(fs.existsSync(rp) && JSON.parse(fs.readFileSync(rp, 'utf8')).uploaded);
 });
 const payload = localPayload(notYetUploaded);
-let live;
-try {
-	live = liveBucketBytes();
-} catch (e) {
-	console.error(`\n✗ FREE-TIER GUARD: cannot read live bucket size via OCI CLI (${String(e).slice(0, 80)}).`);
-	console.error('  Refusing to upload without verifying we stay under the 20 GB free tier. Fix OCI auth or pass --force-unsafe.');
-	if (!args.includes('--force-unsafe')) process.exit(1);
-	live = { bytes: 0, count: 0 };
-}
-const projectedGB = (live.bytes + payload.bytes) / 1e9;
-const currentGB = live.bytes / 1e9;
-console.log(
-	`\nFREE-TIER CHECK (Oracle Always Free: ${FREE_TIER_GB} GB storage, ${MONTHLY_REQUEST_BUDGET.toLocaleString()} req/mo):\n` +
-		`  bucket now:   ${currentGB.toFixed(2)} GB, ${live.count.toLocaleString()} objects\n` +
-		`  this upload:  +${(payload.bytes / 1e9).toFixed(2)} GB, ${payload.files.toLocaleString()} files (= ${payload.files.toLocaleString()} PUT requests, one-time)\n` +
-		`  projected:    ${projectedGB.toFixed(2)} GB / ${FREE_TIER_GB} GB  (ceiling ${CEILING_GB} GB)\n` +
-		`  request note: one-time PUTs are ${((payload.files / MONTHLY_REQUEST_BUDGET) * 100).toFixed(0)}% of the monthly request budget.`
-);
-if (projectedGB > CEILING_GB) {
-	console.error(
-		`\n✗ FREE-TIER GUARD: projected ${projectedGB.toFixed(2)} GB would exceed the ${CEILING_GB} GB safety ceiling ` +
-			`(20 GB free-tier cap). Aborting. Reduce the batch (--only ...) or raise --ceiling-gb deliberately.`
-	);
-	process.exit(1);
-}
-console.log(`  ✓ within free tier — ${(CEILING_GB - projectedGB).toFixed(2)} GB headroom under the safety ceiling.\n`);
+// Fail-closed free-tier gate (shared logic in bucket-guard.mjs): aborts if the
+// live bucket size can't be read or if this upload would breach the ceiling.
+enforceRoom(payload.bytes, {
+	addFiles: payload.files,
+	ceilingGb: CEILING_GB,
+	label: 'duckmath-upload',
+	allowUnsafe: args.includes('--force-unsafe')
+});
 if (DRY) process.exit(0);
 
 async function putObject(objectPath, buf, type, tries = 3) {

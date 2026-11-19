@@ -19,6 +19,7 @@ import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { enforceRoom } from './bucket-guard.mjs';
 
 const WRITE_PAR =
 	'https://objectstorage.us-chicago-1.oraclecloud.com/p/WfZnDpcAp7J5E9byE9rDkZISyiMWqh2qtvMQupM2EaVSuzSqZJLtiUBcLnb4IBFA/n/ax6lk2xbmw8z/b/frogbase/o/';
@@ -182,6 +183,11 @@ async function worker() {
 		}
 	}
 }
+// Fail-closed free-tier gate before any PUT (shared guard). These are in-place
+// overwrites (neutralized game.js + rewritten index.html) so storage barely
+// moves, but we still refuse to write if the bucket is at/over the ceiling.
+// SCAN_ONLY writes nothing, so it needs no gate.
+if (!SCAN_ONLY) enforceRoom(0, { addFiles: slugs.length, label: 'duckmath-fix-busters' });
 await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
 const withBuster = results.filter((r) => r.hadBuster);
