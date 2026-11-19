@@ -21,6 +21,22 @@ export const DEFAULT_CEILING_GB = parseFloat(process.env.KAZWIRE_BUCKET_CEILING_
 
 const GB = 1e9; // storage/billing is decimal GB, matching Oracle's console
 
+// Cache-Control policy for bucket PUTs. The bucket serves assets DIRECTLY to
+// browsers (no CDN in front) and Oracle sets no cache header by default, so every
+// repeat view/replay re-hits Oracle and burns the 50k-req/month budget. Setting a
+// long cache lets browsers serve repeats from disk (0 Oracle requests) and makes
+// the site faster. BUT index.html / game.js get re-uploaded by the frame-buster
+// fix scripts, so they can't be immutable-forever or a fix would never propagate:
+//   .html        -> 1h   (fixes propagate fast; tiny files)
+//   .js/.mjs     -> 1d   (buster fixes still propagate; ~95% of repeats cached)
+//   everything else (img/audio/wasm/swf/data/rom/font) -> 1y immutable (never changes)
+export function cacheControlFor(objectPath) {
+	const ext = (objectPath.match(/\.[a-z0-9]+$/i)?.[0] || '').toLowerCase();
+	if (ext === '.html') return 'public, max-age=3600';
+	if (ext === '.js' || ext === '.mjs') return 'public, max-age=86400';
+	return 'public, max-age=31536000, immutable';
+}
+
 // Query the LIVE bucket size+count. Throws on any failure so callers fail closed.
 export function liveBucket() {
 	const out = execFileSync(

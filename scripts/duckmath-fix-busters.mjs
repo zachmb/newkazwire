@@ -19,7 +19,7 @@ import { chromium } from 'playwright-core';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { enforceRoom } from './bucket-guard.mjs';
+import { enforceRoom, cacheControlFor } from './bucket-guard.mjs';
 
 const WRITE_PAR =
 	'https://objectstorage.us-chicago-1.oraclecloud.com/p/WfZnDpcAp7J5E9byE9rDkZISyiMWqh2qtvMQupM2EaVSuzSqZJLtiUBcLnb4IBFA/n/ax6lk2xbmw8z/b/frogbase/o/';
@@ -52,7 +52,7 @@ async function bput(objPath, body, type) {
 	PUTS++;
 	const r = await fetch(WRITE_PAR + objPath.split('/').map(encodeURIComponent).join('/'), {
 		method: 'PUT',
-		headers: { 'content-type': type },
+		headers: { 'content-type': type, 'cache-control': cacheControlFor(objPath) },
 		body,
 		signal: AbortSignal.timeout(120000)
 	});

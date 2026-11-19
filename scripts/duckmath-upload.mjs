@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { enforceRoom, DEFAULT_CEILING_GB } from './bucket-guard.mjs';
+import { enforceRoom, DEFAULT_CEILING_GB, cacheControlFor } from './bucket-guard.mjs';
 
 const OUT = path.join(os.homedir(), 'duckmath-games');
 const args = process.argv.slice(2);
@@ -120,7 +120,7 @@ async function putObject(objectPath, buf, type, tries = 3) {
 		try {
 			const r = await fetch(WRITE_PAR + objectPath.split('/').map(encodeURIComponent).join('/'), {
 				method: 'PUT',
-				headers: { 'content-type': type },
+				headers: { 'content-type': type, 'cache-control': cacheControlFor(objectPath) },
 				body: buf,
 				signal: AbortSignal.timeout(300000)
 			});
