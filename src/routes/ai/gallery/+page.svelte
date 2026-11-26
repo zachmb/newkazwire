@@ -75,61 +75,61 @@
 </svelte:head>
 
 <div class="font-sans min-h-screen bg-base-200 p-4 text-base-content">
-	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
-		<!-- Left Rail -->
+	<div class="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 lg:grid-cols-[1fr_7fr]">
+		<!-- Left Rail (same 1/8 width as the rest of the site) -->
 		<aside class="hidden h-full lg:block">
 			<GameRail games={mappedGames} />
 		</aside>
 
 		<!-- Main Content -->
 		<main class="flex flex-col gap-6">
-			<div
-				class="flex flex-col items-center justify-between gap-4 rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm md:flex-row"
-			>
-				<div class="flex items-center gap-4">
-					<div
-						class="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-base-content"
-					>
-						<Icon icon="mdi:view-gallery" class="text-4xl" />
-					</div>
+			<!-- Header: matches the standard page register (title + subtitle + bare accent icon) -->
+			<div class="rounded-box border border-base-content/10 bg-base-100 p-8 shadow-sm">
+				<div class="flex items-start justify-between gap-6">
 					<div>
-						<h1 class="text-3xl font-black tracking-tight">AI Community Gallery</h1>
-						<p class="opacity-70">Play and review games created by the community.</p>
+						<h1 class="text-4xl font-black tracking-tight">Community Gallery</h1>
+						<p class="mt-2 text-lg text-base-content/60">
+							Play and review games built by the community.
+						</p>
 					</div>
+					<Icon icon="mdi:view-gallery" class="hidden h-12 w-12 flex-none text-accent md:block" />
 				</div>
-				<div class="flex flex-wrap items-center justify-center gap-3">
-					<!-- Search the community gallery -->
+
+				<!-- Controls: search left, sort + create right -->
+				<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 					<label
-						class="flex items-center gap-2 rounded-full border border-base-content/10 bg-base-200 px-4 py-2 transition focus-within:border-primary/40"
+						class="flex items-center gap-2 rounded-full border border-base-content/10 bg-base-200 px-4 py-2.5 transition focus-within:border-primary/40 sm:w-72"
 					>
-						<Icon icon="mdi:magnify" class="text-lg text-base-content/50" />
+						<Icon icon="mdi:magnify" class="text-lg text-base-content/40" />
 						<input
 							type="search"
 							bind:value={query}
 							placeholder="Search games…"
 							aria-label="Search community games"
-							class="w-32 bg-transparent text-sm font-semibold placeholder:text-base-content/40 focus:outline-none sm:w-44"
+							class="w-full bg-transparent text-sm font-semibold placeholder:text-base-content/40 focus:outline-none"
 						/>
 					</label>
-					<!-- Sort / recommendation toggle -->
-					<div class="inline-flex rounded-full border border-base-content/10 bg-base-200 p-1">
-						<button
-							on:click={() => setSort('top')}
-							class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition {sort === 'top' ? 'bg-primary text-white shadow-sm' : 'text-base-content/70 hover:text-primary'}"
-						>
-							<Icon icon="mdi:fire" /> Top
-						</button>
-						<button
-							on:click={() => setSort('new')}
-							class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition {sort === 'new' ? 'bg-primary text-white shadow-sm' : 'text-base-content/70 hover:text-primary'}"
-						>
-							<Icon icon="mdi:clock-outline" /> Newest
-						</button>
+					<div class="flex items-center gap-3">
+						<!-- Sort / recommendation toggle -->
+						<div class="inline-flex rounded-full border border-base-content/10 bg-base-200 p-1">
+							<button
+								on:click={() => setSort('top')}
+								class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition {sort === 'top' ? 'bg-primary text-white shadow-sm' : 'text-base-content/70 hover:text-primary'}"
+							>
+								<Icon icon="mdi:fire" /> Top
+							</button>
+							<button
+								on:click={() => setSort('new')}
+								class="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition {sort === 'new' ? 'bg-primary text-white shadow-sm' : 'text-base-content/70 hover:text-primary'}"
+							>
+								<Icon icon="mdi:clock-outline" /> Newest
+							</button>
+						</div>
+						<a href="/ai" class="btn btn-primary rounded-full font-black text-white">
+							<Icon icon="mdi:creation" />
+							Create
+						</a>
 					</div>
-					<a href="/ai" class="btn btn-primary rounded-full font-black text-white">
-						<Icon icon="mdi:creation" />
-						Create
-					</a>
 				</div>
 			</div>
 
